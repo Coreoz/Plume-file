@@ -1,7 +1,7 @@
 Plume File
 ===========
 
-Store uploaded files into database and serve it with light but solid web-service.
+Store uploaded files into database and serve it with a light but solid web-service.
 
 Configuration
 -------------
