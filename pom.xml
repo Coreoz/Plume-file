@@ -143,6 +143,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.coreoz</groupId>
+			<artifactId>plume-scheduler</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.coreoz</groupId>
 			<artifactId>plume-db-hibernate</artifactId>
 		</dependency>
 		<dependency>

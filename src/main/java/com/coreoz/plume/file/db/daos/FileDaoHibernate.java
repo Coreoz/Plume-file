@@ -5,12 +5,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 
 import com.coreoz.plume.db.TransactionManager;
 import com.coreoz.plume.db.crud.CrudDao;
 import com.coreoz.plume.file.db.entities.FileEntity;
 import com.coreoz.plume.file.db.entities.QFileEntity;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.JPAExpressions;
 
 @Singleton
 public class FileDaoHibernate extends CrudDao<FileEntity> implements FileDao{
@@ -21,22 +23,12 @@ public class FileDaoHibernate extends CrudDao<FileEntity> implements FileDao{
 	}
 
 	@Override
-	public FileEntity upload(byte[] fileData, String fileName, EntityManager transaction) {
+	public FileEntity upload(String fileType, byte[] fileData, String fileName) {
 		FileEntity file = new FileEntity()
+				.setFileType(fileType)
 				.setData(fileData)
 				.setFilename(fileName);
-		return transaction == null ?
-			save(file)
-			: save(file, transaction);
-	}
-
-	@Override
-	public void delete(Long id, EntityManager em) {
-		if(em == null) {
-			delete(id);
-		} else {
-			super.delete(id, em);
-		}
+		return save(file);
 	}
 
 	@Override
@@ -64,6 +56,23 @@ public class FileDaoHibernate extends CrudDao<FileEntity> implements FileDao{
 				.from(QFileEntity.fileEntity)
 				.where(QFileEntity.fileEntity.id.eq(fileId))
 				.fetchOne()
+		);
+	}
+
+	@Override
+	public Long deleteUnreferenced(String fileType, EntityPathBase<?> fileEntity, NumberPath<Long> column) {
+		return transactionManager.queryDslExecuteAndReturn(query ->
+			query
+				.delete(QFileEntity.fileEntity)
+				.where(QFileEntity.fileEntity.id.in(
+					JPAExpressions
+						.select(QFileEntity.fileEntity.id)
+						.from(QFileEntity.fileEntity)
+						.rightJoin(fileEntity)
+						.on(QFileEntity.fileEntity.fileType.eq(fileType), QFileEntity.fileEntity.id.eq(column))
+						.where(QFileEntity.fileEntity.id.isNull())
+				))
+				.execute()
 		);
 	}
 

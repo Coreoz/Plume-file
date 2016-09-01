@@ -24,6 +24,7 @@ public class FileEntity {
 	@Id
 	private Long id;
 	private String filename;
+	private String fileType;
 	private byte[] data;
 
 }

@@ -29,4 +29,8 @@ public class FileConfigurationService {
 		return config.getDuration("file.max-age-cache");
 	}
 
+	public String cleaningHour() {
+		return config.getString("cleaning-hour");
+	}
+
 }

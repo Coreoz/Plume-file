@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.persistence.EntityManager;
 
 import com.coreoz.plume.file.db.entities.FileEntity;
 import com.google.common.io.ByteStreams;
@@ -20,50 +19,40 @@ public interface FileService {
 	/**
 	 * Save an uploaded file.
 	 */
-	FileUploaded upload(byte[] fileData, @Nullable String fileName, @Nullable EntityManager transaction);
+	FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String fileName);
 
 	// upload alias
-	default FileUploaded upload(byte[] fileData) {
-		return upload(fileData, null);
+	default FileUploaded upload(FileType fileType, byte[] fileData) {
+		return upload(fileType, fileData, null);
 	}
-	default FileUploaded upload(byte[] fileData, String fileName) {
-		return upload(fileData, null, null);
-	}
-	default FileUploaded upload(FileUploadBase64 file) {
-		return upload(file, null);
-	}
-	default FileUploaded upload(FileUploadBase64 file, EntityManager transaction) {
-		return upload(Base64.getDecoder().decode(file.getBase64()), file.getFilename(), transaction);
+	default Optional<FileUploaded> upload(FileType fileType, @Nullable FileUploadBase64 file) {
+		if(file == null || file.getBase64() == null) {
+			return Optional.empty();
+		}
+
+		return Optional.of(upload(fileType, Base64.getDecoder().decode(file.getBase64()), file.getFilename()));
 	}
 	/**
 	 * Consume the stream to produce a byte array,
 	 * then call {@link #upload(byte[], String, EntityManager))}
 	 */
-	default FileUploaded upload(InputStream fileData) {
-		return upload(fileData, null, null);
-	}
-	/**
-	 * Consume the stream to produce a byte array,
-	 * then call {@link #upload(byte[], String, EntityManager))}
-	 */
-	default FileUploaded upload(InputStream fileData, String fileName) {
-		return upload(fileData, fileName, null);
+	default FileUploaded upload(FileType fileType, InputStream fileData) {
+		return upload(fileType, fileData, null);
 	}
 	/**
 	 * Consume the stream to produce a byte array,
 	 * then call {@link #upload(byte[], String, EntityManager))}
 	 */
 	@SneakyThrows
-	default FileUploaded upload(InputStream fileData, String fileName, EntityManager transaction) {
-		return upload(ByteStreams.toByteArray(fileData), fileName, transaction);
+	default FileUploaded upload(FileType fileType, InputStream fileData, String fileName) {
+		return upload(fileType, ByteStreams.toByteArray(fileData), fileName);
 	}
 
 	// delete
 
-	default void delete(Long fileId) {
-		delete(fileId, null);
-	}
-	void delete(Long fileId, EntityManager transaction);
+	void delete(Long fileId);
+
+	void deleteUnreferenced();
 
 	// file URL
 
@@ -82,7 +71,8 @@ public interface FileService {
 	String urlRaw(Long fileId);
 	/**
 	 * Returns a complete relative URL for all ids passed as parameter.
-	 * It will only make one request to the database to fetch the filenames for all ids.
+	 * The goal of this method is to reduce the work to fetch files real names
+	 * compared the iteration over {@link #urlRaw(Long)}.
 	 * The URL returned are like the ones provided by {@link #url(Long)}.
 	 */
 	List<FileUploaded> urlBatch(List<Long> fileIds);

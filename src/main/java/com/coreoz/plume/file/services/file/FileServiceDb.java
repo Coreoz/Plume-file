@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.coreoz.plume.file.db.daos.FileDao;
 import com.coreoz.plume.file.db.entities.FileEntity;
@@ -15,22 +17,27 @@ import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 @Singleton
 public class FileServiceDb implements FileService {
 
+	private static final Logger logger = LoggerFactory.getLogger(FileServiceDb.class);
+
 	private final FileDao fileDao;
+	private final FileTypesProvider fileTypesProvider;
 	private final String fileWsBasePath;
 
 	@Inject
 	public FileServiceDb(FileDao fileDao,
+			FileTypesProvider fileTypesProvider,
 			FileConfigurationService config) {
 		this.fileDao = fileDao;
+		this.fileTypesProvider = fileTypesProvider;
 		this.fileWsBasePath = config.apiBasePath() + config.fileWsPath();
 	}
 
 	@Override
-	public FileUploaded upload(byte[] fileData, String fileName, EntityManager transaction) {
+	public FileUploaded upload(FileType fileType, byte[] fileData, String fileName) {
 		FileEntity file = fileDao.upload(
+			fileType.name(),
 			fileData,
-			FileNameUtils.sanitize(fileName),
-			transaction
+			FileNameUtils.sanitize(fileName)
 		);
 
 		return FileUploaded.of(
@@ -40,8 +47,27 @@ public class FileServiceDb implements FileService {
 	}
 
 	@Override
-	public void delete(Long fileId, EntityManager transaction) {
-		fileDao.delete(fileId, transaction);
+	public void delete(Long fileId) {
+		fileDao.delete(fileId);
+	}
+
+	@Override
+	public void deleteUnreferenced() {
+		long countDeleted = fileTypesProvider
+			.fileTypesAvailable()
+			.stream()
+			.mapToLong(fileType ->
+				fileDao.deleteUnreferenced(
+					fileType.name(),
+					fileType.getFileEntity(),
+					fileType.getJoinColumn()
+				)
+			)
+			.sum();
+
+		if(countDeleted > 0) {
+			logger.debug("{} unreferenced files deleted", countDeleted);
+		}
 	}
 
 	@Override
