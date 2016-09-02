@@ -5,7 +5,10 @@ Store uploaded files into database and serve it with a light but solid web-servi
 
 Getting started
 ---------------
-An implementation of FileTypesProvider should be provided.
+- Guice : install(new GuiceFileModule());
+- Guice : an implementation of FileTypesProvider should be provided
+- Jersey : register(FileWs.class);
+
 
 Configuration
 -------------

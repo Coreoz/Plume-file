@@ -30,7 +30,7 @@ public class FileConfigurationService {
 	}
 
 	public String cleaningHour() {
-		return config.getString("cleaning-hour");
+		return config.getString("file.cleaning-hour");
 	}
 
 }

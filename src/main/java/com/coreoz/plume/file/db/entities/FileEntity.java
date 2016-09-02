@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.db.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,6 +25,7 @@ public class FileEntity {
 	@Id
 	private Long id;
 	private String filename;
+	@Column(name = "file_type")
 	private String fileType;
 	private byte[] data;
 
