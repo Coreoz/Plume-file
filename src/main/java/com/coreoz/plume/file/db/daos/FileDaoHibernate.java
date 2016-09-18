@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.coreoz.plume.db.TransactionManager;
-import com.coreoz.plume.db.crud.CrudDao;
+import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
+import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
 import com.coreoz.plume.file.db.entities.FileEntity;
 import com.coreoz.plume.file.db.entities.QFileEntity;
 import com.querydsl.core.types.dsl.EntityPathBase;
@@ -15,10 +15,10 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 
 @Singleton
-public class FileDaoHibernate extends CrudDao<FileEntity> implements FileDao{
+public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements FileDao {
 
 	@Inject
-	public FileDaoHibernate(TransactionManager transactionManager) {
+	public FileDaoHibernate(TransactionManagerHibernate transactionManager) {
 		super(QFileEntity.fileEntity, transactionManager);
 	}
 

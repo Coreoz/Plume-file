@@ -10,7 +10,7 @@ public interface FileDao {
 
 	FileEntity upload(String fileType, byte[] fileData, String fileName);
 
-	void delete(Long fileId);
+	long delete(Long fileId);
 
 	List<FileWithName> findFileNames(List<Long> fileIds);
 
