@@ -182,6 +182,28 @@
 			<artifactId>dagger</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		
+		
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-sql</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-sql-codegen</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-db-querydsl</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.h2database</groupId>
+		    <artifactId>h2</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
