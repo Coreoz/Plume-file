@@ -2,22 +2,22 @@ package com.coreoz.plume.file.db.daos;
 
 import java.util.List;
 
-import com.coreoz.plume.file.db.entities.FileEntity;
-import com.querydsl.core.types.dsl.EntityPathBase;
+import com.coreoz.plume.file.db.generated.File;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.sql.RelationalPathBase;
 
 public interface FileDao {
 
-	FileEntity upload(String fileType, byte[] fileData, String fileName);
+	File upload(String fileType, byte[] fileData, String fileName);
 
-	void delete(Long fileId);
+	long delete(Long fileId);
 
 	List<FileWithName> findFileNames(List<Long> fileIds);
 
 	String fileName(Long fileId);
 
-	FileEntity findById(Long fileId);
+	File findById(Long fileId);
 
-	Long deleteUnreferenced(String fileType, EntityPathBase<?> fileEntity, NumberPath<Long> column);
+	Long deleteUnreferenced(String fileType, RelationalPathBase<?> relationalPathBase, NumberPath<Long> column);
 
 }
