@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Entity
 @Table(name = "plm_file")
-public class FileEntity implements FileEntry {
+class FileEntity implements FileEntry {
 
 	@GeneratedValue(generator = HibernateIdGenerator.NAME)
 	@Id

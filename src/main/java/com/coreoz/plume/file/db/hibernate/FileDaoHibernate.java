@@ -61,9 +61,6 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements Fi
 
 	@Override
 	public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
-		// it would be better to left join qfileEntity to fileEntity
-		// and look for row where the left part is null,
-		// but does not allow to join table in a delete query :/
 		return transactionManager.queryDslExecuteAndReturn(query ->
 			query
 				.delete(QFileEntity.fileEntity)
