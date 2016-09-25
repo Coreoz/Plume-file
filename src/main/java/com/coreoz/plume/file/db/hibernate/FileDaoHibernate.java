@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.db.daos;
+package com.coreoz.plume.file.db.hibernate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,9 +8,9 @@ import javax.inject.Singleton;
 
 import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
 import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
-import com.coreoz.plume.file.db.entities.FileEntity;
-import com.coreoz.plume.file.db.entities.QFileEntity;
-import com.querydsl.core.types.dsl.EntityPathBase;
+import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileWithName;
+import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 
@@ -60,7 +60,7 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements Fi
 	}
 
 	@Override
-	public Long deleteUnreferenced(String fileType, EntityPathBase<?> fileEntity, NumberPath<Long> column) {
+	public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
 		// it would be better to left join qfileEntity to fileEntity
 		// and look for row where the left part is null,
 		// but does not allow to join table in a delete query :/

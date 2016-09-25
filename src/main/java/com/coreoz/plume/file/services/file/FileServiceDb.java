@@ -10,8 +10,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.coreoz.plume.file.db.daos.FileDao;
-import com.coreoz.plume.file.db.entities.FileEntity;
+import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 
 @Singleton
@@ -34,7 +34,7 @@ public class FileServiceDb implements FileService {
 
 	@Override
 	public FileUploaded upload(FileType fileType, byte[] fileData, String fileName) {
-		FileEntity file = fileDao.upload(
+		FileEntry file = fileDao.upload(
 			fileType.name(),
 			fileData,
 			FileNameUtils.sanitize(fileName)
@@ -98,7 +98,7 @@ public class FileServiceDb implements FileService {
 	}
 
 	@Override
-	public Optional<FileEntity> fetch(Long fileId) {
+	public Optional<FileEntry> fetch(Long fileId) {
 		return Optional.ofNullable(fileDao.findById(fileId));
 	}
 

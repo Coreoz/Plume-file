@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.db.entities;
+package com.coreoz.plume.file.db.hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.coreoz.plume.db.hibernate.utils.HibernateIdGenerator;
+import com.coreoz.plume.file.db.FileEntry;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Entity
 @Table(name = "plm_file")
-public class FileEntity {
+public class FileEntity implements FileEntry {
 
 	@GeneratedValue(generator = HibernateIdGenerator.NAME)
 	@Id

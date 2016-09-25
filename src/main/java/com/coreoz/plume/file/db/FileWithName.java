@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.db.daos;
+package com.coreoz.plume.file.db;
 
 import lombok.Value;
 

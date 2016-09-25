@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.coreoz.plume.file.db.entities.FileEntity;
+import com.coreoz.plume.file.db.FileEntry;
 import com.google.common.io.ByteStreams;
 
 import lombok.SneakyThrows;
@@ -79,7 +79,7 @@ public interface FileService {
 
 	// file data
 
-	Optional<FileEntity> fetch(Long fileId);
+	Optional<FileEntry> fetch(Long fileId);
 
 
 }

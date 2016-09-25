@@ -1,7 +1,7 @@
 package com.coreoz.plume.file.services.file;
 
-import com.coreoz.plume.file.db.entities.QFileEntity;
-import com.querydsl.core.types.dsl.EntityPathBase;
+import com.coreoz.plume.file.db.FileEntry;
+import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 
 public interface FileType {
@@ -9,12 +9,12 @@ public interface FileType {
 	String name();
 
 	/**
-	 * The entity that contains a column that referenced {@link QFileEntity#id}
+	 * The entity that contains a column that referenced the {@link FileEntry} ID
 	 */
-	EntityPathBase<?> getFileEntity();
+	EntityPath<?> getFileEntity();
 
 	/**
-	 * The column that has a reference to {@link QFileEntity#id}
+	 * The column that has a reference to {@link FileEntry} ID
 	 */
 	NumberPath<Long> getJoinColumn();
 

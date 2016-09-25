@@ -147,11 +147,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.coreoz</groupId>
-			<artifactId>plume-db-hibernate</artifactId>
+			<artifactId>plume-web-jersey</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.coreoz</groupId>
-			<artifactId>plume-web-jersey</artifactId>
+			<artifactId>plume-db-hibernate</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
