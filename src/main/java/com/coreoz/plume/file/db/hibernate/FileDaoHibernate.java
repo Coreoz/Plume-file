@@ -15,16 +15,16 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 
 @Singleton
-public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements FileDao {
+public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> implements FileDao {
 
 	@Inject
 	public FileDaoHibernate(TransactionManagerHibernate transactionManager) {
-		super(QFileEntity.fileEntity, transactionManager);
+		super(QFileEntityHibernate.fileEntity, transactionManager);
 	}
 
 	@Override
-	public FileEntity upload(String fileType, byte[] fileData, String fileName) {
-		FileEntity file = new FileEntity()
+	public FileEntityHibernate upload(String fileType, byte[] fileData, String fileName) {
+		FileEntityHibernate file = new FileEntityHibernate()
 				.setFileType(fileType)
 				.setData(fileData)
 				.setFilename(fileName);
@@ -35,15 +35,15 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements Fi
 	public List<FileWithName> findFileNames(List<Long> fileIds) {
 		return transactionManager.queryDslExecuteAndReturn(query ->
 			query
-				.select(QFileEntity.fileEntity.id, QFileEntity.fileEntity.filename)
-				.from(QFileEntity.fileEntity)
-				.where(QFileEntity.fileEntity.id.in(fileIds))
+				.select(QFileEntityHibernate.fileEntity.id, QFileEntityHibernate.fileEntity.filename)
+				.from(QFileEntityHibernate.fileEntity)
+				.where(QFileEntityHibernate.fileEntity.id.in(fileIds))
 				.fetch()
 		)
 		.stream()
 		.map(row -> FileWithName.of(
-			row.get(QFileEntity.fileEntity.id),
-			row.get(QFileEntity.fileEntity.filename)
+			row.get(QFileEntityHibernate.fileEntity.id),
+			row.get(QFileEntityHibernate.fileEntity.filename)
 		))
 		.collect(Collectors.toList());
 	}
@@ -52,9 +52,9 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements Fi
 	public String fileName(Long fileId) {
 		return transactionManager.queryDslExecuteAndReturn(query ->
 			query
-				.select(QFileEntity.fileEntity.filename)
-				.from(QFileEntity.fileEntity)
-				.where(QFileEntity.fileEntity.id.eq(fileId))
+				.select(QFileEntityHibernate.fileEntity.filename)
+				.from(QFileEntityHibernate.fileEntity)
+				.where(QFileEntityHibernate.fileEntity.id.eq(fileId))
 				.fetchOne()
 		);
 	}
@@ -63,9 +63,9 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntity> implements Fi
 	public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
 		return transactionManager.queryDslExecuteAndReturn(query ->
 			query
-				.delete(QFileEntity.fileEntity)
-				.where(QFileEntity.fileEntity.fileType.eq(fileType))
-				.where(QFileEntity.fileEntity.id.notIn(
+				.delete(QFileEntityHibernate.fileEntity)
+				.where(QFileEntityHibernate.fileEntity.fileType.eq(fileType))
+				.where(QFileEntityHibernate.fileEntity.id.notIn(
 					JPAExpressions
 						.select(column)
 						.from(fileEntity)

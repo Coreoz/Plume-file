@@ -11,11 +11,11 @@ import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.sql.ColumnMetadata;
 
-class QFileEntity extends com.querydsl.sql.RelationalPathBase<FileEntity> {
+public class QFileEntityQuerydsl extends com.querydsl.sql.RelationalPathBase<FileEntityQuerydsl> {
 
 	private static final long serialVersionUID = 117412621;
 
-	public static final QFileEntity file = new QFileEntity("PLM_FILE");
+	public static final QFileEntityQuerydsl file = new QFileEntityQuerydsl("PLM_FILE");
 
 	public final SimplePath<byte[]> data = createSimple("data", byte[].class);
 
@@ -25,25 +25,25 @@ class QFileEntity extends com.querydsl.sql.RelationalPathBase<FileEntity> {
 
 	public final NumberPath<Long> id = createNumber("id", Long.class);
 
-	public final com.querydsl.sql.PrimaryKey<FileEntity> constraintB = createPrimaryKey(id);
+	public final com.querydsl.sql.PrimaryKey<FileEntityQuerydsl> constraintB = createPrimaryKey(id);
 
-	public QFileEntity(String variable) {
-		super(FileEntity.class, forVariable(variable), "PUBLIC", "PLM_FILE");
+	public QFileEntityQuerydsl(String variable) {
+		super(FileEntityQuerydsl.class, forVariable(variable), "PUBLIC", "PLM_FILE");
 		addMetadata();
 	}
 
-	public QFileEntity(String variable, String schema, String table) {
-		super(FileEntity.class, forVariable(variable), schema, table);
+	public QFileEntityQuerydsl(String variable, String schema, String table) {
+		super(FileEntityQuerydsl.class, forVariable(variable), schema, table);
 		addMetadata();
 	}
 
-	public QFileEntity(Path<? extends FileEntity> path) {
+	public QFileEntityQuerydsl(Path<? extends FileEntityQuerydsl> path) {
 		super(path.getType(), path.getMetadata(), "PUBLIC", "PLM_FILE");
 		addMetadata();
 	}
 
-	public QFileEntity(PathMetadata metadata) {
-		super(FileEntity.class, metadata, "PUBLIC", "PLM_FILE");
+	public QFileEntityQuerydsl(PathMetadata metadata) {
+		super(FileEntityQuerydsl.class, metadata, "PUBLIC", "PLM_FILE");
 		addMetadata();
 	}
 

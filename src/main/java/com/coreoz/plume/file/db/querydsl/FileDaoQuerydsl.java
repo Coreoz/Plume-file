@@ -16,16 +16,16 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
 
 @Singleton
-public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntity> implements FileDao {
+public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> implements FileDao {
 
 	@Inject
 	public FileDaoQuerydsl(TransactionManagerQuerydsl transactionManager) {
-		super(transactionManager, QFileEntity.file);
+		super(transactionManager, QFileEntityQuerydsl.file);
 	}
 
 	@Override
 	public FileEntry upload(String fileType, byte[] fileData, String fileName) {
-		FileEntity file = new FileEntity();
+		FileEntityQuerydsl file = new FileEntityQuerydsl();
 		file.setFileType(fileType);
 		file.setData(fileData);
 		file.setFilename(fileName);
@@ -37,14 +37,14 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntity> implements File
 	public List<FileWithName> findFileNames(List<Long> fileIds) {
 		return transactionManager
 			.selectQuery()
-			.select(QFileEntity.file.id, QFileEntity.file.filename)
-			.from(QFileEntity.file)
-			.where(QFileEntity.file.id.in(fileIds))
+			.select(QFileEntityQuerydsl.file.id, QFileEntityQuerydsl.file.filename)
+			.from(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.id.in(fileIds))
 			.fetch()
 			.stream()
 			.map(row -> FileWithName.of(
-				row.get(QFileEntity.file.id),
-				row.get(QFileEntity.file.filename)
+				row.get(QFileEntityQuerydsl.file.id),
+				row.get(QFileEntityQuerydsl.file.filename)
 			))
 			.collect(Collectors.toList());
 	}
@@ -53,18 +53,18 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntity> implements File
 	public String fileName(Long fileId) {
 		return transactionManager
 			.selectQuery()
-			.select(QFileEntity.file.filename)
-			.from(QFileEntity.file)
-			.where(QFileEntity.file.id.eq(fileId))
+			.select(QFileEntityQuerydsl.file.filename)
+			.from(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.id.eq(fileId))
 			.fetchOne();
 	}
 
 	@Override
 	public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
 		return transactionManager
-			.delete(QFileEntity.file)
-			.where(QFileEntity.file.fileType.eq(fileType))
-			.where(QFileEntity.file.id.notIn(
+			.delete(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.fileType.eq(fileType))
+			.where(QFileEntityQuerydsl.file.id.notIn(
 				SQLExpressions
 					.select(column)
 					.from(fileEntity)
