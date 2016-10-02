@@ -127,7 +127,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.coreoz</groupId>
-			<artifactId>plume-scheduler</artifactId>
+			<artifactId>wisp</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.coreoz</groupId>

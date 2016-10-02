@@ -5,8 +5,8 @@ import javax.inject.Singleton;
 
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.FileService;
-import com.coreoz.plume.scheduler.Scheduler;
-import com.coreoz.plume.scheduler.schedule.Schedules;
+import com.coreoz.wisp.Scheduler;
+import com.coreoz.wisp.schedule.Schedules;
 
 @Singleton
 public class ScheduledTasks {
