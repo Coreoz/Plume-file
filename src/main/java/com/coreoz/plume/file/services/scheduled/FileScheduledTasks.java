@@ -9,10 +9,10 @@ import com.coreoz.wisp.Scheduler;
 import com.coreoz.wisp.schedule.Schedules;
 
 @Singleton
-public class ScheduledTasks {
+public class FileScheduledTasks {
 
 	@Inject
-	public ScheduledTasks(Scheduler scheduler,
+	public FileScheduledTasks(Scheduler scheduler,
 			FileConfigurationService fileConfigurationService,
 			FileService fileService) {
 		scheduler.schedule(
