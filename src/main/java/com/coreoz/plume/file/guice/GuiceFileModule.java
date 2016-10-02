@@ -7,6 +7,7 @@ import com.coreoz.plume.file.services.file.FileServiceDb;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.services.hash.ChecksumServiceSha1;
 import com.coreoz.plume.file.services.scheduled.ScheduledTasks;
+import com.coreoz.wisp.guice.GuiceWispSchedulerModule;
 import com.google.inject.AbstractModule;
 
 public class GuiceFileModule extends AbstractModule {
@@ -17,6 +18,7 @@ public class GuiceFileModule extends AbstractModule {
 		bind(FileService.class).to(FileServiceDb.class);
 		bind(FileCacheService.class).to(FileCacheServiceGuava.class);
 
+		install(new GuiceWispSchedulerModule());
 		bind(ScheduledTasks.class).asEagerSingleton();
 	}
 
