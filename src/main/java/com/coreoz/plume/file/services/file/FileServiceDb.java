@@ -82,7 +82,7 @@ public class FileServiceDb implements FileService {
 
 	@Override
 	public String urlRaw(Long fileId) {
-		return fileWsBasePath + "/" + fileId;
+		return fileId == null ? null : (fileWsBasePath + "/" + fileId);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class FileServiceDb implements FileService {
 		if(fileName == null) {
 			return urlRaw(fileId);
 		}
-		return urlRaw(fileId) + "/" + fileName;
+		return fileId == null ? null : (urlRaw(fileId) + "/" + fileName);
 	}
 
 }
