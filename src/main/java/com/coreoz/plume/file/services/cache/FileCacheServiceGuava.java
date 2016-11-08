@@ -16,7 +16,7 @@ public class FileCacheServiceGuava implements FileCacheService {
 	public LoadingCache<Long, CachedFile> newCache(Function<Long, CachedFile> loadingData) {
 		return CacheBuilder
 			.newBuilder()
-			.expireAfterWrite(1, TimeUnit.HOURS)
+			.expireAfterAccess(1, TimeUnit.DAYS)
 			.maximumSize(100)
 			.build(CacheLoader.from(loadingData::apply));
 	}
