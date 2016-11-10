@@ -4,5 +4,5 @@ CREATE TABLE  plm_file (
   filename varchar(255) NULL,
   file_type varchar(255) NOT NULL,
   data BLOB NOT NULL,
-  PRIMARY KEY  (id)
+  CONSTRAINT plm_file_pk PRIMARY KEY  (id)
 );
