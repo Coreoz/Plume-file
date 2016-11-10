@@ -59,9 +59,10 @@
 
 		<plume.version>1.0.0-beta3</plume.version>
 	</properties>
-	
+
 	<modules>
 		<module>plume-file-core</module>
+		<module>plume-file-gallery</module>
 	</modules>
 
 	<profiles>
@@ -134,12 +135,19 @@
 		</plugins>
 	</build>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.coreoz</groupId>
-			<artifactId>plume-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-gallery</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>
