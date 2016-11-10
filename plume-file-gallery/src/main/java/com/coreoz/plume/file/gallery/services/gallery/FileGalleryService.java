@@ -9,9 +9,9 @@ public interface FileGalleryService {
 
 	// insert
 
-	FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, Integer initialPosition, Long idData);
+	FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, int initialPosition, Long idData);
 
-	default FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, Integer initialPosition) {
+	default FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, int initialPosition) {
 		return add(fileUploaded, galleryType, initialPosition, null);
 	}
 

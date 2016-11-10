@@ -27,7 +27,7 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 	}
 
 	@Override
-	public void insert(long idFile, String galleryType, Integer initialPosition, Long idData) {
+	public void insert(long idFile, String galleryType, int initialPosition, Long idData) {
 		transactionManager
 			.insert(QFileGallerydsl.fileGallery)
 			.columns(

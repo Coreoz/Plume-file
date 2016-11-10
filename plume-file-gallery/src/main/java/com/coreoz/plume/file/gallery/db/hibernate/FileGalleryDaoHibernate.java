@@ -15,7 +15,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 public class FileGalleryDaoHibernate implements FileGalleryDao {
 
 	@Override
-	public void insert(long idFile, String galleryType, Integer initialPosition, Long idData) {
+	public void insert(long idFile, String galleryType, int initialPosition, Long idData) {
 		// TODO to implement
 	}
 

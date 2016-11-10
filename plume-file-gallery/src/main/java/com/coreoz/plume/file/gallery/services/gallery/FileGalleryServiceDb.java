@@ -32,7 +32,7 @@ public class FileGalleryServiceDb implements FileGalleryService {
 	}
 
 	@Override
-	public FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, Integer initialPosition,
+	public FileGallery add(FileUploaded fileUploaded, FileGalleryType galleryType, int initialPosition,
 			Long idData) {
 		fileGalleryDao.insert(fileUploaded.getId(), galleryType.name(), initialPosition, idData);
 		return FileGallery.of(

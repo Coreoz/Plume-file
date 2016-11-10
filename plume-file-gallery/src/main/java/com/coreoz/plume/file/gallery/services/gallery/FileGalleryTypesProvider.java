@@ -4,6 +4,6 @@ import java.util.Collection;
 
 public interface FileGalleryTypesProvider {
 
-	Collection<FileGalleryType> fileGalleryTypesAvailable();
+	Collection<? extends FileGalleryType> fileGalleryTypesAvailable();
 
 }

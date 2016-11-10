@@ -9,7 +9,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 
 public interface FileGalleryDao {
 
-	void insert(long idFile, String galleryType, Integer initialPosition, Long idData);
+	void insert(long idFile, String galleryType, int initialPosition, Long idData);
 
 	void updatePositions(Iterable<FileGalleryPosition> newPositions);
 
