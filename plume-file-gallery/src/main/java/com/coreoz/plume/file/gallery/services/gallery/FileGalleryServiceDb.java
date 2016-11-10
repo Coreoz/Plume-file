@@ -51,6 +51,11 @@ public class FileGalleryServiceDb implements FileGalleryService {
 	}
 
 	@Override
+	public void deleteFile(Long idFile) {
+		fileGalleryDao.deleteFile(idFile);
+	}
+
+	@Override
 	public void deleteUnreferenced() {
 		long countDeleted = fileGalleryTypesProvider
 			.fileGalleryTypesAvailable()

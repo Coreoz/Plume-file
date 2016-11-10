@@ -23,6 +23,10 @@ public interface FileGalleryService {
 
 	void updatePositions(Collection<FileGalleryPosition> newPositions);
 
+	// delete
+
+	void deleteFile(Long idFile);
+
 	// clean
 
 	void deleteUnreferenced();

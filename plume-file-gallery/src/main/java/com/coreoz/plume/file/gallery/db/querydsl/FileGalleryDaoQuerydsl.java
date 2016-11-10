@@ -109,4 +109,12 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 			.execute();
 	}
 
+	@Override
+	public void deleteFile(Long idFile) {
+		transactionManager
+			.delete(QFileGallerydsl.fileGallery)
+			.where(QFileGallerydsl.fileGallery.idFile.eq(idFile))
+			.execute();
+	}
+
 }

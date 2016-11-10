@@ -19,4 +19,6 @@ public interface FileGalleryDao {
 
 	Long deleteUnreferenced(String galleryType, EntityPath<?> fileGalleryDataEntity, NumberPath<Long> joinColumn);
 
+	void deleteFile(Long idFile);
+
 }

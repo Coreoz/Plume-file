@@ -43,4 +43,9 @@ public class FileGalleryDaoHibernate implements FileGalleryDao {
 		return null;
 	}
 
+	@Override
+	public void deleteFile(Long idFile) {
+		// TODO to implement
+	}
+
 }
