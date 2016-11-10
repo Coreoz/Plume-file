@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.gallery.webservices;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -7,9 +8,13 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -20,7 +25,8 @@ import com.coreoz.plume.admin.security.permission.WebSessionPermission;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeHibernate;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeQuerydsl;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;
-import com.coreoz.plume.file.gallery.webservices.data.GalleryFileUpload;
+import com.coreoz.plume.file.gallery.webservices.data.FileGalleryPositionAdmin;
+import com.coreoz.plume.file.gallery.webservices.data.FileGalleryUpload;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypeAdmin;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypesAdminProvider;
 import com.coreoz.plume.file.gallery.webservices.validation.FileGalleryWsError;
@@ -76,18 +82,27 @@ public class FileGalleryAdminWs {
 			));
 	}
 
+	@GET
+	@Path("{galleryType}/{idData}")
+	@ApiOperation(value = "Fetch gallery medias")
+	public void fetch(@PathParam("galleryType") String galleryTypeParam, @PathParam("idData") Long idData) {
+		// TODO to implement
+	}
+
 	@POST
+	@Path("{galleryType}")
 	@ApiOperation(value = "Add a new media to a gallery")
-	public void add(GalleryFileUpload galleryFileUpload, @Context WebSessionPermission webSession) {
+	public void add(@PathParam("galleryType") String galleryTypeParam,
+			FileGalleryUpload galleryFileUpload, @Context WebSessionPermission webSession) {
 		Validators.checkRequired("FILE_DATA", galleryFileUpload.getData());
 		Validators.checkRequired("FILE_DATA_FILENAME", galleryFileUpload.getData().getFilename());
 		Validators.checkRequired("FILE_DATA_DATA", galleryFileUpload.getData().getBase64());
-		Validators.checkRequired("GALLERY_TYPE", galleryFileUpload.getGalleryType());
+		Validators.checkRequired("GALLERY_TYPE", galleryTypeParam);
 
-		FileGalleryTypeAdmin galleryType = galleryTypeIndex.get(galleryFileUpload.getGalleryType());
+		FileGalleryTypeAdmin galleryType = galleryTypeIndex.get(galleryTypeParam);
 
 		if(galleryType == null) {
-			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryFileUpload.getGalleryType());
+			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryTypeParam);
 		}
 
 		if(webSession.getPermissions() == null || !webSession.getPermissions().contains(galleryType.galleryPermission())) {
@@ -110,6 +125,22 @@ public class FileGalleryAdminWs {
 			galleryFileUpload.getInitialPosition() == null ? 0 : galleryFileUpload.getInitialPosition(),
 			galleryFileUpload.getIdData()
 		);
+	}
+
+	@DELETE
+	@Path("{galleryType}/{idFile}/{idData}")
+	@ApiOperation(value = "Delete a media from a gallery")
+	public void delete(@PathParam("galleryType") String galleryTypeParam,
+			@PathParam("idFile") Long idFile, @PathParam("idData") Long idData) {
+		// TODO to implement
+	}
+
+	@PUT
+	@Path("{galleryType}")
+	@ApiOperation(value = "Reorder gallery medias")
+	public void updatePositions(@PathParam("galleryType") String galleryTypeParam,
+			List<FileGalleryPositionAdmin> medias) {
+		// TODO to implement
 	}
 
 }

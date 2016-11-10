@@ -7,10 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GalleryFileUpload {
+public class FileGalleryUpload {
 
 	private FileUploadBase64 data;
-	private String galleryType;
 	private Integer initialPosition;
 	private Long idData;
 
