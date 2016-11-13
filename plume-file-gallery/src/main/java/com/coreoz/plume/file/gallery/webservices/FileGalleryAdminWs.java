@@ -85,7 +85,8 @@ public class FileGalleryAdminWs {
 	@GET
 	@Path("{galleryType}/{idData}")
 	@ApiOperation(value = "Fetch gallery medias")
-	public void fetch(@PathParam("galleryType") String galleryTypeParam, @PathParam("idData") Long idData) {
+	public void fetch(@PathParam("galleryType") String galleryTypeParam,
+			@PathParam("idData") Long idData, @Context WebSessionPermission webSession) {
 		// TODO to implement
 	}
 
@@ -97,22 +98,8 @@ public class FileGalleryAdminWs {
 		Validators.checkRequired("FILE_DATA", galleryFileUpload.getData());
 		Validators.checkRequired("FILE_DATA_FILENAME", galleryFileUpload.getData().getFilename());
 		Validators.checkRequired("FILE_DATA_DATA", galleryFileUpload.getData().getBase64());
-		Validators.checkRequired("GALLERY_TYPE", galleryTypeParam);
 
-		FileGalleryTypeAdmin galleryType = galleryTypeIndex.get(galleryTypeParam);
-
-		if(galleryType == null) {
-			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryTypeParam);
-		}
-
-		if(webSession.getPermissions() == null || !webSession.getPermissions().contains(galleryType.galleryPermission())) {
-			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
-		}
-
-		if(galleryType.isAllowedToChangeGallery() != null
-			&& !galleryType.isAllowedToChangeGallery().test(webSession, idData)) {
-			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
-		}
+		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
 
 		if(!galleryType.isFilenameAllowed().test(galleryFileUpload.getData().getFilename())) {
 			throw new WsException(FileGalleryWsError.INVALID_FILENAME, galleryFileUpload.getData().getFilename());
@@ -131,7 +118,8 @@ public class FileGalleryAdminWs {
 	@Path("{galleryType}/{idFile}/{idData}")
 	@ApiOperation(value = "Delete a media from a gallery")
 	public void delete(@PathParam("galleryType") String galleryTypeParam,
-			@PathParam("idFile") Long idFile, @PathParam("idData") Long idData) {
+			@PathParam("idFile") Long idFile, @PathParam("idData") Long idData,
+			@Context WebSessionPermission webSession) {
 		// TODO to implement
 	}
 
@@ -139,9 +127,34 @@ public class FileGalleryAdminWs {
 	@Path("{galleryType}/{idData}")
 	@ApiOperation(value = "Reorder gallery medias")
 	public void updatePositions(@PathParam("galleryType") String galleryTypeParam,
-			@PathParam("idData") Long idData,
-			List<FileGalleryPositionAdmin> medias) {
+			@PathParam("idData") Long idData, List<FileGalleryPositionAdmin> medias,
+			@Context WebSessionPermission webSession) {
 		// TODO to implement
+	}
+
+	// internal
+
+	private FileGalleryTypeAdmin validateAccessAndParseGallery(String galleryTypeParam, Long idData,
+			WebSessionPermission webSession) {
+		Validators.checkRequired("GALLERY_TYPE", galleryTypeParam);
+
+		FileGalleryTypeAdmin galleryType = galleryTypeIndex.get(galleryTypeParam);
+
+		if(galleryType == null) {
+			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryTypeParam);
+		}
+
+		if(webSession.getPermissions() == null
+			|| !webSession.getPermissions().contains(galleryType.galleryPermission())) {
+			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
+		}
+
+		if(galleryType.isAllowedToChangeGallery() != null
+			&& !galleryType.isAllowedToChangeGallery().test(webSession, idData)) {
+			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
+		}
+
+		return galleryType;
 	}
 
 }
