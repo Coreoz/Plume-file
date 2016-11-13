@@ -23,7 +23,7 @@ public interface FileGalleryService {
 
 	// update
 
-	void updatePositions(Collection<FileGalleryPosition> newPositions);
+	void updatePositions(Collection<? extends FileGalleryPosition> newPositions);
 
 	// delete
 

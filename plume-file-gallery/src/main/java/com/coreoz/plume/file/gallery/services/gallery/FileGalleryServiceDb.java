@@ -44,7 +44,7 @@ public class FileGalleryServiceDb implements FileGalleryService {
 	}
 
 	@Override
-	public void updatePositions(Collection<FileGalleryPosition> newPositions) {
+	public void updatePositions(Collection<? extends FileGalleryPosition> newPositions) {
 		if(!newPositions.isEmpty()) {
 			fileGalleryDao.updatePositions(newPositions);
 		}

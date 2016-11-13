@@ -20,7 +20,7 @@ public class FileGalleryDaoHibernate implements FileGalleryDao {
 	}
 
 	@Override
-	public void updatePositions(Iterable<FileGalleryPosition> newPositions) {
+	public void updatePositions(Collection<? extends FileGalleryPosition> newPositions) {
 		// TODO to implement
 	}
 

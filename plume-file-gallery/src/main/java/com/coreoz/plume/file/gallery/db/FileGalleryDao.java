@@ -11,7 +11,7 @@ public interface FileGalleryDao {
 
 	void insert(long idFile, String galleryType, int initialPosition, Long idData);
 
-	void updatePositions(Iterable<FileGalleryPosition> newPositions);
+	void updatePositions(Collection<? extends FileGalleryPosition> newPositions);
 
 	List<FileGalleryRaw> fetch(String galleryType, Long idData);
 

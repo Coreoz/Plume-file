@@ -139,7 +139,25 @@ public class FileGalleryAdminWs {
 	public void updatePositions(@PathParam("galleryType") String galleryTypeParam,
 			@PathParam("idData") Long idData, List<FileGalleryPositionAdmin> medias,
 			@Context WebSessionPermission webSession) {
-		// TODO to implement
+		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
+
+		Validators.checkRequired("MEDIAS", medias);
+		for(FileGalleryPositionAdmin media : medias) {
+			Validators.checkRequired("MEDIA_ID_FILE", media.getIdFile());
+			Validators.checkRequired("MEDIA_POSITION", media.getPosition());
+		}
+
+		if(!fileGalleryService.checkFilesInGallery(
+			medias
+				.stream()
+				.map(FileGalleryPositionAdmin::getIdFile)
+				.collect(Collectors.toList()),
+			galleryType
+		)) {
+			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryTypeParam);
+		}
+
+		fileGalleryService.updatePositions(medias);
 	}
 
 	// internal

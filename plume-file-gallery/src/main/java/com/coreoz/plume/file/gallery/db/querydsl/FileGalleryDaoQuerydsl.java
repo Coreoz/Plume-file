@@ -41,7 +41,7 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 	}
 
 	@Override
-	public void updatePositions(Iterable<FileGalleryPosition> newPositions) {
+	public void updatePositions(Collection<? extends FileGalleryPosition> newPositions) {
 		SQLUpdateClause updateQuery = transactionManager.update(QFileGallerydsl.fileGallery);
 
 		for(FileGalleryPosition newPosition : newPositions) {
