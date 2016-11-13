@@ -24,6 +24,7 @@ import org.glassfish.jersey.server.internal.LocalizationMessages;
 import com.coreoz.plume.admin.security.permission.WebSessionPermission;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeHibernate;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeQuerydsl;
+import com.coreoz.plume.file.gallery.services.gallery.FileGallery;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;
 import com.coreoz.plume.file.gallery.webservices.data.FileGalleryPositionAdmin;
 import com.coreoz.plume.file.gallery.webservices.data.FileGalleryUpload;
@@ -85,9 +86,12 @@ public class FileGalleryAdminWs {
 	@GET
 	@Path("{galleryType}/{idData}")
 	@ApiOperation(value = "Fetch gallery medias")
-	public void fetch(@PathParam("galleryType") String galleryTypeParam,
+	public List<FileGallery> fetch(@PathParam("galleryType") String galleryTypeParam,
 			@PathParam("idData") Long idData, @Context WebSessionPermission webSession) {
-		// TODO to implement
+		return fileGalleryService.fetch(
+			validateAccessAndParseGallery(galleryTypeParam, idData, webSession),
+			idData
+		);
 	}
 
 	@POST
