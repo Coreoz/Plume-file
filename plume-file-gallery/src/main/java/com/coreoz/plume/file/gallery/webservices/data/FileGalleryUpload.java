@@ -11,6 +11,5 @@ public class FileGalleryUpload {
 
 	private FileUploadBase64 data;
 	private Integer initialPosition;
-	private Long idData;
 
 }

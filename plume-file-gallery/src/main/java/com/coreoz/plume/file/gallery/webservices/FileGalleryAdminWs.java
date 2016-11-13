@@ -90,9 +90,9 @@ public class FileGalleryAdminWs {
 	}
 
 	@POST
-	@Path("{galleryType}")
+	@Path("{galleryType}/{idData}")
 	@ApiOperation(value = "Add a new media to a gallery")
-	public void add(@PathParam("galleryType") String galleryTypeParam,
+	public void add(@PathParam("galleryType") String galleryTypeParam, @PathParam("idData") Long idData,
 			FileGalleryUpload galleryFileUpload, @Context WebSessionPermission webSession) {
 		Validators.checkRequired("FILE_DATA", galleryFileUpload.getData());
 		Validators.checkRequired("FILE_DATA_FILENAME", galleryFileUpload.getData().getFilename());
@@ -110,7 +110,7 @@ public class FileGalleryAdminWs {
 		}
 
 		if(galleryType.isAllowedToChangeGallery() != null
-			&& !galleryType.isAllowedToChangeGallery().test(webSession, galleryFileUpload.getIdData())) {
+			&& !galleryType.isAllowedToChangeGallery().test(webSession, idData)) {
 			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
 		}
 
@@ -123,7 +123,7 @@ public class FileGalleryAdminWs {
 			fileUploaded,
 			galleryType,
 			galleryFileUpload.getInitialPosition() == null ? 0 : galleryFileUpload.getInitialPosition(),
-			galleryFileUpload.getIdData()
+			idData
 		);
 	}
 
@@ -136,9 +136,10 @@ public class FileGalleryAdminWs {
 	}
 
 	@PUT
-	@Path("{galleryType}")
+	@Path("{galleryType}/{idData}")
 	@ApiOperation(value = "Reorder gallery medias")
 	public void updatePositions(@PathParam("galleryType") String galleryTypeParam,
+			@PathParam("idData") Long idData,
 			List<FileGalleryPositionAdmin> medias) {
 		// TODO to implement
 	}
