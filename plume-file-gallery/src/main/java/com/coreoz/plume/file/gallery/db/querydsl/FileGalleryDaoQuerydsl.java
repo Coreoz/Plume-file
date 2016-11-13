@@ -67,6 +67,7 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 		}
 
 		return selectQuery
+			.orderBy(QFileGallerydsl.fileGallery.position.asc())
 			.fetch()
 			.stream()
 			.map(tuple -> {
