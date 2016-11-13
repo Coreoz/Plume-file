@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.coreoz.plume.file.services.file.FileUploaded;
 
+import jersey.repackaged.com.google.common.collect.ImmutableList;
+
 public interface FileGalleryService {
 
 	// insert
@@ -45,6 +47,14 @@ public interface FileGalleryService {
 
 	default boolean checkFilesInGallery(Collection<Long> fileIds, FileGalleryType galleryType) {
 		return checkFilesInGallery(fileIds, galleryType, null);
+	}
+
+	default boolean checkFileInGallery(Long fileId, FileGalleryType galleryType, Long idData) {
+		return checkFilesInGallery(ImmutableList.of(fileId), galleryType, idData);
+	}
+
+	default boolean checkFileInGallery(Long fileId, FileGalleryType galleryType) {
+		return checkFilesInGallery(ImmutableList.of(fileId), galleryType);
 	}
 
 }

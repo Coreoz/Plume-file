@@ -124,7 +124,13 @@ public class FileGalleryAdminWs {
 	public void delete(@PathParam("galleryType") String galleryTypeParam,
 			@PathParam("idFile") Long idFile, @PathParam("idData") Long idData,
 			@Context WebSessionPermission webSession) {
-		// TODO to implement
+		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
+
+		if(!fileGalleryService.checkFileInGallery(idFile, galleryType, idData)) {
+			throw new WsException(FileGalleryWsError.INVALID_GALLERY, galleryTypeParam);
+		}
+
+		fileGalleryService.deleteFile(idFile);
 	}
 
 	@PUT
