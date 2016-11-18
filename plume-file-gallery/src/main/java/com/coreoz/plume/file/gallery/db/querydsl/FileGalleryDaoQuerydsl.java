@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
@@ -22,6 +23,7 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 
 	private final TransactionManagerQuerydsl transactionManager;
 
+	@Inject
 	public FileGalleryDaoQuerydsl(TransactionManagerQuerydsl transactionManager) {
 		this.transactionManager = transactionManager;
 	}
