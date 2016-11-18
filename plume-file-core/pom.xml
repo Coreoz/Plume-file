@@ -23,9 +23,11 @@
 			<groupId>com.coreoz</groupId>
 			<artifactId>wisp</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.coreoz</groupId>
 			<artifactId>plume-web-jersey</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
