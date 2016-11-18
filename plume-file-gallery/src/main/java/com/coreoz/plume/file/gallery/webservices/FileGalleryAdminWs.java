@@ -16,16 +16,17 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.server.internal.LocalizationMessages;
 
-import com.coreoz.plume.admin.security.permission.WebSessionPermission;
+import com.coreoz.plume.admin.jersey.WebSessionPermission;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeHibernate;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeQuerydsl;
-import com.coreoz.plume.file.gallery.services.gallery.FileGallery;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;
+import com.coreoz.plume.file.gallery.webservices.data.FileGalleryAdmin;
 import com.coreoz.plume.file.gallery.webservices.data.FileGalleryPositionAdmin;
 import com.coreoz.plume.file.gallery.webservices.data.FileGalleryUpload;
 import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypeAdmin;
@@ -84,20 +85,30 @@ public class FileGalleryAdminWs {
 	}
 
 	@GET
-	@Path("{galleryType}/{idData}")
+	@Path("{galleryType}")
 	@ApiOperation(value = "Fetch gallery medias")
-	public List<FileGallery> fetch(@PathParam("galleryType") String galleryTypeParam,
-			@PathParam("idData") Long idData, @Context WebSessionPermission webSession) {
-		return fileGalleryService.fetch(
-			validateAccessAndParseGallery(galleryTypeParam, idData, webSession),
-			idData
-		);
+	public List<FileGalleryAdmin> fetch(@PathParam("galleryType") String galleryTypeParam,
+			@QueryParam("idData") Long idData, @Context WebSessionPermission webSession) {
+		return fileGalleryService
+			.fetch(
+				validateAccessAndParseGallery(galleryTypeParam, idData, webSession),
+				idData
+			)
+			.stream()
+			// conversion so that the object can be used with javascript without the Long issue
+			.map(file -> FileGalleryAdmin.of(
+				file.getIdFile(),
+				file.getFileUrl(),
+				file.getIdData(),
+				file.getPosition()
+			))
+			.collect(Collectors.toList());
 	}
 
 	@POST
-	@Path("{galleryType}/{idData}")
+	@Path("{galleryType}")
 	@ApiOperation(value = "Add a new media to a gallery")
-	public void add(@PathParam("galleryType") String galleryTypeParam, @PathParam("idData") Long idData,
+	public void add(@PathParam("galleryType") String galleryTypeParam, @QueryParam("idData") Long idData,
 			FileGalleryUpload galleryFileUpload, @Context WebSessionPermission webSession) {
 		Validators.checkRequired("FILE_DATA", galleryFileUpload.getData());
 		Validators.checkRequired("FILE_DATA_FILENAME", galleryFileUpload.getData().getFilename());
@@ -105,7 +116,7 @@ public class FileGalleryAdminWs {
 
 		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
 
-		if(!galleryType.isFilenameAllowed().test(galleryFileUpload.getData().getFilename())) {
+		if(!galleryType.getFilenameAllowed().test(galleryFileUpload.getData().getFilename())) {
 			throw new WsException(FileGalleryWsError.INVALID_FILENAME, galleryFileUpload.getData().getFilename());
 		}
 
@@ -119,10 +130,10 @@ public class FileGalleryAdminWs {
 	}
 
 	@DELETE
-	@Path("{galleryType}/{idFile}/{idData}")
+	@Path("{galleryType}/{idFile}")
 	@ApiOperation(value = "Delete a media from a gallery")
 	public void delete(@PathParam("galleryType") String galleryTypeParam,
-			@PathParam("idFile") Long idFile, @PathParam("idData") Long idData,
+			@QueryParam("idData") Long idData, @PathParam("idFile") Long idFile,
 			@Context WebSessionPermission webSession) {
 		Validators.checkRequired("ID_FILE", idFile);
 		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
@@ -135,10 +146,10 @@ public class FileGalleryAdminWs {
 	}
 
 	@PUT
-	@Path("{galleryType}/{idData}")
+	@Path("{galleryType}")
 	@ApiOperation(value = "Reorder gallery medias")
 	public void updatePositions(@PathParam("galleryType") String galleryTypeParam,
-			@PathParam("idData") Long idData, List<FileGalleryPositionAdmin> medias,
+			@QueryParam("idData") Long idData, List<FileGalleryPositionAdmin> medias,
 			@Context WebSessionPermission webSession) {
 		FileGalleryTypeAdmin galleryType = validateAccessAndParseGallery(galleryTypeParam, idData, webSession);
 
@@ -174,12 +185,12 @@ public class FileGalleryAdminWs {
 		}
 
 		if(webSession.getPermissions() == null
-			|| !webSession.getPermissions().contains(galleryType.galleryPermission())) {
+			|| !webSession.getPermissions().contains(galleryType.getGalleryPermission())) {
 			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
 		}
 
-		if(galleryType.isAllowedToChangeGallery() != null
-			&& !galleryType.isAllowedToChangeGallery().test(webSession, idData)) {
+		if(galleryType.getAllowedToChangeGallery() != null
+			&& !galleryType.getAllowedToChangeGallery().test(webSession, idData)) {
 			throw new ForbiddenException(LocalizationMessages.USER_NOT_AUTHORIZED());
 		}
 
