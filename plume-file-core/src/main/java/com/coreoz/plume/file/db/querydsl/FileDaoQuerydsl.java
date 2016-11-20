@@ -7,6 +7,8 @@ import com.coreoz.plume.db.querydsl.crud.CrudDaoQuerydsl;
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.FileDao;
 import com.coreoz.plume.file.db.FileEntry;
+import com.google.common.base.Strings;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
@@ -31,12 +33,16 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> impleme
 
 	@Override
 	public String fileName(Long fileId) {
-		return transactionManager
+		Tuple tuple = transactionManager
 			.selectQuery()
-			.select(QFileEntityQuerydsl.file.filename)
+			.select(QFileEntityQuerydsl.file.id, QFileEntityQuerydsl.file.filename)
 			.from(QFileEntityQuerydsl.file)
 			.where(QFileEntityQuerydsl.file.id.eq(fileId))
 			.fetchOne();
+
+		return tuple == null ?
+			null
+			: Strings.nullToEmpty(tuple.get(QFileEntityQuerydsl.file.filename));
 	}
 
 	@Override

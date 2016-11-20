@@ -64,13 +64,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-db-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -86,5 +81,15 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<id>oss.snapshot</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>

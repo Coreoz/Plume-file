@@ -1,7 +1,6 @@
 package com.coreoz.plume.file.services.file;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -19,8 +18,10 @@ import com.coreoz.plume.file.services.fileType.FileType;
 import com.coreoz.plume.file.services.fileType.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 @Singleton
 public class FileServiceDb implements FileService {
@@ -33,6 +34,7 @@ public class FileServiceDb implements FileService {
 
 	private final String fileWsBasePath;
 	private final LoadingCache<Long, FileData> fileCache;
+	private final LoadingCache<Long, String> fileUrlCache;
 
 	@Inject
 	public FileServiceDb(FileDao fileDao,
@@ -43,8 +45,10 @@ public class FileServiceDb implements FileService {
 		this.fileDao = fileDao;
 		this.fileTypesProvider = fileTypesProvider;
 		this.checksumService = checksumService;
+
 		this.fileWsBasePath = config.apiBasePath() + config.fileWsPath();
 		this.fileCache = cacheService.newFileDataCache(this::fetchUncached);
+		this.fileUrlCache = cacheService.newFileUrlCache(this::fileUrl);
 	}
 
 	@Override
@@ -90,9 +94,13 @@ public class FileServiceDb implements FileService {
 		if(fileId == null) {
 			return Optional.empty();
 		}
-		return Optional
-			.ofNullable(fileDao.fileName(fileId))
-			.map(fileName -> fullFileUrl(fileId, fileName));
+
+		FileData fileData = fileCache.getIfPresent(fileId);
+		if(fileData != null) {
+			return Optional.of(fullFileUrl(fileId, fileData.getFilename()));
+		}
+
+		return fileUrlCached(fileId);
 	}
 
 	@Override
@@ -102,10 +110,14 @@ public class FileServiceDb implements FileService {
 
 	@Override
 	public Optional<FileData> fetch(Long fileId) {
+		if(fileId == null) {
+			return Optional.empty();
+		}
+
 		try {
 			return Optional.of(fileCache.get(fileId));
-		} catch (ExecutionException e) {
-			if(e.getCause() instanceof NotFoundException) {
+		} catch (Exception e) {
+			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
 			}
 			throw Throwables.propagate(e);
@@ -123,6 +135,24 @@ public class FileServiceDb implements FileService {
 				checksumService.hash(file.getData()),
 				file.getData()
 			))
+			.orElseThrow(NotFoundException::new);
+	}
+
+	private Optional<String> fileUrlCached(Long fileId) {
+		try {
+			return Optional.of(fileUrlCache.get(fileId));
+		} catch (Exception e) {
+			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
+				return Optional.empty();
+			}
+			throw Throwables.propagate(e);
+		}
+	}
+
+	private String fileUrl(Long fileId) {
+		return Optional
+			.ofNullable(fileDao.fileName(fileId))
+			.map(fileName -> fullFileUrl(fileId, Strings.emptyToNull(fileName)))
 			.orElseThrow(NotFoundException::new);
 	}
 
