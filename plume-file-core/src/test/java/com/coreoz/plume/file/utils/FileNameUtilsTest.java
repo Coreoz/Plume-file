@@ -1,8 +1,10 @@
-package com.coreoz.plume.file.services.file;
+package com.coreoz.plume.file.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+
+import com.coreoz.plume.file.utils.FileNameUtils;
 
 public class FileNameUtilsTest {
 

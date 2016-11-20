@@ -2,7 +2,7 @@ package com.coreoz.plume.file.gallery.webservices.permissions;
 
 import java.util.function.Predicate;
 
-import com.coreoz.plume.file.services.file.FileNameUtils;
+import com.coreoz.plume.file.utils.FileNameUtils;
 
 public class FilenamePredicates {
 

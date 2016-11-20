@@ -13,6 +13,10 @@ import org.slf4j.LoggerFactory;
 import com.coreoz.plume.file.db.FileDao;
 import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
+import com.coreoz.plume.file.services.file.data.FileUploaded;
+import com.coreoz.plume.file.services.fileType.FileType;
+import com.coreoz.plume.file.services.fileType.FileTypesProvider;
+import com.coreoz.plume.file.utils.FileNameUtils;
 
 @Singleton
 public class FileServiceDb implements FileService {

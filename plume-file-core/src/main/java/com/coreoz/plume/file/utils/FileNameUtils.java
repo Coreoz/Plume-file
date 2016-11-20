@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.file;
+package com.coreoz.plume.file.utils;
 
 import java.net.FileNameMap;
 import java.net.URLConnection;

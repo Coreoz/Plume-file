@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import com.coreoz.plume.file.services.cache.CachedFile;
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
-import com.coreoz.plume.file.services.file.FileNameUtils;
 import com.coreoz.plume.file.services.file.FileService;
 import com.coreoz.plume.file.services.hash.ChecksumService;
+import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 

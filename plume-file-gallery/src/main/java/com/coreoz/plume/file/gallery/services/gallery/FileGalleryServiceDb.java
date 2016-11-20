@@ -11,8 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coreoz.plume.file.gallery.db.FileGalleryDao;
+import com.coreoz.plume.file.gallery.services.gallery.data.FileGallery;
+import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
+import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryType;
+import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryTypesProvider;
 import com.coreoz.plume.file.services.file.FileService;
-import com.coreoz.plume.file.services.file.FileUploaded;
+import com.coreoz.plume.file.services.file.data.FileUploaded;
 
 @Singleton
 public class FileGalleryServiceDb implements FileGalleryService {

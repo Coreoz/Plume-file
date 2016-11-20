@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.gallery.services.gallery;
+package com.coreoz.plume.file.gallery.services.galleryType;
 
 import com.coreoz.plume.file.gallery.db.FileGalleryRaw;
 import com.querydsl.core.types.EntityPath;

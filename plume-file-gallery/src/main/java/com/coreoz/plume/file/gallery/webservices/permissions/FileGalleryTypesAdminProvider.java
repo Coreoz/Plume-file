@@ -2,8 +2,8 @@ package com.coreoz.plume.file.gallery.webservices.permissions;
 
 import java.util.Collection;
 
-import com.coreoz.plume.file.gallery.services.gallery.FileGalleryType;
-import com.coreoz.plume.file.gallery.services.gallery.FileGalleryTypesProvider;
+import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryType;
+import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryTypesProvider;
 
 public interface FileGalleryTypesAdminProvider extends FileGalleryTypesProvider {
 

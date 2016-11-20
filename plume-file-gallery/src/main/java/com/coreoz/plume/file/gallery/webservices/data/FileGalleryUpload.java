@@ -1,6 +1,6 @@
 package com.coreoz.plume.file.gallery.webservices.data;
 
-import com.coreoz.plume.file.services.file.FileUploadBase64;
+import com.coreoz.plume.file.services.file.data.FileUploadBase64;
 
 import lombok.Getter;
 import lombok.Setter;

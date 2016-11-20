@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.gallery.services.gallery;
+package com.coreoz.plume.file.gallery.services.gallery.data;
 
 import lombok.Value;
 

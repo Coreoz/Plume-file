@@ -3,7 +3,10 @@ package com.coreoz.plume.file.gallery.services.gallery;
 import java.util.Collection;
 import java.util.List;
 
-import com.coreoz.plume.file.services.file.FileUploaded;
+import com.coreoz.plume.file.gallery.services.gallery.data.FileGallery;
+import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
+import com.coreoz.plume.file.gallery.services.galleryType.FileGalleryType;
+import com.coreoz.plume.file.services.file.data.FileUploaded;
 
 import jersey.repackaged.com.google.common.collect.ImmutableList;
 

@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.gallery.db.FileGalleryDao;
 import com.coreoz.plume.file.gallery.db.FileGalleryRaw;
-import com.coreoz.plume.file.gallery.services.gallery.FileGalleryPosition;
+import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;

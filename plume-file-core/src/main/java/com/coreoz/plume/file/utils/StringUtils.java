@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.coreoz.plume.file.services.file;
+package com.coreoz.plume.file.utils;
 
 import java.text.Normalizer;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.file;
+package com.coreoz.plume.file.services.file.data;
 
 import lombok.Getter;
 import lombok.Setter;

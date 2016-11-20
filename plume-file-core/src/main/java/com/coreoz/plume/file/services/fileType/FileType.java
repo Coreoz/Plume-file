@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.file;
+package com.coreoz.plume.file.services.fileType;
 
 import com.coreoz.plume.file.db.FileEntry;
 import com.querydsl.core.types.EntityPath;
