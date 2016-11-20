@@ -1,8 +1,5 @@
 package com.coreoz.plume.file.db.querydsl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -10,7 +7,6 @@ import com.coreoz.plume.db.querydsl.crud.CrudDaoQuerydsl;
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.FileDao;
 import com.coreoz.plume.file.db.FileEntry;
-import com.coreoz.plume.file.db.FileWithName;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
@@ -31,22 +27,6 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> impleme
 		file.setFilename(fileName);
 
 		return save(file);
-	}
-
-	@Override
-	public List<FileWithName> findFileNames(List<Long> fileIds) {
-		return transactionManager
-			.selectQuery()
-			.select(QFileEntityQuerydsl.file.id, QFileEntityQuerydsl.file.filename)
-			.from(QFileEntityQuerydsl.file)
-			.where(QFileEntityQuerydsl.file.id.in(fileIds))
-			.fetch()
-			.stream()
-			.map(row -> FileWithName.of(
-				row.get(QFileEntityQuerydsl.file.id),
-				row.get(QFileEntityQuerydsl.file.filename)
-			))
-			.collect(Collectors.toList());
 	}
 
 	@Override

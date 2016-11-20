@@ -2,12 +2,11 @@ package com.coreoz.plume.file.services.file;
 
 import java.io.InputStream;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.coreoz.plume.file.db.FileEntry;
+import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploadBase64;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
 import com.coreoz.plume.file.services.fileType.FileType;
@@ -72,17 +71,10 @@ public interface FileService {
 	 * For example, returns /api/file/3418557718705733633
 	 */
 	String urlRaw(Long fileId);
-	/**
-	 * Returns a complete relative URL for all ids passed as parameter.
-	 * The goal of this method is to reduce the work to fetch files real names
-	 * compared the iteration over {@link #urlRaw(Long)}.
-	 * The URL returned are like the ones provided by {@link #url(Long)}.
-	 */
-	List<FileUploaded> urlBatch(List<Long> fileIds);
 
 	// file data
 
-	Optional<FileEntry> fetch(Long fileId);
+	Optional<FileData> fetch(Long fileId);
 
 
 }
