@@ -34,8 +34,8 @@ import com.coreoz.plume.file.gallery.webservices.permissions.FileGalleryTypesAdm
 import com.coreoz.plume.file.gallery.webservices.validation.FileGalleryWsError;
 import com.coreoz.plume.file.services.file.FileService;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
-import com.coreoz.plume.file.services.fileType.FileType;
-import com.coreoz.plume.file.services.fileType.FileTypesProvider;
+import com.coreoz.plume.file.services.filetype.FileType;
+import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.jersey.errors.Validators;
 import com.coreoz.plume.jersey.errors.WsException;
 

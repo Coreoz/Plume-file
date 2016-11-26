@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploadBase64;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
-import com.coreoz.plume.file.services.fileType.FileType;
+import com.coreoz.plume.file.services.filetype.FileType;
 import com.google.common.io.ByteStreams;
 
 import lombok.SneakyThrows;

@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.fileType;
+package com.coreoz.plume.file.services.filetype;
 
 import java.util.Collection;
 
