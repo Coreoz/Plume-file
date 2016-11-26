@@ -31,6 +31,7 @@ public class LoadingCacheTest<K, V> implements LoadingCache {
 		return getIfPresent(key);
 	}
 
+	// unused
 
 	@Override
 	public Object get(Object key, Callable valueLoader) throws ExecutionException {
