@@ -1,6 +1,7 @@
 package com.coreoz.plume.file.services.file;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -19,7 +20,6 @@ import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
@@ -116,11 +116,11 @@ public class FileServiceDb implements FileService {
 
 		try {
 			return Optional.of(fileCache.get(fileId));
-		} catch (Exception e) {
+		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
 			}
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -141,11 +141,11 @@ public class FileServiceDb implements FileService {
 	private Optional<String> fileUrlCached(Long fileId) {
 		try {
 			return Optional.of(fileUrlCache.get(fileId));
-		} catch (Exception e) {
+		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
 			}
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
