@@ -70,7 +70,7 @@
 			<dependency>
 				<groupId>com.coreoz</groupId>
 				<artifactId>plume-dependencies</artifactId>
-				<version>${plume.version}</version>
+				<version>${plume-dependencies.version}</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
