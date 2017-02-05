@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 @Singleton
 public class FileConfigurationService {
@@ -14,7 +15,11 @@ public class FileConfigurationService {
 
 	@Inject
 	public FileConfigurationService(Config config) {
-		this.config = config;
+		// the reference file is not located in src/main/resources/ to ensure
+		// that it is not overridden by another config file when a "fat jar" is created.
+		this.config = config.withFallback(
+			ConfigFactory.parseResources(FileConfigurationService.class, "reference.conf")
+		);
 	}
 
 	public String apiBasePath() {
