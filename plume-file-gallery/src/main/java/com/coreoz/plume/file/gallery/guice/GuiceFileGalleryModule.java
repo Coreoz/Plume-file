@@ -4,7 +4,7 @@ import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryServiceDb;
 import com.coreoz.plume.file.gallery.services.scheduled.FileGalleryScheduledTasks;
 import com.coreoz.plume.file.guice.GuiceFileModule;
-import com.coreoz.wisp.guice.GuiceWispSchedulerModule;
+import com.coreoz.plume.scheduler.guice.GuiceSchedulerModule;
 import com.google.inject.AbstractModule;
 
 public class GuiceFileGalleryModule extends AbstractModule {
@@ -15,7 +15,7 @@ public class GuiceFileGalleryModule extends AbstractModule {
 
 		bind(FileGalleryService.class).to(FileGalleryServiceDb.class);
 
-		install(new GuiceWispSchedulerModule());
+		install(new GuiceSchedulerModule());
 		bind(FileGalleryScheduledTasks.class).asEagerSingleton();
 	}
 

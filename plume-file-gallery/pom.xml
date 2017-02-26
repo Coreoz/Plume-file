@@ -58,11 +58,6 @@
 			<artifactId>guice</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.google.dagger</groupId>
-			<artifactId>dagger</artifactId>
-			<optional>true</optional>
-		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
