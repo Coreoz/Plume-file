@@ -172,9 +172,7 @@ public class FileGalleryAdminWs {
 		fileGalleryService.updatePositions(medias);
 	}
 
-	// internal
-
-	private FileGalleryTypeAdmin validateAccessAndParseGallery(String galleryTypeParam, Long idData,
+	public FileGalleryTypeAdmin validateAccessAndParseGallery(String galleryTypeParam, Long idData,
 			WebSessionPermission webSession) {
 		Validators.checkRequired("GALLERY_TYPE", galleryTypeParam);
 
