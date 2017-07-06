@@ -1,11 +1,10 @@
 package com.coreoz.plume.file.utils;
 
-import java.net.FileNameMap;
-import java.net.URLConnection;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class FileNameUtils {
-
-	private static final FileNameMap MIME_TYPE_FILENAME_MAP = URLConnection.getFileNameMap();
 
 	/**
 	 * Remove all weird characters while trying to ensure
@@ -38,7 +37,11 @@ public class FileNameUtils {
 			return null;
 		}
 
-		return MIME_TYPE_FILENAME_MAP.getContentTypeFor(filename);
+		try {
+			return Files.probeContentType(Paths.get(filename));
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 }
