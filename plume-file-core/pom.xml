@@ -84,8 +84,8 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.coreoz</groupId>
-				<artifactId>plume-dependencies</artifactId>
-				<version>${plume-dependencies.version}</version>
+				<artifactId>plume-framework-dependencies</artifactId>
+				<version>${plume-framework-dependencies.version}</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>

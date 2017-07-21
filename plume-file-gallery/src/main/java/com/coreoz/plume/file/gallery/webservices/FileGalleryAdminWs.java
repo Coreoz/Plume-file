@@ -22,7 +22,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.server.internal.LocalizationMessages;
 
-import com.coreoz.plume.admin.jersey.WebSessionPermission;
+import com.coreoz.plume.admin.websession.WebSessionPermission;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeHibernate;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeQuerydsl;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;

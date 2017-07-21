@@ -7,8 +7,7 @@ import com.coreoz.plume.file.gallery.services.gallery.data.FileGallery;
 import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
 import com.coreoz.plume.file.gallery.services.gallerytype.FileGalleryType;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
-
-import jersey.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 
 public interface FileGalleryService {
 
