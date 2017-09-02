@@ -19,7 +19,7 @@ public class ChecksumServiceSha1 implements ChecksumService {
 				.getEncoder()
 				.encodeToString(
 					Hashing
-						.sha1()
+						.sha256()
 						.hashBytes(data)
 						.asBytes()
 				);
