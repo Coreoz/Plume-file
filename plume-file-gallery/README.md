@@ -15,7 +15,7 @@ Getting started
 ```
 2. Install Guice module: `install(new GuiceFileGalleryModuleQuerydsl());`
 3. Provide an implementation of `FileTypesProvider` in Guice
-4. The implementation of `FileTypesProvider` should also return the values `GalleryFileTypeQuerydsl`
+4. The implementation of `FileTypesProvider` should also return the values of the enum `GalleryFileTypeQuerydsl`
 5. Provide an implementation of `FileGalleryTypesProvider` in Guice
 
 ### Jersey web-service installation
