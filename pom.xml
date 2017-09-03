@@ -51,13 +51,23 @@
 		</repository>
 	</distributionManagement>
 
+	<repositories>
+		<repository>
+			<id>oss.public</id>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<additionalparam>-Xdoclint:none</additionalparam>
 
-		<plume-framework-dependencies.version>1.0.0-SNAPSHOT</plume-framework-dependencies.version>
+		<plume-framework-dependencies.version>1.0.0</plume-framework-dependencies.version>
 	</properties>
 
 	<modules>

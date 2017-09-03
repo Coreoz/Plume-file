@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>com.coreoz</groupId>
 			<artifactId>plume-admin-security</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 			<optional>true</optional>
 		</dependency>
 
