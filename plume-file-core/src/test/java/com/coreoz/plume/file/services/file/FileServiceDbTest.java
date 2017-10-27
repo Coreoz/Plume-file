@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import com.coreoz.plume.file.db.querydsl.FileEntryUploaded;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -129,13 +130,14 @@ public class FileServiceDbTest {
 				return null;
 			}
 			@Override
-			public FileEntityQuerydsl findById(Long id) {
+			public FileEntryUploaded findById(Long id) {
 				if(id == 5L) {
-					FileEntityQuerydsl fileEntity = new FileEntityQuerydsl();
-					fileEntity.setId(5L);
-					fileEntity.setFilename("file.ext");
-
-					return fileEntity;
+					return FileEntryUploaded.of(
+						5L,
+						"file.ext",
+						null,
+						null
+					);
 				}
 				return null;
 			}
