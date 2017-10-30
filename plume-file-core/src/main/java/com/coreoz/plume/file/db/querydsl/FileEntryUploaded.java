@@ -11,8 +11,8 @@ import lombok.experimental.Accessors;
 @Value(staticConstructor = "of")
 public class FileEntryUploaded implements FileEntry {
 
-    private Long id;
-    private String filename;
-    private String fileType;
-    private byte[] data;
+    private final Long id;
+    private final String filename;
+    private final String fileType;
+    private final byte[] data;
 }

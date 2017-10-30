@@ -6,14 +6,14 @@ import org.junit.runner.RunWith;
 
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
-import com.coreoz.plume.file.db.querydsl.FileDaoQuerydsl;
+import com.coreoz.plume.file.db.querydsl.FileDaoDbQuerydsl;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestDbModule.class)
-public class FileDaoQuerydslTest extends FileDaoTest {
+public class FileDaoDbQuerydslTest extends FileDaoTest {
 
 	@Inject
-	private FileDaoQuerydsl fileDao;
+	private FileDaoDbQuerydsl fileDao;
 
 	@Override
 	protected FileDao fileDao() {

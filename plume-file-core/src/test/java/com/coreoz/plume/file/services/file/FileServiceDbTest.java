@@ -13,8 +13,7 @@ import org.junit.runner.RunWith;
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileDao;
-import com.coreoz.plume.file.db.querydsl.FileDaoQuerydsl;
-import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
+import com.coreoz.plume.file.db.querydsl.FileDaoDbQuerydsl;
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.cache.FileCacheServiceGuava;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
@@ -118,7 +117,7 @@ public class FileServiceDbTest {
 	// utils
 
 	private FileDao fileDaoMock() {
-		return new FileDaoQuerydsl(null) {
+		return new FileDaoDbQuerydsl(null) {
 			@Override
 			public String fileName(Long fileId) {
 				if(5L == fileId) {

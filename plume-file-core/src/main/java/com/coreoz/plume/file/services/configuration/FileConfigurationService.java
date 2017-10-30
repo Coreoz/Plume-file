@@ -38,4 +38,8 @@ public class FileConfigurationService {
 		return config.getString("file.cleaning-hour");
 	}
 
+	public String mediaLocalPath() {
+		return config.getString("file.medial-local-path");
+	}
+
 }

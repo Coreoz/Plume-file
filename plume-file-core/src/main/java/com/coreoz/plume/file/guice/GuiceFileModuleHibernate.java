@@ -8,7 +8,7 @@ public class GuiceFileModuleHibernate extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new GuiceFileModule());
+		install(new GuiceFileModuleDb());
 
 		bind(FileDao.class).to(FileDaoHibernate.class);
 	}

@@ -1,7 +1,6 @@
 package com.coreoz.plume.file.db.querydsl;
 
 import com.coreoz.plume.db.querydsl.crud.CrudEntity;
-import com.coreoz.plume.file.db.FileEntry;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

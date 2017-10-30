@@ -13,11 +13,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class FileDaoQuerydsl implements FileDao {
+public class FileDaoDbQuerydsl implements FileDao {
     private final TransactionManagerQuerydsl transactionManager;
 
     @Inject
-    public FileDaoQuerydsl(TransactionManagerQuerydsl transactionManager) {
+    public FileDaoDbQuerydsl(TransactionManagerQuerydsl transactionManager) {
         this.transactionManager = transactionManager;
     }
 
@@ -114,13 +114,13 @@ public class FileDaoQuerydsl implements FileDao {
         transactionManager
             .execute(connection -> {
                 transactionManager
-                    .delete(QFileEntityQuerydsl.file, connection)
-                    .where(QFileEntityQuerydsl.file.id.eq(id))
+                    .delete(QFileDataEntityQuerydsl.fileData, connection)
+                    .where(QFileDataEntityQuerydsl.fileData.idFile.eq(id))
                     .execute();
 
                 transactionManager
-                    .delete(QFileDataEntityQuerydsl.fileData, connection)
-                    .where(QFileDataEntityQuerydsl.fileData.idFile.eq(id))
+                    .delete(QFileEntityQuerydsl.file, connection)
+                    .where(QFileEntityQuerydsl.file.id.eq(id))
                     .execute();
             });
 
