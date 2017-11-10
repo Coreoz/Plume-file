@@ -15,4 +15,5 @@ public class FileEntryUploaded implements FileEntry {
     private final String filename;
     private final String fileType;
     private final byte[] data;
+
 }

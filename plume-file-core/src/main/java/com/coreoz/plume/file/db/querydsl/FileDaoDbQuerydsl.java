@@ -1,6 +1,7 @@
 package com.coreoz.plume.file.db.querydsl;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
+import com.coreoz.plume.db.utils.IdGenerator;
 import com.coreoz.plume.file.db.FileDao;
 import com.coreoz.plume.file.db.FileEntry;
 import com.google.common.base.Strings;
@@ -24,25 +25,32 @@ public class FileDaoDbQuerydsl implements FileDao {
     @Override
     public FileEntry upload(String fileType, byte[] fileData, String fileName) {
         FileEntityQuerydsl file = new FileEntityQuerydsl();
-        FileDataEntityQuerydsl fileDataBlob = new FileDataEntityQuerydsl();
-
-        fileDataBlob.setData(fileData);
         file.setFileType(fileType);
         file.setFilename(fileName);
 
         final Long[] fileUploadedId = new Long[1];
 
         transactionManager.execute(connection -> {
+            //TODO Voir avec Aurélien si il n'existe pas une meilleure méthode
             fileUploadedId[0] =
                 transactionManager
                     .insert(QFileEntityQuerydsl.file, connection)
-                    .values(file)
+                    .columns(
+                        QFileEntityQuerydsl.file.id,
+                        QFileEntityQuerydsl.file.filename,
+                        QFileEntityQuerydsl.file.fileType
+                    )
+                    .values(IdGenerator.generate(), file.getFilename(), file.getFileType())
                     .execute();
-            fileDataBlob.setId_file(fileUploadedId[0]);
 
             transactionManager
                 .insert(QFileDataEntityQuerydsl.fileData, connection)
-                .values(fileDataBlob)
+                .columns(
+                    QFileDataEntityQuerydsl.fileData.id,
+                    QFileDataEntityQuerydsl.fileData.idFile,
+                    QFileDataEntityQuerydsl.fileData.data
+                )
+                .values(IdGenerator.generate(), fileUploadedId[0], fileData)
                 .execute();
 
         });
@@ -71,15 +79,28 @@ public class FileDaoDbQuerydsl implements FileDao {
 
     @Override
     public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
-        return transactionManager
-            .delete(QFileEntityQuerydsl.file)
-            .where(QFileEntityQuerydsl.file.fileType.eq(fileType))
-            .where(QFileEntityQuerydsl.file.id.notIn(
-                SQLExpressions
-                    .select(column)
-                    .from(fileEntity)
-            ))
-            .execute();
+        return transactionManager.executeAndReturn(connection -> {
+            //TODO a valider avec Aurélien
+            transactionManager
+                .delete(QFileDataEntityQuerydsl.fileData, connection)
+                .where(QFileEntityQuerydsl.file.fileType.eq(fileType))
+                .where(QFileEntityQuerydsl.file.id.notIn(
+                    SQLExpressions
+                        .select(column)
+                        .from(fileEntity)
+                ))
+                .execute();
+
+            return transactionManager
+                .delete(QFileEntityQuerydsl.file, connection)
+                .where(QFileEntityQuerydsl.file.fileType.eq(fileType))
+                .where(QFileEntityQuerydsl.file.id.notIn(
+                    SQLExpressions
+                        .select(column)
+                        .from(fileEntity)
+                ))
+                .execute();
+        });
     }
 
     @Override

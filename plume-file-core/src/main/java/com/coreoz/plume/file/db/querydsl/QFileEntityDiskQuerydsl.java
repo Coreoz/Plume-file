@@ -53,7 +53,7 @@ public class QFileEntityDiskQuerydsl extends com.querydsl.sql.RelationalPathBase
 
     public void addMetadata() {
         addMetadata(path, ColumnMetadata.named("PATH").withIndex(2).ofType(Types.VARCHAR).withSize(255));
-        addMetadata(id, ColumnMetadata.named("ID").withIndex(1).ofType(Types.DECIMAL).withSize(19).notNull());
-        addMetadata(idFile, ColumnMetadata.named("ID_FILE").withIndex(2).ofType(Types.DECIMAL).withSize(19).notNull());
+        addMetadata(id, ColumnMetadata.named("ID").withIndex(1).ofType(Types.BIGINT).withSize(19).notNull());
+        addMetadata(idFile, ColumnMetadata.named("ID_FILE").withIndex(2).ofType(Types.BIGINT).withSize(19).notNull());
     }
 }

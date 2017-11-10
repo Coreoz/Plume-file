@@ -11,6 +11,8 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
+import com.coreoz.plume.jersey.errors.WsError;
+import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.slf4j.Logger;
@@ -25,10 +27,10 @@ import java.util.Optional;
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
     protected String path;
-    protected String baseUrl;
-    protected final FileDaoDiskQuerydsl fileDao;
+    private String baseUrl;
+    private final FileDaoDiskQuerydsl fileDao;
     private final FileTypesProvider fileTypesProvider;
-    protected final ChecksumService checksumService;
+    private final ChecksumService checksumService;
 
     @Inject
     public FileServiceDisk(FileDaoDiskQuerydsl fileDao,
@@ -50,12 +52,12 @@ public class FileServiceDisk implements FileService {
 
         FileEntityQuerydsl file = fileDao.upload(fileType.name(), fileName, relativePath);
 
-        createFile(path, fileData, fileName);
+        createFile(path, fileData, relativePath);
 
-        return FileUploaded.of(file.getId(), url(file.getId()).get());
+        return FileUploaded.of(file.getId(), url(file.getId()).orElseThrow(() -> new WsException(WsError.WsErrorInternal.INTERNAL_ERROR)));
     }
 
-    protected void createFile(String path, byte[] fileData, @Nullable String fileName) {
+    private void createFile(String path, byte[] fileData, @Nullable String fileName) {
         try {
             if (!new File(path).exists()) {
                 new File(path).mkdirs();
@@ -124,7 +126,7 @@ public class FileServiceDisk implements FileService {
         return fetchFile(fileEntity, path + fileEntityDisk.getPath());
     }
 
-    protected Optional<FileData> fetchFile(FileEntityQuerydsl fileEntity, String path) {
+    private Optional<FileData> fetchFile(FileEntityQuerydsl fileEntity, String path) {
         File file = new File(path);
         if (!file.exists()) {
             return Optional.empty();

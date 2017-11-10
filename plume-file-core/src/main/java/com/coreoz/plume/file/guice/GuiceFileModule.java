@@ -8,7 +8,7 @@ import com.coreoz.plume.file.services.scheduled.FileScheduledTasks;
 import com.coreoz.plume.scheduler.guice.GuiceSchedulerModule;
 import com.google.inject.AbstractModule;
 
-public class GuiceFileModuleBase extends AbstractModule {
+public class GuiceFileModule extends AbstractModule {
 
     @Override
     protected void configure() {
