@@ -2,6 +2,7 @@ package com.coreoz.plume.file.db.querydsl;
 
 import com.coreoz.plume.db.querydsl.crud.CrudDaoQuerydsl;
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
+import com.coreoz.plume.db.utils.IdGenerator;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
@@ -24,15 +25,14 @@ public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
         transactionManager.execute(connection -> {
             Long idFile = save(file, connection).getId();
 
-            FileEntityDiskQuerydsl fileEntryDisk = FileEntityDiskQuerydsl.of(
-                null,
-                idFile,
-                path
-            );
-
             transactionManager
                 .insert(QFileEntityDiskQuerydsl.fileDisk, connection)
-                .values(fileEntryDisk)
+                .columns(
+                    QFileEntityDiskQuerydsl.fileDisk.id,
+                    QFileEntityDiskQuerydsl.fileDisk.path,
+                    QFileEntityDiskQuerydsl.fileDisk.idFile
+                )
+                .values(IdGenerator.generate(), path, idFile)
                 .execute();
             file.setId(idFile);
 
@@ -77,6 +77,7 @@ public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
         return transactionManager
             .selectQuery()
             .select(QFileEntityDiskQuerydsl.fileDisk)
+            .from(QFileEntityDiskQuerydsl.fileDisk)
             .where(QFileEntityDiskQuerydsl.fileDisk.idFile.eq(id))
             .fetchFirst();
     }

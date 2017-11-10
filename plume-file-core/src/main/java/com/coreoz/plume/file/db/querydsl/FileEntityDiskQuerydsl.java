@@ -1,8 +1,14 @@
 package com.coreoz.plume.file.db.querydsl;
 
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Value(staticConstructor = "of")
+@Setter
+@Getter
+@EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "id_file", "path"})
 public class FileEntityDiskQuerydsl {
     private Long id;
     private Long id_file;
