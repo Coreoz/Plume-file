@@ -39,7 +39,7 @@ public class FileConfigurationService {
 	}
 
 	public String mediaLocalPath() {
-		return config.getString("file.medial-local-path");
+		return config.getString("file.media-local-path");
 	}
 
 }
