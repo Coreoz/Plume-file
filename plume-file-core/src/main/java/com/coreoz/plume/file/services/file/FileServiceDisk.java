@@ -24,6 +24,7 @@ import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
+// TODO should be unit tested
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
     protected String path;
@@ -108,7 +109,12 @@ public class FileServiceDisk implements FileService {
         if (fileId == null) {
             return Optional.empty();
         }
-        return Optional.of(url(fileId, fileDao.findById(fileId).getFilename()));
+
+        return Optional
+        	// TODO instead of fecthing the whole table row, this should only fetch the file name
+        	.ofNullable(fileDao.findById(fileId))
+        	.map(FileEntityQuerydsl::getFilename)
+        	.map(fileName -> url(fileId, fileName));
     }
 
     private String url(Long fileId, String fileName) {

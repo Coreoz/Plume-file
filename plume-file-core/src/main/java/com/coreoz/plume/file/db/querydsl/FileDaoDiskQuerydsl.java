@@ -11,6 +11,7 @@ import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
 
+// TODO remove the "extends CrudDaoQuerydsl" to optimize correctly the DAO
 public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
 
     @Inject
