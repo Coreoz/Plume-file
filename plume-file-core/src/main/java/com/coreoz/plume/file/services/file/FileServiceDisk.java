@@ -1,5 +1,15 @@
 package com.coreoz.plume.file.services.file;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.coreoz.plume.db.utils.IdGenerator;
 import com.coreoz.plume.file.db.querydsl.FileDaoDiskQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileEntityDiskQuerydsl;
@@ -11,18 +21,8 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
-import com.coreoz.plume.jersey.errors.WsError;
-import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
@@ -54,7 +54,7 @@ public class FileServiceDisk implements FileService {
 
         createFile(path, fileData, relativePath);
 
-        return FileUploaded.of(file.getId(), url(file.getId()).orElseThrow(() -> new WsException(WsError.WsErrorInternal.INTERNAL_ERROR)));
+        return FileUploaded.of(file.getId(), url(file.getId(), fileName));
     }
 
     private void createFile(String path, byte[] fileData, @Nullable String fileName) {
@@ -108,7 +108,11 @@ public class FileServiceDisk implements FileService {
         if (fileId == null) {
             return Optional.empty();
         }
-        return Optional.of(baseUrl + "files/" + fileId + "/" + fileDao.findById(fileId).getFilename());
+        return Optional.of(url(fileId, fileDao.findById(fileId).getFilename()));
+    }
+
+    private String url(Long fileId, String fileName) {
+    	return baseUrl + "files/" + fileId + "/" + fileName;
     }
 
     @Override

@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "id_file", "path"})
+@ToString
 public class FileEntityDiskQuerydsl {
     private Long id;
     private Long id_file;
