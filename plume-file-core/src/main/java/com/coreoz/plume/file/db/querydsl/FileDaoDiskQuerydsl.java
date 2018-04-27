@@ -1,5 +1,9 @@
 package com.coreoz.plume.file.db.querydsl;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import com.coreoz.plume.db.querydsl.crud.CrudDaoQuerydsl;
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.db.utils.IdGenerator;
@@ -7,9 +11,7 @@ import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
 
-import javax.inject.Inject;
-import java.util.List;
-
+// TODO remove the "extends CrudDaoQuerydsl" to optimize correctly the DAO
 public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
 
     @Inject
@@ -34,8 +36,6 @@ public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
                 )
                 .values(IdGenerator.generate(), path, idFile)
                 .execute();
-            file.setId(idFile);
-
         });
 
         return file;

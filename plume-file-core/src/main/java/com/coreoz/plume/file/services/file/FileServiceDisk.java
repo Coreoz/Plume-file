@@ -1,10 +1,19 @@
 package com.coreoz.plume.file.services.file;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.coreoz.plume.db.utils.IdGenerator;
 import com.coreoz.plume.file.db.querydsl.FileDaoDiskQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileEntityDiskQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
-import com.coreoz.plume.file.db.querydsl.FileEntryDisk;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
@@ -12,19 +21,10 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
-import com.coreoz.plume.jersey.errors.WsError;
-import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-
+// TODO should be unit tested
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
     protected String path;
@@ -55,7 +55,7 @@ public class FileServiceDisk implements FileService {
 
         createFile(path, fileData, relativePath);
 
-        return FileUploaded.of(file.getId(), url(file.getId()).orElseThrow(() -> new WsException(WsError.WsErrorInternal.INTERNAL_ERROR)));
+        return FileUploaded.of(file.getId(), url(file.getId(), fileName));
     }
 
     private void createFile(String path, byte[] fileData, @Nullable String fileName) {
@@ -109,8 +109,16 @@ public class FileServiceDisk implements FileService {
         if (fileId == null) {
             return Optional.empty();
         }
-        FileEntityDiskQuerydsl fileDiskEntity = fileDao.findFileDiskById(fileId);
-        return Optional.of(baseUrl + "files/" + fileDiskEntity.getPath());
+
+        return Optional
+        	// TODO instead of fecthing the whole table row, this should only fetch the file name
+        	.ofNullable(fileDao.findFileDiskById(fileId))
+        	.map(FileEntityDiskQuerydsl::getPath)
+        	.map(fileName -> url(fileId, fileName));
+    }
+
+    private String url(Long fileId, String fileName) {
+    	return baseUrl + "files/" + fileName;
     }
 
     @Override
