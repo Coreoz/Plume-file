@@ -49,13 +49,13 @@ public class FileServiceDisk implements FileService {
     public FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String filename) {
         String fileName = FileNameUtils.sanitize(Strings.nullToEmpty(filename));
 
-        String relativePath = String.valueOf(IdGenerator.generate());
+        String relativePath = String.valueOf(IdGenerator.generate()) + extractFileExtension(fileName);
 
         FileEntityQuerydsl file = fileDao.upload(fileType.name(), fileName, relativePath);
 
         createFile(path, fileData, relativePath);
 
-        return FileUploaded.of(file.getId(), url(file.getId(), fileName));
+        return FileUploaded.of(file.getId(), url(fileName));
     }
 
     private void createFile(String path, byte[] fileData, @Nullable String fileName) {
@@ -114,10 +114,10 @@ public class FileServiceDisk implements FileService {
         	// TODO instead of fecthing the whole table row, this should only fetch the file name
         	.ofNullable(fileDao.findFileDiskById(fileId))
         	.map(FileEntityDiskQuerydsl::getPath)
-        	.map(fileName -> url(fileId, fileName));
+        	.map(this::url);
     }
 
-    private String url(Long fileId, String fileName) {
+    private String url(String fileName) {
     	return baseUrl + "files/" + fileName;
     }
 
@@ -153,5 +153,13 @@ public class FileServiceDisk implements FileService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String extractFileExtension(String filename) {
+        String[] filenameSplited = filename.split("[.]");
+        if (filenameSplited.length < 1) {
+            return "";
+        }
+        return "." + filenameSplited[filenameSplited.length - 1].toLowerCase();
     }
 }
