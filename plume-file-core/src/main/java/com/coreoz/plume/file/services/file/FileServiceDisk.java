@@ -4,6 +4,7 @@ import com.coreoz.plume.db.utils.IdGenerator;
 import com.coreoz.plume.file.db.querydsl.FileDaoDiskQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileEntityDiskQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
+import com.coreoz.plume.file.db.querydsl.FileEntryDisk;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
@@ -48,7 +49,7 @@ public class FileServiceDisk implements FileService {
     public FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String filename) {
         String fileName = FileNameUtils.sanitize(Strings.nullToEmpty(filename));
 
-        String relativePath = IdGenerator.generate() + "_" + fileName;
+        String relativePath = String.valueOf(IdGenerator.generate());
 
         FileEntityQuerydsl file = fileDao.upload(fileType.name(), fileName, relativePath);
 
@@ -108,7 +109,8 @@ public class FileServiceDisk implements FileService {
         if (fileId == null) {
             return Optional.empty();
         }
-        return Optional.of(baseUrl + "files/" + fileId + "/" + fileDao.findById(fileId).getFilename());
+        FileEntityDiskQuerydsl fileDiskEntity = fileDao.findFileDiskById(fileId);
+        return Optional.of(baseUrl + "files/" + fileDiskEntity.getPath());
     }
 
     @Override

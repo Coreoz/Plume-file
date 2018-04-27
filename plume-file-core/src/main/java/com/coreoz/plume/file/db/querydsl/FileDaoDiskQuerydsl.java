@@ -17,7 +17,7 @@ public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
         super(transactionManager, QFileEntityQuerydsl.file);
     }
 
-    public FileEntityQuerydsl upload(String fileType, String fileName, String path) {
+    public FileEntityQuerydsl     upload(String fileType, String fileName, String path) {
         FileEntityQuerydsl file = new FileEntityQuerydsl();
         file.setFilename(fileName);
         file.setFileType(fileType);
@@ -58,27 +58,27 @@ public class FileDaoDiskQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> {
     }
 
     @Override
-    public long delete(Long id) {
+    public long delete(Long idFile) {
         transactionManager.execute(connection -> {
             transactionManager
                 .delete(QFileEntityDiskQuerydsl.fileDisk, connection)
-                .where(QFileEntityDiskQuerydsl.fileDisk.idFile.eq(id))
+                .where(QFileEntityDiskQuerydsl.fileDisk.idFile.eq(idFile))
                 .execute();
 
             transactionManager
                 .delete(QFileEntityQuerydsl.file, connection)
-                .where(QFileEntityQuerydsl.file.id.eq(id))
+                .where(QFileEntityQuerydsl.file.id.eq(idFile))
                 .execute();
         });
-        return id;
+        return idFile;
     }
 
-    public FileEntityDiskQuerydsl findFileDiskById(Long id) {
+    public FileEntityDiskQuerydsl findFileDiskById(Long idFile) {
         return transactionManager
             .selectQuery()
             .select(QFileEntityDiskQuerydsl.fileDisk)
             .from(QFileEntityDiskQuerydsl.fileDisk)
-            .where(QFileEntityDiskQuerydsl.fileDisk.idFile.eq(id))
+            .where(QFileEntityDiskQuerydsl.fileDisk.idFile.eq(idFile))
             .fetchFirst();
     }
 
