@@ -55,7 +55,7 @@ public class FileServiceDisk implements FileService {
 
         createFile(path, fileData, relativePath);
 
-        return FileUploaded.of(file.getId(), url(fileName));
+        return FileUploaded.of(file.getId(), url(file.getId(), fileName));
     }
 
     private void createFile(String path, byte[] fileData, @Nullable String fileName) {
@@ -114,11 +114,11 @@ public class FileServiceDisk implements FileService {
         	// TODO instead of fecthing the whole table row, this should only fetch the file name
         	.ofNullable(fileDao.findFileDiskById(fileId))
         	.map(FileEntityDiskQuerydsl::getPath)
-        	.map(this::url);
+        	.map(fileName -> url(fileId, fileName));
     }
 
-    private String url(String fileName) {
-    	return baseUrl + "files/" + fileName;
+    private String url(Long fileId, String fileName) {
+    	return baseUrl + "files/" + fileId + "/" + fileName;
     }
 
     @Override
