@@ -6,6 +6,8 @@ import javax.inject.Singleton;
 import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
 import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
 import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
+import com.coreoz.plume.file.db.querydsl.QFileEntityQuerydsl;
 import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
@@ -30,12 +32,12 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 	}
 
 	@Override
-	public String fileName(Long fileId) {
+	public String fileName(String fileUid) {
 		return transactionManager.queryDslExecuteAndReturn(query -> {
 			Tuple tuple = query
-				.select(QFileEntityHibernate.fileEntity.id, QFileEntityHibernate.fileEntity.filename)
+				.select(QFileEntityHibernate.fileEntity.uid, QFileEntityHibernate.fileEntity.filename)
 				.from(QFileEntityHibernate.fileEntity)
-				.where(QFileEntityHibernate.fileEntity.id.eq(fileId))
+				.where(QFileEntityHibernate.fileEntity.uid.eq(fileUid))
 				.fetchOne();
 
 			return tuple == null ?
@@ -59,4 +61,24 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 		);
 	}
 
+	public FileEntityQuerydsl findByUid(String fileUid) {
+		return transactionManager.queryDslExecuteAndReturn(query ->
+			query
+			.select()
+			.select(QFileEntityQuerydsl.file)
+			.from(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
+			.fetchOne()
+		);
+	}
+
+	@Override
+	public long delete(String fileUid) {
+		return transactionManager.queryDslExecuteAndReturn(query ->
+			query
+			.delete(QFileEntityHibernate.fileEntity)
+			.where(QFileEntityHibernate.fileEntity.uid.eq(fileUid))
+			.execute()
+		);
+	}
 }

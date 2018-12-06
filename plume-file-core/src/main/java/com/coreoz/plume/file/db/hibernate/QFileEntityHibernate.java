@@ -26,6 +26,8 @@ public class QFileEntityHibernate extends EntityPathBase<FileEntityHibernate> {
 
 	public final NumberPath<Long> id = createNumber("id", Long.class);
 
+	public final StringPath uid = createString("uid");
+
 	public QFileEntityHibernate(String variable) {
 		super(FileEntityHibernate.class, forVariable(variable));
 	}

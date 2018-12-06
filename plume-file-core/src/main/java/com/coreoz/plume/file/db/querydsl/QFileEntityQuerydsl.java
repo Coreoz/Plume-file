@@ -25,6 +25,8 @@ public class QFileEntityQuerydsl extends com.querydsl.sql.RelationalPathBase<Fil
 
 	public final NumberPath<Long> id = createNumber("id", Long.class);
 
+	public final StringPath uid = createString("uid");
+
 	public final com.querydsl.sql.PrimaryKey<FileEntityQuerydsl> constraintB = createPrimaryKey(id);
 
 	public QFileEntityQuerydsl(String variable) {
@@ -52,6 +54,7 @@ public class QFileEntityQuerydsl extends com.querydsl.sql.RelationalPathBase<Fil
 		addMetadata(filename, ColumnMetadata.named("FILENAME").withIndex(2).ofType(Types.VARCHAR).withSize(255));
 		addMetadata(fileType, ColumnMetadata.named("FILE_TYPE").withIndex(3).ofType(Types.VARCHAR).withSize(255).notNull());
 		addMetadata(id, ColumnMetadata.named("ID").withIndex(1).ofType(Types.BIGINT).withSize(19).notNull());
+		addMetadata(uid, ColumnMetadata.named("UID").withIndex(1).ofType(Types.VARCHAR).withSize(255).notNull());
 	}
 
 }

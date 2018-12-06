@@ -52,7 +52,10 @@ public interface FileService {
 
 	// delete
 
-	void delete(Long fileId);
+//	void delete(Long fileId);
+
+	// TODO Doit-on garder la première méhtode ?
+	void delete(String fileUid);
 
 	void deleteUnreferenced();
 
@@ -62,7 +65,10 @@ public interface FileService {
 	 * Returns a complete relative URL, for example /api/files/3418557718705733633/cats.jpg
 	 * {@link Optional#empty()} is returned if the corresponding file does not exist
 	 */
-	Optional<String> url(Long fileId);
+//	Optional<String> url(Long fileId);
+
+	// TODO Doit-on garder la première méhtode ?
+	Optional<String> url(String fileUid);
 	/**
 	 * Returns a relative URL without the extension.
 	 * Contrary to {@link #url(Long)},
@@ -70,11 +76,17 @@ public interface FileService {
 	 *
 	 * For example, returns /api/file/3418557718705733633
 	 */
-	String urlRaw(Long fileId);
+//	String urlRaw(Long fileId);
+
+	// TODO Doit-on garder la première méhtode ?
+	String urlRaw(String fileUid);
 
 	// file data
 
-	Optional<FileData> fetch(Long fileId);
+//	Optional<FileData> fetch(Long fileId);
+
+	// TODO Doit-on garder la première méhtode ?
+	Optional<FileData> fetch(String fileUid);
 
 
 }

@@ -14,7 +14,7 @@ import com.google.common.cache.LoadingCache;
 public class FileCacheServiceGuava implements FileCacheService {
 
 	@Override
-	public LoadingCache<Long, FileData> newFileDataCache(Function<Long, FileData> loadingData) {
+	public LoadingCache<String, FileData> newFileDataCache(Function<String, FileData> loadingData) {
 		return CacheBuilder
 			.newBuilder()
 			.expireAfterAccess(1, TimeUnit.DAYS)
@@ -23,7 +23,7 @@ public class FileCacheServiceGuava implements FileCacheService {
 	}
 
 	@Override
-	public LoadingCache<Long, String> newFileUrlCache(Function<Long, String> loadingData) {
+	public LoadingCache<String, String> newFileUrlCache(Function<String, String> loadingData) {
 		return CacheBuilder
 			.newBuilder()
 			.expireAfterAccess(1, TimeUnit.DAYS)

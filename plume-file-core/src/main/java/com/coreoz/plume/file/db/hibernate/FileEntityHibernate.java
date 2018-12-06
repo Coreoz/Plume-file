@@ -28,6 +28,7 @@ public class FileEntityHibernate implements FileEntry {
 	@GeneratedValue(generator = HibernateIdGenerator.NAME)
 	@Id
 	private Long id;
+	private String uid;
 	private String filename;
 	@Column(name = "file_type")
 	private String fileType;

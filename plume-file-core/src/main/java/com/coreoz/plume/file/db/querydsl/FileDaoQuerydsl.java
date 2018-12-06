@@ -13,6 +13,8 @@ import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.SQLExpressions;
 
+import java.util.UUID;
+
 @Singleton
 public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> implements FileDao {
 
@@ -27,17 +29,17 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> impleme
 		file.setFileType(fileType);
 		file.setData(fileData);
 		file.setFilename(fileName);
-
+		file.setUid(UUID.randomUUID().toString());
 		return save(file);
 	}
 
 	@Override
-	public String fileName(Long fileId) {
+	public String fileName(String fileUid) {
 		Tuple tuple = transactionManager
 			.selectQuery()
-			.select(QFileEntityQuerydsl.file.id, QFileEntityQuerydsl.file.filename)
+			.select(QFileEntityQuerydsl.file.uid, QFileEntityQuerydsl.file.filename)
 			.from(QFileEntityQuerydsl.file)
-			.where(QFileEntityQuerydsl.file.id.eq(fileId))
+			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
 			.fetchOne();
 
 		return tuple == null ?
@@ -58,4 +60,18 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> impleme
 			.execute();
 	}
 
+	public FileEntityQuerydsl findByUid(String fileUid) {
+		return selectFrom()
+			.from(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
+			.fetchOne();
+	}
+
+	@Override
+	public long delete(String fileUid) {
+		return transactionManager
+			.delete(QFileEntityQuerydsl.file)
+			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
+			.execute();
+	}
 }

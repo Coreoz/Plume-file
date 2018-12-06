@@ -7,8 +7,8 @@ import com.google.common.cache.LoadingCache;
 
 public interface FileCacheService {
 
-	LoadingCache<Long, FileData> newFileDataCache(Function<Long, FileData> loadingData);
+	LoadingCache<String, FileData> newFileDataCache(Function<String, FileData> loadingData);
 
-	LoadingCache<Long, String> newFileUrlCache(Function<Long, String> loadingData);
+	LoadingCache<String, String> newFileUrlCache(Function<String, String> loadingData);
 
 }

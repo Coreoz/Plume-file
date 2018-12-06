@@ -48,10 +48,10 @@ public class FileServiceDbTest {
 		FileServiceDb fileService = new FileServiceDb(null, null, null, configurationService, new FileCacheService() {
 			@SuppressWarnings("unchecked")
 			@Override
-			public LoadingCache<Long, FileData> newFileDataCache(Function<Long, FileData> loadingData) {
-				return new LoadingCacheTest<Long, FileData>(fileId -> {
-					if(Long.valueOf(1).equals(fileId)) {
-						return FileData.of(1L, "file.ext", null, null, null, null);
+			public LoadingCache<String, FileData> newFileDataCache(Function<String, FileData> loadingData) {
+				return new LoadingCacheTest<String, FileData>(fileUid -> {
+					if("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1".equals(fileUid)) {
+						return FileData.of(1L, "efaaeb68-f973-11e8-8eb2-f2801f1b9fd1","file.ext", null, null, null, null);
 					}
 
 					return null;
@@ -59,12 +59,12 @@ public class FileServiceDbTest {
 			}
 
 			@Override
-			public LoadingCache<Long, String> newFileUrlCache(Function<Long, String> loadingData) {
+			public LoadingCache<String, String> newFileUrlCache(Function<String, String> loadingData) {
 				return null;
 			}
 		});
 
-		assertThat(fileService.url(1L)).hasValue("/api/files/1/file.ext");
+		assertThat(fileService.url("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/efaaeb68-f973-11e8-8eb2-f2801f1b9fd1/file.ext");
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class FileServiceDbTest {
 			fileDaoMock(), null, null, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.url(5L)).hasValue("/api/files/5/file.ext");
+		assertThat(fileService.url("846c36cc-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/846c36cc-f973-11e8-8eb2-f2801f1b9fd1/file.ext");
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class FileServiceDbTest {
 			fileDaoMock(), null, null, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.url(4L)).hasValue("/api/files/4");
+		assertThat(fileService.url("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class FileServiceDbTest {
 			fileDaoMock(), null, null, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.url(1L)).isEmpty();
+		assertThat(fileService.url("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).isEmpty();
 	}
 
 	// testing fetch(Long fileId)
@@ -102,7 +102,7 @@ public class FileServiceDbTest {
 			fileDaoMock(), null, checksumService, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.fetch(5L).map(FileData::getFilename)).hasValue("file.ext");
+		assertThat(fileService.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1").map(FileData::getFilename)).hasValue("file.ext");
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class FileServiceDbTest {
 			fileDaoMock(), null, checksumService, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.fetch(1L)).isEmpty();
+		assertThat(fileService.fetch("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).isEmpty();
 	}
 
 	// utils
@@ -119,11 +119,11 @@ public class FileServiceDbTest {
 	private FileDao fileDaoMock() {
 		return new FileDaoQuerydsl(null) {
 			@Override
-			public String fileName(Long fileId) {
-				if(5L == fileId) {
+			public String fileName(String fileUid) {
+				if("846c36cc-f973-11e8-8eb2-f2801f1b9fd1".equals(fileUid)) {
 					return "file.ext";
 				}
-				if(4L == fileId) {
+				if("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1".equals(fileUid)) {
 					return "";
 				}
 				return null;

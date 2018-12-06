@@ -15,6 +15,7 @@ import lombok.ToString;
 public class FileEntityQuerydsl implements FileEntry, CrudEntity {
 
 	private Long id;
+	private String uid;
 	private String filename;
 	private String fileType;
 	private byte[] data;
