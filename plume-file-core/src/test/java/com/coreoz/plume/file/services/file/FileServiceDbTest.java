@@ -129,8 +129,8 @@ public class FileServiceDbTest {
 				return null;
 			}
 			@Override
-			public FileEntityQuerydsl findById(Long id) {
-				if(id == 5L) {
+			public FileEntityQuerydsl findByUid(String uid) {
+				if("846c36cc-f973-11e8-8eb2-f2801f1b9fd1".equals(uid)) {
 					FileEntityQuerydsl fileEntity = new FileEntityQuerydsl();
 					fileEntity.setId(5L);
 					fileEntity.setFilename("file.ext");
