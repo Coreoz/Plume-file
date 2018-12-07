@@ -1,6 +1,6 @@
 CREATE TABLE  `plm_file` (
   `id` bigint(20) NOT NULL,
-  `uid` varchat(255) NOT NULL,
+  `uid` varchar(255) NOT NULL,
   `filename` varchar(255) NULL,
   `file_type` varchar(255) NOT NULL,
   `data` MEDIUMBLOB NOT NULL,
