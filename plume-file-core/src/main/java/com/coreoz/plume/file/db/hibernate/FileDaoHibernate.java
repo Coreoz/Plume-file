@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 
 @Singleton
@@ -69,16 +70,6 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 			.from(QFileEntityQuerydsl.file)
 			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
 			.fetchOne()
-		);
-	}
-
-	@Override
-	public long delete(String fileUid) {
-		return transactionManager.queryDslExecuteAndReturn(query ->
-			query
-			.delete(QFileEntityHibernate.fileEntity)
-			.where(QFileEntityHibernate.fileEntity.uid.eq(fileUid))
-			.execute()
 		);
 	}
 }

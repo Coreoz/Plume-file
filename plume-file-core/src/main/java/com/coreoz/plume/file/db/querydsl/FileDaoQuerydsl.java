@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.sql.SQLExpressions;
 
 import java.util.UUID;
@@ -65,13 +66,5 @@ public class FileDaoQuerydsl extends CrudDaoQuerydsl<FileEntityQuerydsl> impleme
 			.from(QFileEntityQuerydsl.file)
 			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
 			.fetchOne();
-	}
-
-	@Override
-	public long delete(String fileUid) {
-		return transactionManager
-			.delete(QFileEntityQuerydsl.file)
-			.where(QFileEntityQuerydsl.file.uid.eq(fileUid))
-			.execute();
 	}
 }

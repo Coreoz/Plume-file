@@ -61,13 +61,9 @@ public class FileServiceDb implements FileService {
 
 		return FileUploaded.of(
 			file.getId(),
+			file.getUid(),
 			fullFileUrl(file.getUid(), file.getFilename())
 		);
-	}
-
-	@Override
-	public void delete(String fileUid) {
-		fileDao.delete(fileUid);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import lombok.Value;
 public class FileUploaded {
 
 	private final long id;
+	private final String uid;
 	private final String url;
 
 }

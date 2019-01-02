@@ -2,13 +2,14 @@ package com.coreoz.plume.file.db;
 
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
 
 public interface FileDao {
 
 	FileEntry upload(String fileType, byte[] fileData, String fileName);
 
-//	long delete(Long fileId);
-	long delete(String fileUid);
+	long delete(Long fileId);
+//	long delete(String fileUid);
 
 	/**
 	 * Fetch the file name corresponding to the file identifier.
