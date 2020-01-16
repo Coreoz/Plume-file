@@ -1,18 +1,16 @@
 package com.coreoz.plume.file.services.file;
 
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploadBase64;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.google.common.io.ByteStreams;
-
 import lombok.SneakyThrows;
+
+import javax.annotation.Nullable;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.Optional;
 
 public interface FileService {
 
@@ -36,14 +34,14 @@ public interface FileService {
 	}
 	/**
 	 * Consume the stream to produce a byte array,
-	 * then call {@link #upload(byte[], String, EntityManager))}
+	 * then call {@link #upload(FileType, InputStream, String))}
 	 */
 	default FileUploaded upload(FileType fileType, InputStream fileData) {
 		return upload(fileType, fileData, null);
 	}
 	/**
 	 * Consume the stream to produce a byte array,
-	 * then call {@link #upload(byte[], String, EntityManager))}
+	 * then call {@link #upload(FileType, byte[], String))}
 	 */
 	@SneakyThrows
 	default FileUploaded upload(FileType fileType, InputStream fileData, String fileName) {
@@ -52,7 +50,7 @@ public interface FileService {
 
 	// delete
 
-	void delete(Long fileId);
+	void delete(String fileUid);
 
 	void deleteUnreferenced();
 
@@ -62,19 +60,20 @@ public interface FileService {
 	 * Returns a complete relative URL, for example /api/files/3418557718705733633/cats.jpg
 	 * {@link Optional#empty()} is returned if the corresponding file does not exist
 	 */
-	Optional<String> url(Long fileId);
+	Optional<String> url(String fileUid);
+
 	/**
 	 * Returns a relative URL without the extension.
-	 * Contrary to {@link #url(Long)},
+	 * Contrary to {@link #url(String)},
 	 * it does not make a call to the database to compute the file URL.
 	 *
 	 * For example, returns /api/file/3418557718705733633
 	 */
-	String urlRaw(Long fileId);
+	String urlRaw(String fileUid);
 
 	// file data
 
-	Optional<FileData> fetch(Long fileId);
+	Optional<FileData> fetch(String fileUid);
 
 
 }

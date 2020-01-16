@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
 import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
 import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileEntry;
 import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
@@ -30,18 +31,28 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 	}
 
 	@Override
-	public String fileName(Long fileId) {
+	public String delete(String fileUid) {
+		return null;
+	}
+
+	@Override
+	public String fileName(String fileUid) {
 		return transactionManager.queryDslExecuteAndReturn(query -> {
 			Tuple tuple = query
 				.select(QFileEntityHibernate.fileEntity.id, QFileEntityHibernate.fileEntity.filename)
 				.from(QFileEntityHibernate.fileEntity)
-				.where(QFileEntityHibernate.fileEntity.id.eq(fileId))
+				.where(QFileEntityHibernate.fileEntity.uid.eq(fileUid))
 				.fetchOne();
 
 			return tuple == null ?
 				null
 				: Strings.nullToEmpty(tuple.get(QFileEntityHibernate.fileEntity.filename));
 		});
+	}
+
+	@Override
+	public FileEntry findByUid(String fileUid) {
+		return null;
 	}
 
 	@Override

@@ -87,7 +87,7 @@ public class FileGalleryServiceDb implements FileGalleryService {
 			.map(fileGalleryRaw -> FileGallery.of(
 				fileGalleryRaw.getIdFile(),
 				fileService
-					.url(fileGalleryRaw.getIdFile())
+					.url(fileGalleryRaw.getFileUid())
 					.orElse(null),
 				idData,
 				fileGalleryRaw.getPosition()

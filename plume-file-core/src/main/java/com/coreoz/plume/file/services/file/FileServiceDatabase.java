@@ -1,14 +1,5 @@
 package com.coreoz.plume.file.services.file;
 
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.coreoz.plume.file.db.FileDao;
 import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.services.cache.FileCacheService;
@@ -22,26 +13,33 @@ import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.base.Strings;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Singleton
-public class FileServiceDb implements FileService {
+public class FileServiceDatabase implements FileService {
 
-	private static final Logger logger = LoggerFactory.getLogger(FileServiceDb.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileServiceDatabase.class);
 
 	private final FileDao fileDao;
 	private final FileTypesProvider fileTypesProvider;
 	private final ChecksumService checksumService;
 
 	private final String fileWsBasePath;
-	private final LoadingCache<Long, FileData> fileCache;
-	private final LoadingCache<Long, String> fileUrlCache;
+	private final LoadingCache<String, FileData> fileCache;
+	private final LoadingCache<String, String> fileUrlCache;
 
 	@Inject
-	public FileServiceDb(FileDao fileDao,
-			FileTypesProvider fileTypesProvider,
-			ChecksumService checksumService,
-			FileConfigurationService config,
-			FileCacheService cacheService) {
+	public FileServiceDatabase(FileDao fileDao,
+                               FileTypesProvider fileTypesProvider,
+                               ChecksumService checksumService,
+                               FileConfigurationService config,
+                               FileCacheService cacheService) {
 		this.fileDao = fileDao;
 		this.fileTypesProvider = fileTypesProvider;
 		this.checksumService = checksumService;
@@ -53,7 +51,7 @@ public class FileServiceDb implements FileService {
 
 	@Override
 	public FileUploaded upload(FileType fileType, byte[] fileData, String fileName) {
-		FileEntry file = fileDao.upload(
+		FileEntry file = this.fileDao.upload(
 			fileType.name(),
 			fileData,
 			FileNameUtils.sanitize(fileName)
@@ -61,13 +59,14 @@ public class FileServiceDb implements FileService {
 
 		return FileUploaded.of(
 			file.getId(),
-			fullFileUrl(file.getId(), file.getFilename())
+			file.getUid(),
+			this.fullFileUrl(file.getUid(), file.getFilename())
 		);
 	}
 
 	@Override
-	public void delete(Long fileId) {
-		fileDao.delete(fileId);
+	public void delete(String fileUid) {
+		fileDao.delete(fileUid);
 	}
 
 	@Override
@@ -90,32 +89,32 @@ public class FileServiceDb implements FileService {
 	}
 
 	@Override
-	public Optional<String> url(Long fileId) {
-		if(fileId == null) {
+	public Optional<String> url(String fileUid) {
+		if(fileUid == null) {
 			return Optional.empty();
 		}
 
-		FileData fileData = fileCache.getIfPresent(fileId);
+		FileData fileData = fileCache.getIfPresent(fileUid);
 		if(fileData != null) {
-			return Optional.of(fullFileUrl(fileId, fileData.getFilename()));
+			return Optional.of(fullFileUrl(fileUid, fileData.getFilename()));
 		}
 
-		return fileUrlCached(fileId);
+		return fileUrlCached(fileUid);
 	}
 
 	@Override
-	public String urlRaw(Long fileId) {
-		return fileId == null ? null : (fileWsBasePath + "/" + fileId);
+	public String urlRaw(String fileUid) {
+		return fileUid == null ? null : (fileWsBasePath + "/" + fileUid);
 	}
 
 	@Override
-	public Optional<FileData> fetch(Long fileId) {
-		if(fileId == null) {
+	public Optional<FileData> fetch(String fileUid) {
+		if(fileUid == null) {
 			return Optional.empty();
 		}
 
 		try {
-			return Optional.of(fileCache.get(fileId));
+			return Optional.of(fileCache.get(fileUid));
 		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
@@ -124,11 +123,12 @@ public class FileServiceDb implements FileService {
 		}
 	}
 
-	private FileData fetchUncached(Long fileId) {
+	private FileData fetchUncached(String fileUid) {
 		return Optional
-			.ofNullable(fileDao.findById(fileId))
+			.ofNullable(fileDao.findByUid(fileUid))
 			.map(file -> FileData.of(
 				file.getId(),
+				file.getUid(),
 				file.getFilename(),
 				file.getFileType(),
 				FileNameUtils.guessMimeType(file.getFilename()),
@@ -138,9 +138,9 @@ public class FileServiceDb implements FileService {
 			.orElseThrow(NotFoundException::new);
 	}
 
-	private Optional<String> fileUrlCached(Long fileId) {
+	private Optional<String> fileUrlCached(String fileUid) {
 		try {
-			return Optional.of(fileUrlCache.get(fileId));
+			return Optional.of(fileUrlCache.get(fileUid));
 		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
@@ -149,18 +149,18 @@ public class FileServiceDb implements FileService {
 		}
 	}
 
-	private String fileUrl(Long fileId) {
+	private String fileUrl(String fileUid) {
 		return Optional
-			.ofNullable(fileDao.fileName(fileId))
-			.map(fileName -> fullFileUrl(fileId, Strings.emptyToNull(fileName)))
+			.ofNullable(fileDao.fileName(fileUid))
+			.map(fileName -> fullFileUrl(fileUid, Strings.emptyToNull(fileName)))
 			.orElseThrow(NotFoundException::new);
 	}
 
-	private String fullFileUrl(Long fileId, String fileName) {
+	private String fullFileUrl(String fileUid, String fileName) {
 		if(fileName == null) {
-			return urlRaw(fileId);
+			return urlRaw(fileUid);
 		}
-		return fileId == null ? null : (urlRaw(fileId) + "/" + fileName);
+		return fileUid == null ? null : (urlRaw(fileUid) + "/" + fileName);
 	}
 
 	private static class NotFoundException extends RuntimeException {

@@ -9,12 +9,11 @@ import lombok.ToString;
 
 @Setter
 @Getter
-@EqualsAndHashCode(of = "id")
-@ToString(of = { "id", "filename", "fileType" })
-public class FileEntityQuerydsl implements CrudEntity{
-
+@EqualsAndHashCode(of = "uid")
+@ToString(of = { "uid", "filename", "fileType" })
+public class FileEntityQuerydsl implements CrudEntity {
 	private Long id;
+	private String uid;
 	private String filename;
 	private String fileType;
-
 }

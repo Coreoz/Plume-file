@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.db.querydsl;
+package com.coreoz.plume.file.db.querydsl.disk;
 
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;

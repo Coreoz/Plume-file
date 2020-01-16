@@ -1,15 +1,14 @@
 package com.coreoz.plume.file.gallery.db.hibernate;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.inject.Singleton;
-
 import com.coreoz.plume.file.gallery.db.FileGalleryDao;
-import com.coreoz.plume.file.gallery.db.FileGalleryRaw;
+import com.coreoz.plume.file.gallery.db.querydsl.FileGalleryResponse;
 import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
+
+import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.List;
 
 @Singleton
 public class FileGalleryDaoHibernate implements FileGalleryDao {
@@ -25,7 +24,7 @@ public class FileGalleryDaoHibernate implements FileGalleryDao {
 	}
 
 	@Override
-	public List<FileGalleryRaw> fetch(String galleryType, Long idData) {
+	public List<FileGalleryResponse> fetch(String galleryType, Long idData) {
 		// TODO to implement
 		return null;
 	}
