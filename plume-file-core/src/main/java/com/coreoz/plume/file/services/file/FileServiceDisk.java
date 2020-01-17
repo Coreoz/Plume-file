@@ -16,7 +16,6 @@ import com.google.common.io.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
@@ -53,11 +52,9 @@ public class FileServiceDisk implements FileService {
         }
         String fileName = FileNameUtils.sanitize(filename);
 
-        String fullFileName = fileName + extractFileExtension(fileName);
+        FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, fileName);
 
-        FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, fullFileName);
-
-        createFile(this.path, fileData, fullFileName);
+        createFile(this.path, fileData, file.getPath());
 
         return FileUploaded.of(
             file.getId(),
@@ -66,7 +63,7 @@ public class FileServiceDisk implements FileService {
         );
     }
 
-    private void createFile(String path, byte[] fileData, @Nullable String fileName) {
+    private void createFile(String path, byte[] fileData, String fileName) {
         try {
             if (!new File(path).exists()) {
                 new File(path).mkdirs();
@@ -163,13 +160,5 @@ public class FileServiceDisk implements FileService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String extractFileExtension(String filename) {
-        String[] filenameSplited = filename.split("[.]");
-        if (filenameSplited.length < 1) {
-            return "";
-        }
-        return "." + filenameSplited[filenameSplited.length - 1].toLowerCase();
     }
 }

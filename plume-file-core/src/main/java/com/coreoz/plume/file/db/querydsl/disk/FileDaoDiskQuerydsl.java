@@ -100,7 +100,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
                 QFileEntityDiskQuerydsl.fileDisk.path
             )
             .from(QFileEntityDiskQuerydsl.fileDisk)
-            .innerJoin(QFileEntityDiskQuerydsl.fileDisk)
+            .innerJoin(QFileEntityQuerydsl.file)
             .on(QFileEntityQuerydsl.file.id.eq(QFileEntityDiskQuerydsl.fileDisk.idFile))
             .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
             .fetchFirst()
