@@ -1,6 +1,5 @@
 package com.coreoz.plume.file.services.file;
 
-import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDisk;
 import com.coreoz.plume.file.db.querydsl.disk.FileDaoDiskQuerydsl;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
@@ -10,6 +9,8 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
+import com.coreoz.plume.jersey.errors.WsError;
+import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.slf4j.Logger;
@@ -21,12 +22,12 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
 // TODO should be unit tested
 @Singleton
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
+
     protected String path;
     private String baseUrl;
     private final FileDaoDiskQuerydsl fileDao;
@@ -46,16 +47,17 @@ public class FileServiceDisk implements FileService {
     }
 
     @Override
-    public FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String filename) {
-        String fileName = FileNameUtils.sanitize(Strings.nullToEmpty(filename));
+    public FileUploaded upload(FileType fileType, byte[] fileData, String filename) {
+        if (Strings.isNullOrEmpty(filename)) {
+            throw new WsException(new WsError.WsErrorInternal("File name must be declared to be saved on disk"));
+        }
+        String fileName = FileNameUtils.sanitize(filename);
 
-        String uid = UUID.randomUUID().toString();
+        String fullFileName = fileName + extractFileExtension(fileName);
 
-        String relativePath = uid + extractFileExtension(fileName);
+        FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, fullFileName);
 
-        FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, relativePath);
-
-        createFile(this.path, fileData, relativePath);
+        createFile(this.path, fileData, fullFileName);
 
         return FileUploaded.of(
             file.getId(),

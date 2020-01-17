@@ -2,7 +2,7 @@ package com.coreoz.plume.file.db.querydsl.database;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.db.utils.IdGenerator;
-import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
 import com.coreoz.plume.file.db.querydsl.QFileEntityQuerydsl;
@@ -16,11 +16,10 @@ import com.querydsl.sql.SQLQuery;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
-public class FileDaoDatabaseQuerydsl implements FileDao {
+public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
     private final TransactionManagerQuerydsl transactionManager;
 
     @Inject

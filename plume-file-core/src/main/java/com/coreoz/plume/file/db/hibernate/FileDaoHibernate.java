@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 
 import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
 import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
-import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
 import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 
 @Singleton
-public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> implements FileDao {
+public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> implements FileDaoDatabase {
 
 	@Inject
 	public FileDaoHibernate(TransactionManagerHibernate transactionManager) {

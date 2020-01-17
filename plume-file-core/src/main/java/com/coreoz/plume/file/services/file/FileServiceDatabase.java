@@ -1,6 +1,6 @@
 package com.coreoz.plume.file.services.file;
 
-import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class FileServiceDatabase implements FileService {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileServiceDatabase.class);
 
-	private final FileDao fileDao;
+	private final FileDaoDatabase fileDaoDatabase;
 	private final FileTypesProvider fileTypesProvider;
 	private final ChecksumService checksumService;
 
@@ -35,12 +36,12 @@ public class FileServiceDatabase implements FileService {
 	private final LoadingCache<String, String> fileUrlCache;
 
 	@Inject
-	public FileServiceDatabase(FileDao fileDao,
-                               FileTypesProvider fileTypesProvider,
-                               ChecksumService checksumService,
-                               FileConfigurationService config,
-                               FileCacheService cacheService) {
-		this.fileDao = fileDao;
+	public FileServiceDatabase(FileDaoDatabase fileDaoDatabase,
+							   FileTypesProvider fileTypesProvider,
+							   ChecksumService checksumService,
+							   FileConfigurationService config,
+							   FileCacheService cacheService) {
+		this.fileDaoDatabase = fileDaoDatabase;
 		this.fileTypesProvider = fileTypesProvider;
 		this.checksumService = checksumService;
 
@@ -50,8 +51,8 @@ public class FileServiceDatabase implements FileService {
 	}
 
 	@Override
-	public FileUploaded upload(FileType fileType, byte[] fileData, String fileName) {
-		FileEntry file = this.fileDao.upload(
+	public FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String fileName) {
+		FileEntry file = this.fileDaoDatabase.upload(
 			fileType.name(),
 			fileData,
 			FileNameUtils.sanitize(fileName)
@@ -66,7 +67,7 @@ public class FileServiceDatabase implements FileService {
 
 	@Override
 	public void delete(String fileUid) {
-		fileDao.delete(fileUid);
+		fileDaoDatabase.delete(fileUid);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class FileServiceDatabase implements FileService {
 			.fileTypesAvailable()
 			.stream()
 			.mapToLong(fileType ->
-				fileDao.deleteUnreferenced(
+				fileDaoDatabase.deleteUnreferenced(
 					fileType.name(),
 					fileType.getFileEntity(),
 					fileType.getJoinColumn()
@@ -125,7 +126,7 @@ public class FileServiceDatabase implements FileService {
 
 	private FileData fetchUncached(String fileUid) {
 		return Optional
-			.ofNullable(fileDao.findByUid(fileUid))
+			.ofNullable(fileDaoDatabase.findByUid(fileUid))
 			.map(file -> FileData.of(
 				file.getId(),
 				file.getUid(),
@@ -151,7 +152,7 @@ public class FileServiceDatabase implements FileService {
 
 	private String fileUrl(String fileUid) {
 		return Optional
-			.ofNullable(fileDao.fileName(fileUid))
+			.ofNullable(fileDaoDatabase.fileName(fileUid))
 			.map(fileName -> fullFileUrl(fileUid, Strings.emptyToNull(fileName)))
 			.orElseThrow(NotFoundException::new);
 	}

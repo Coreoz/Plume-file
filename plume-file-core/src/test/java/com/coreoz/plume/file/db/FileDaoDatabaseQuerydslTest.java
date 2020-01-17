@@ -10,13 +10,13 @@ import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestDbModule.class)
-public class FileDaoDatabaseQuerydslTest extends FileDaoTest {
+public class FileDaoDatabaseQuerydslTest extends FileDaoDatabaseTest {
 
 	@Inject
 	private FileDaoDatabaseQuerydsl fileDao;
 
 	@Override
-	protected FileDao fileDao() {
+	protected FileDaoDatabase fileDao() {
 		return fileDao;
 	}
 

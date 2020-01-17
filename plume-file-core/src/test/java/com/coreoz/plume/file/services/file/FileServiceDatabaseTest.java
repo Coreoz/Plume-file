@@ -2,7 +2,7 @@ package com.coreoz.plume.file.services.file;
 
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
-import com.coreoz.plume.file.db.FileDao;
+import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDatabase;
 import com.coreoz.plume.file.services.cache.FileCacheService;
@@ -120,7 +120,7 @@ public class FileServiceDatabaseTest {
 
 	// utils
 
-	private FileDao fileDaoMock() {
+	private FileDaoDatabase fileDaoMock() {
 		return new FileDaoDatabaseQuerydsl(null) {
 			@Override
 			public String fileName(String fileUid) {

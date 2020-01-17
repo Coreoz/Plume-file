@@ -3,7 +3,7 @@ package com.coreoz.plume.file.db;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 
-public interface FileDao {
+public interface FileDaoDatabase {
 
 	FileEntry upload(String fileType, byte[] fileData, String fileName);
 

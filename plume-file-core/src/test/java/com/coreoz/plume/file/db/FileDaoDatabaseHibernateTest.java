@@ -10,13 +10,13 @@ import com.coreoz.plume.file.db.hibernate.FileDaoHibernate;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestDbModule.class)
-public class FileDaoHibernateTest extends FileDaoTest {
+public class FileDaoDatabaseHibernateTest extends FileDaoDatabaseTest {
 
 	@Inject
 	private FileDaoHibernate fileDao;
 
 	@Override
-	protected FileDao fileDao() {
+	protected FileDaoDatabase fileDao() {
 		return fileDao;
 	}
 
