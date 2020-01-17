@@ -49,7 +49,7 @@ public class QFileDatabaseEntityQuerydsl extends com.querydsl.sql.RelationalPath
     }
 
     public void addMetadata() {
-        addMetadata(this.data, ColumnMetadata.named("DATA").withIndex(4).ofType(2004).withSize(2147483647).notNull());
+        addMetadata(this.data, ColumnMetadata.named("DATA").withIndex(1).ofType(Types.BLOB).withSize(2147483647).notNull());
         addMetadata(idFile, ColumnMetadata.named("ID_FILE").withIndex(2).ofType(Types.DECIMAL).withSize(19).notNull());
     }
 }

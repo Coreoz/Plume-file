@@ -33,7 +33,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
         file.setUid(UUID.randomUUID().toString());
 
         transactionManager.execute(connection -> {
-            Long idFile = transactionManager
+            transactionManager
                 .insert(QFileEntityQuerydsl.file, connection)
                 .populate(file)
                 .execute();
@@ -41,11 +41,10 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
             transactionManager
                 .insert(QFileEntityDiskQuerydsl.fileDisk, connection)
                 .columns(
-                    QFileEntityDiskQuerydsl.fileDisk.id,
                     QFileEntityDiskQuerydsl.fileDisk.path,
                     QFileEntityDiskQuerydsl.fileDisk.idFile
                 )
-                .values(file.getId(), path, idFile)
+                .values(path, file.getId())
                 .execute();
         });
 
