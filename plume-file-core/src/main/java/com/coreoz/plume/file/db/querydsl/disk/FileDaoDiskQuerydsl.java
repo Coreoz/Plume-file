@@ -13,6 +13,7 @@ import com.querydsl.sql.SQLExpressions;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FileDaoDiskQuerydsl implements FileDaoDisk {
@@ -29,6 +30,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
         file.setFilename(fileName);
         file.setFileType(fileType);
         file.setId(IdGenerator.generate());
+        file.setUid(UUID.randomUUID().toString());
 
         transactionManager.execute(connection -> {
             Long idFile = transactionManager
