@@ -90,7 +90,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
 
     @Override
     public FileEntryDisk findByUid(String fileUid) {
-        return Optional.of(transactionManager
+        return Optional.ofNullable(transactionManager
             .selectQuery()
             .select(
                 QFileEntityQuerydsl.file.id,
