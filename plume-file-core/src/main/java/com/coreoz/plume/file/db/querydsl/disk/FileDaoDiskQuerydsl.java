@@ -107,7 +107,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
         ).map(file -> FileEntryDisk.of(
             file.get(QFileEntityQuerydsl.file.id),
             file.get(QFileEntityQuerydsl.file.uid),
-            file.get(QFileEntityQuerydsl.file.fileType),
+            file.get(QFileEntityQuerydsl.file.filename),
             file.get(QFileEntityQuerydsl.file.fileType),
             file.get(QFileEntityDiskQuerydsl.fileDisk.path))
         ).orElse(null);
