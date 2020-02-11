@@ -16,6 +16,7 @@ import com.querydsl.sql.SQLQuery;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
@@ -128,6 +129,17 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
             )
             .findFirst()
             .orElse(null);
+    }
+
+    @Override
+    public FileEntryDatabase findById(Long fileId) {
+        Optional<String> uid = Optional.ofNullable(
+            transactionManager
+                .selectQuery()
+                .select(QFileEntityQuerydsl.file.uid)
+                .where(QFileEntityQuerydsl.file.id.eq(fileId))
+                .fetchFirst());
+        return uid.map(this::findByUid).orElse(null);
     }
 
     @Override

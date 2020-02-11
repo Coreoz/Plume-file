@@ -20,6 +20,8 @@ public interface FileDaoDatabase {
 
 	FileEntry findByUid(String fileUid);
 
+	FileEntry findById(Long fileId);
+
 	Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column);
 
 }

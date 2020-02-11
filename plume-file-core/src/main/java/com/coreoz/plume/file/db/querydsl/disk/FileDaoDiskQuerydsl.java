@@ -114,6 +114,16 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
     }
 
     @Override
+    public FileEntryDisk findById(Long fileId) {
+        Optional<String> uid = Optional.ofNullable(transactionManager
+            .selectQuery()
+            .select(QFileEntityQuerydsl.file.uid)
+            .where(QFileEntityQuerydsl.file.id.eq(fileId))
+            .fetchFirst());
+        return uid.map(this::findByUid).orElse(null);
+    }
+
+    @Override
     public List<String> deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
         return this.selectUnreferenced(fileType, fileEntity, column)
             .stream()

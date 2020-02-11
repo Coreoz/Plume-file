@@ -22,5 +22,7 @@ public interface FileDaoDisk {
 
     FileEntryDisk findByUid(String fileUid);
 
+    FileEntryDisk findById(Long fileId);
+
     List<String> deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column);
 }
