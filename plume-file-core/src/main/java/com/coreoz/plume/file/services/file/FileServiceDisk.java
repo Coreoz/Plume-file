@@ -121,6 +121,12 @@ public class FileServiceDisk implements FileService {
             .map(fileName -> url(fileUid, fileName));
     }
 
+    @Override
+    public Optional<String> url(Long fileId) {
+        FileEntryDisk fileEntryDisk = this.fileDao.findById(fileId);
+        return this.url(fileEntryDisk.getUid());
+    }
+
     private String url(String fileUid, String fileName) {
         return baseUrl + "files/" + fileUid + "/" + fileName;
     }

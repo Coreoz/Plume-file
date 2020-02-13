@@ -104,6 +104,12 @@ public class FileServiceDatabase implements FileService {
 	}
 
 	@Override
+	public Optional<String> url(Long fileId) {
+		FileEntry fileEntry = this.fileDaoDatabase.findById(fileId);
+		return this.url(fileEntry.getUid());
+	}
+
+	@Override
 	public String urlRaw(String fileUid) {
 		return fileUid == null ? null : (fileWsBasePath + "/" + fileUid);
 	}
