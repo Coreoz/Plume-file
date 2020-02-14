@@ -39,12 +39,7 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
         transactionManager.execute(connection -> {
             transactionManager
                 .insert(QFileEntityQuerydsl.file, connection)
-                .columns(
-                    QFileEntityQuerydsl.file.uid,
-                    QFileEntityQuerydsl.file.filename,
-                    QFileEntityQuerydsl.file.fileType
-                )
-                .values(file.getUid(), file.getFilename(), file.getFileType())
+                .populate(file)
                 .execute();
 
             transactionManager
