@@ -69,6 +69,22 @@ CITY_LANDSCAPE_IMAGE(QCity.city, QCity.city.landscapeImageId)
 ```
 4. Start using `FileService`.
 
+The file service is separated in 2 parts:
+- FileServiceDisk to store your files on the server disk
+- FileServiceDatabase to store your files directly into a blob in the database
+
+1. FileServiceDisk
+
+To use File Service Disk you must bind FileService to FileServiceDisk in the `ApplicationModule`:
+ ```java
+ // file management
+ bind(FileService.class).to(FileServiceDisk.class);
+ ```
+To use File Service Database you must bind FileService to FileServiceDatabase in the `ApplicationModule`:
+ ```java
+ // file management
+ bind(FileService.class).to(FileServiceDatabase.class);
+ ```
 The instance `FileService` should be obtained by injection:
 ```java
 @Inject
