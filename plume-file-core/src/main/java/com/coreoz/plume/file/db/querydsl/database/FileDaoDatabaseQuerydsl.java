@@ -16,9 +16,11 @@ import com.querydsl.sql.SQLQuery;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -65,24 +67,28 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
 
     @Override
     public String delete(String uid) {
+        return transactionManager
+            .executeAndReturn(connection ->
+                this.delete(uid, connection)
+            );
+    }
+
+    private String delete(String uid, Connection connection) {
+        Long fileId = transactionManager
+            .selectQuery(connection)
+            .select(QFileEntityQuerydsl.file.id)
+            .where(QFileEntityQuerydsl.file.uid.eq(uid))
+            .fetchFirst();
+
         transactionManager
-            .execute(connection -> {
-                Long fileId = transactionManager
-                    .selectQuery(connection)
-                    .select(QFileEntityQuerydsl.file.id)
-                    .where(QFileEntityQuerydsl.file.uid.eq(uid))
-                    .fetchFirst();
+            .delete(QFileDatabaseEntityQuerydsl.fileData, connection)
+            .where(QFileDatabaseEntityQuerydsl.fileData.idFile.eq(fileId))
+            .execute();
 
-                transactionManager
-                    .delete(QFileDatabaseEntityQuerydsl.fileData, connection)
-                    .where(QFileDatabaseEntityQuerydsl.fileData.idFile.eq(fileId))
-                    .execute();
-
-                transactionManager
-                    .delete(QFileEntityQuerydsl.file, connection)
-                    .where(QFileEntityQuerydsl.file.id.eq(fileId))
-                    .execute();
-            });
+        transactionManager
+            .delete(QFileEntityQuerydsl.file, connection)
+            .where(QFileEntityQuerydsl.file.id.eq(fileId))
+            .execute();
 
         return uid;
     }
@@ -103,49 +109,28 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
 
     @Override
     public FileEntryDatabase findByUid(String fileUid) {
-        return transactionManager
-            .selectQuery()
-            .select(
-                QFileEntityQuerydsl.file.id,
-                QFileEntityQuerydsl.file.fileType,
-                QFileEntityQuerydsl.file.filename,
-                QFileDatabaseEntityQuerydsl.fileData.data
-            )
-            .from(QFileEntityQuerydsl.file)
-            .join(QFileDatabaseEntityQuerydsl.fileData)
-            .on(QFileEntityQuerydsl.file.id.eq(QFileDatabaseEntityQuerydsl.fileData.idFile))
-            .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
-            .fetch()
-            .stream()
-            .map(row ->
-                FileEntryDatabase.of(
-                    row.get(QFileEntityQuerydsl.file.id),
-                    row.get(QFileEntityQuerydsl.file.uid),
-                    row.get(QFileEntityQuerydsl.file.filename),
-                    row.get(QFileEntityQuerydsl.file.fileType),
-                    row.get(QFileDatabaseEntityQuerydsl.fileData.data)
-                )
-            )
-            .findFirst()
-            .orElse(null);
+        return Optional.ofNullable(this.getBasicQuery()
+                .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
+                .fetchFirst())
+                .map(this.toFileEntryDisk())
+                .orElse(null);
     }
 
     @Override
     public FileEntryDatabase findById(Long fileId) {
-        Optional<String> uid = Optional.ofNullable(
-            transactionManager
-                .selectQuery()
-                .select(QFileEntityQuerydsl.file.uid)
+        return Optional.ofNullable(
+            this.getBasicQuery()
                 .where(QFileEntityQuerydsl.file.id.eq(fileId))
-                .fetchFirst());
-        return uid.map(this::findByUid).orElse(null);
+                .fetchFirst())
+            .map(this.toFileEntryDisk())
+            .orElse(null);
     }
 
     @Override
     public List<String> deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
         return this.selectUnreferenced(fileType, fileEntity, column)
             .stream()
-            .map(file -> delete(file.getUid()))
+            .map(file -> transactionManager.executeAndReturn(connection -> delete(file.getUid(), connection)))
             .collect(Collectors.toList());
     }
 
@@ -161,6 +146,31 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
                     .from(fileEntity)
             ))
             .fetch();
+    }
+
+    private SQLQuery<Tuple> getBasicQuery() {
+        return transactionManager
+            .selectQuery()
+            .select(
+                QFileEntityQuerydsl.file.id,
+                QFileEntityQuerydsl.file.fileType,
+                QFileEntityQuerydsl.file.filename,
+                QFileDatabaseEntityQuerydsl.fileData.data
+            )
+            .from(QFileEntityQuerydsl.file)
+            .join(QFileDatabaseEntityQuerydsl.fileData)
+            .on(QFileEntityQuerydsl.file.id.eq(QFileDatabaseEntityQuerydsl.fileData.idFile));
+    }
+
+    private Function<Tuple, FileEntryDatabase> toFileEntryDisk() {
+        return row ->
+            FileEntryDatabase.of(
+                row.get(QFileEntityQuerydsl.file.id),
+                row.get(QFileEntityQuerydsl.file.uid),
+                row.get(QFileEntityQuerydsl.file.filename),
+                row.get(QFileEntityQuerydsl.file.fileType),
+                row.get(QFileDatabaseEntityQuerydsl.fileData.data)
+            );
     }
 
 }

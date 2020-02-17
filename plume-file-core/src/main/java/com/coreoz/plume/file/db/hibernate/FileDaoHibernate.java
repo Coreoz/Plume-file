@@ -7,11 +7,16 @@ import com.coreoz.plume.db.hibernate.TransactionManagerHibernate;
 import com.coreoz.plume.db.hibernate.crud.CrudDaoHibernate;
 import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
+import com.coreoz.plume.file.db.querydsl.QFileEntityQuerydsl;
+import com.coreoz.plume.file.db.querydsl.database.QFileDatabaseEntityQuerydsl;
 import com.google.common.base.Strings;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> implements FileDaoDatabase {
@@ -30,10 +35,22 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 		return save(file);
 	}
 
-	@Override
-	public String delete(String fileUid) {
-		return null;
-	}
+    @Override
+    public String delete(String fileUid) {
+        return this.transactionManager.queryDslExecuteAndReturn
+            (
+                query -> {
+                    Long toDelete = query.select(QFileEntityQuerydsl.file.id).where(QFileEntityQuerydsl.file.uid.eq(fileUid)).fetchFirst();
+
+                    query.delete(QFileEntityQuerydsl.file)
+                        .where(QFileEntityQuerydsl.file.id.eq(toDelete));
+
+                    query.delete(QFileDatabaseEntityQuerydsl.fileData)
+                        .where(QFileDatabaseEntityQuerydsl.fileData.idFile.eq(toDelete));
+
+                    return fileUid;
+                });
+    }
 
 	@Override
 	public String fileName(String fileUid) {
@@ -56,8 +73,9 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 	}
 
 	@Override
-	public Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
+	public List<String> deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column) {
 		return transactionManager.queryDslExecuteAndReturn(query ->
+		{
 			query
 				.delete(QFileEntityHibernate.fileEntity)
 				.where(QFileEntityHibernate.fileEntity.fileType.eq(fileType))
@@ -66,8 +84,9 @@ public class FileDaoHibernate extends CrudDaoHibernate<FileEntityHibernate> impl
 						.select(column)
 						.from(fileEntity)
 				))
-				.execute()
-		);
+				.execute();
+			return new ArrayList<>();
+		});
 	}
 
 }
