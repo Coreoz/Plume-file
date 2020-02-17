@@ -63,12 +63,6 @@ public interface FileService {
 	Optional<String> url(String fileUid);
 
 	/**
-	 * Returns a complete relative URL, for example /api/files/3418557718705733633/cats.jpg
-	 * {@link Optional#empty()} is returned if the corresponding file does not exist
-	 */
-	Optional<String> url(Long fileId);
-
-	/**
 	 * Returns a relative URL without the extension.
 	 * Contrary to {@link #url(String)},
 	 * it does not make a call to the database to compute the file URL.
@@ -80,6 +74,8 @@ public interface FileService {
 	// file data
 
 	Optional<FileData> fetch(String fileUid);
+
+	Optional<FileData> fetch(Long fileId);
 
 
 }

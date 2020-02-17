@@ -3,6 +3,8 @@ package com.coreoz.plume.file.db;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 
+import java.util.List;
+
 public interface FileDaoDatabase {
 
 	FileEntry upload(String fileType, byte[] fileData, String fileName);
@@ -22,6 +24,6 @@ public interface FileDaoDatabase {
 
 	FileEntry findById(Long fileId);
 
-	Long deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column);
+	List<String> deleteUnreferenced(String fileType, EntityPath<?> fileEntity, NumberPath<Long> column);
 
 }

@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // TODO should be unit tested
 @Singleton
@@ -98,14 +99,21 @@ public class FileServiceDisk implements FileService {
 
     @Override
     public void deleteUnreferenced() {
-        fileTypesProvider
+        Integer countDeleted = fileTypesProvider
             .fileTypesAvailable()
-            .forEach(fileType ->
+            .stream()
+            .map(fileType ->
                 this.fileDao.deleteUnreferenced(
                     fileType.name(),
                     fileType.getFileEntity(),
                     fileType.getJoinColumn()
-                ));
+                ))
+        .collect(Collectors.toList())
+        .size();
+
+        if(countDeleted > 0) {
+            logger.debug("{} unreferenced files deleted", countDeleted);
+        }
     }
 
     @Override
@@ -119,12 +127,6 @@ public class FileServiceDisk implements FileService {
             .ofNullable(this.fileDao.findByUid(fileUid))
             .map(FileEntryDisk::getFilename)
             .map(fileName -> url(fileUid, fileName));
-    }
-
-    @Override
-    public Optional<String> url(Long fileId) {
-        FileEntryDisk fileEntryDisk = this.fileDao.findById(fileId);
-        return this.url(fileEntryDisk.getUid());
     }
 
     private String url(String fileUid, String fileName) {
@@ -146,6 +148,15 @@ public class FileServiceDisk implements FileService {
             return Optional.empty();
         }
         return fetchFile(fileWithPath, path + fileWithPath.getPath());
+    }
+
+    @Override
+    public Optional<FileData> fetch(Long fileId) {
+        FileEntryDisk fileEntryDisk = this.fileDao.findById(fileId);
+        if (fileEntryDisk != null) {
+            return this.fetch(fileEntryDisk.getUid());
+        }
+        return Optional.empty();
     }
 
     private Optional<FileData> fetchFile(FileEntryDisk fileEntity, String path) {

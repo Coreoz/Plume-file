@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 @Getter
 @Accessors(chain = true)
 public class FileUploadBase64 {
-
 	private String filename;
 	private String base64;
 

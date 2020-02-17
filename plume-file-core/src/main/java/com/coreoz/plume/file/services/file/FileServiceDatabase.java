@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Singleton
 public class FileServiceDatabase implements FileService {
@@ -75,14 +76,15 @@ public class FileServiceDatabase implements FileService {
 		long countDeleted = fileTypesProvider
 			.fileTypesAvailable()
 			.stream()
-			.mapToLong(fileType ->
+			.map(fileType ->
 				fileDaoDatabase.deleteUnreferenced(
 					fileType.name(),
 					fileType.getFileEntity(),
 					fileType.getJoinColumn()
 				)
 			)
-			.sum();
+			.collect(Collectors.toList())
+			.size();
 
 		if(countDeleted > 0) {
 			logger.debug("{} unreferenced files deleted", countDeleted);
@@ -104,12 +106,6 @@ public class FileServiceDatabase implements FileService {
 	}
 
 	@Override
-	public Optional<String> url(Long fileId) {
-		FileEntry fileEntry = this.fileDaoDatabase.findById(fileId);
-		return this.url(fileEntry.getUid());
-	}
-
-	@Override
 	public String urlRaw(String fileUid) {
 		return fileUid == null ? null : (fileWsBasePath + "/" + fileUid);
 	}
@@ -121,13 +117,22 @@ public class FileServiceDatabase implements FileService {
 		}
 
 		try {
-			return Optional.of(fileCache.get(fileUid));
+			return Optional.of(this.fileCache.get(fileUid));
 		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
 			}
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public Optional<FileData> fetch(Long fileId) {
+		FileEntry fileEntry = this.fileDaoDatabase.findById(fileId);
+		if (fileEntry != null) {
+			return this.fetch(fileEntry.getUid());
+		}
+		return Optional.empty();
 	}
 
 	private FileData fetchUncached(String fileUid) {
@@ -147,7 +152,7 @@ public class FileServiceDatabase implements FileService {
 
 	private Optional<String> fileUrlCached(String fileUid) {
 		try {
-			return Optional.of(fileUrlCache.get(fileUid));
+			return Optional.of(this.fileUrlCache.get(fileUid));
 		} catch (ExecutionException | UncheckedExecutionException e) {
 			if(e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
 				return Optional.empty();
