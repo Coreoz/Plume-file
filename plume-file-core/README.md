@@ -48,7 +48,7 @@ install(new GuiceFileModuleQuerydsl());
 bind(FileTypesProvider.class).to(ProjectFileTypesProvider.class);
 ```
 6. Install Jersey web-service: `register(FileWs.class);`
-7. Create the `plm_file` table by applying the correct [creation script](sql/)
+7. Create the `plm_file` table by applying the correct [creation script](sql/) and the associated table (Disk or Database)
 8. [Start using files](#usage)
 
 Usage
@@ -79,12 +79,25 @@ To use File Service Disk you must bind FileService to FileServiceDisk in the `Ap
  ```java
  // file management
  bind(FileService.class).to(FileServiceDisk.class);
+
  ```
 To use File Service Database you must bind FileService to FileServiceDatabase in the `ApplicationModule`:
  ```java
  // file management
  bind(FileService.class).to(FileServiceDatabase.class);
  ```
+
+You lust bind FileDaoDatabase to specify if you are using Hibernate or Mysql:
+ ```java
+ bind(FileDaoDatabase.class).to(FileDaoDatabaseQuerydsl.class); // mysql
+ bind(FileDaoDatabase.class).to(FileDaoHibernate.class); // hibernate
+```
+ 
+ Then, you must bind the Checksum service and the file cache service (if using database storage)
+ ```java
+ bind(FileCacheService.class).to(FileCacheServiceGuava.class);
+ bind(ChecksumService.class).to(ChecksumServiceSha1.class);
+```
 The instance `FileService` should be obtained by injection:
 ```java
 @Inject
