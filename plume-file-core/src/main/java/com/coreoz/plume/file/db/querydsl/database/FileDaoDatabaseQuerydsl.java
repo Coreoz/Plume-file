@@ -153,6 +153,7 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
             .selectQuery()
             .select(
                 QFileEntityQuerydsl.file.id,
+                QFileEntityQuerydsl.file.uid,
                 QFileEntityQuerydsl.file.fileType,
                 QFileEntityQuerydsl.file.filename,
                 QFileDatabaseEntityQuerydsl.fileData.data
