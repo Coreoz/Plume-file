@@ -6,6 +6,7 @@ CREATE TABLE  `plm_file_data` (
 
 INSERT INTO plm_file_data VALUES(4, X'00aabb');
 INSERT INTO plm_file_data VALUES(5,  X'00aabb');
+INSERT INTO plm_file_data VALUES(8,  X'00aabb');
 
 CREATE TABLE  `plm_file_disk` (
   `id_file` bigint(20) NOT NULL,

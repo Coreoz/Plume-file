@@ -77,6 +77,7 @@ public class FileDaoDatabaseQuerydsl implements FileDaoDatabase {
         Long fileId = transactionManager
             .selectQuery(connection)
             .select(QFileEntityQuerydsl.file.id)
+            .from(QFileEntityQuerydsl.file)
             .where(QFileEntityQuerydsl.file.uid.eq(uid))
             .fetchFirst();
 

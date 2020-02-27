@@ -3,8 +3,9 @@ package com.coreoz.plume.file.services.file;
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileDaoDatabase;
-import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
+import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDatabase;
+import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.cache.FileCacheServiceGuava;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
@@ -118,6 +119,21 @@ public class FileServiceDatabaseTest {
 		assertThat(fileService.fetch("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).isEmpty();
 	}
 
+	@Test
+	public void findById__should_return_null_if_the_file_does_not_exist_mock() {
+		FileEntry file = fileDaoMock().findById(3L);
+		assertThat(file).isNull();
+	}
+
+	@Test
+	public void findById__should_not_return_null_if_the_file_exists_mock() {
+		FileEntry file = fileDaoMock().findById(5L);
+		assertThat(file.getUid()).isEqualTo("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
+		assertThat(file.getFilename()).isEqualTo("file.ext");
+		assertThat(file.getData()).isNull();
+		assertThat(file.getId()).isEqualTo(5L);
+	}
+
 	// utils
 
 	private FileDaoDatabase fileDaoMock() {
@@ -138,6 +154,20 @@ public class FileServiceDatabaseTest {
 					return FileEntryDatabase.of(
 						5L,
 						"846c36cc-f973-11e8-8eb2-f2801f1b9fd1",
+						"file.ext",
+						null,
+						null
+					);
+				}
+				return null;
+			}
+
+			@Override
+			public FileEntryDatabase findById(Long id) {
+				if(5L == id) {
+					return FileEntryDatabase.of(
+						5L,
+						"7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1",
 						"file.ext",
 						null,
 						null

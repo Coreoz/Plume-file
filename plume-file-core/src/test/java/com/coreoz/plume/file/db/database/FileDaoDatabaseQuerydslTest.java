@@ -1,7 +1,9 @@
-package com.coreoz.plume.file.db;
+package com.coreoz.plume.file.db.database;
 
 import javax.inject.Inject;
 
+import com.coreoz.plume.file.db.FileDaoDatabase;
+import com.coreoz.plume.file.db.FileTestDbModule;
 import org.junit.runner.RunWith;
 
 import com.carlosbecker.guice.GuiceModules;

@@ -5,11 +5,14 @@ import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDisk;
 import com.coreoz.plume.file.db.querydsl.disk.FileDaoDiskQuerydsl;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
+import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.hash.ChecksumServiceSha1;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,6 +48,15 @@ public class FileServiceDiskTest {
         assertThat(fileService.fetch("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).isEmpty();
     }
 
+    @Test
+    public void fetch__should_return_empty_if_the_file_does_not_exist_on_db() {
+        FileServiceDisk fileService = new FileServiceDisk(
+            fileDaoMock(), null, configurationService, checksumService
+        );
+        Optional<FileData> file = fileService.fetch(3L);
+        assertThat(file).isEmpty();
+    }
+
     private FileDaoDiskQuerydsl fileDaoMock() {
         return new FileDaoDiskQuerydsl(null) {
             @Override
@@ -67,6 +79,20 @@ public class FileServiceDiskTest {
                         "file.ext",
                         null,
                         "/api/files/846c36cc-f973-11e8-8eb2-f2801f1b9fd1/file.ext"
+                    );
+                }
+                return null;
+            }
+
+            @Override
+            public FileEntryDisk findById(Long id) {
+                if (5L == id) {
+                    return FileEntryDisk.of(
+                        5L,
+                        "7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1",
+                        "file.ext",
+                        null,
+                        "/api/files/7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1/file.ext"
                     );
                 }
                 return null;
