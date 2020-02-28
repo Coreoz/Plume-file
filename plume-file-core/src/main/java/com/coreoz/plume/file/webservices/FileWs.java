@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response.Status;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.FileService;
 
+import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 @Path("/files")
 @Api(value = "Serve binary resources")
 @Singleton
+@PublicApi
 public class FileWs {
 
 	private final FileService fileService;

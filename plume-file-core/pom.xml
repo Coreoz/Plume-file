@@ -42,11 +42,6 @@
 
 		<dependency>
 			<groupId>com.coreoz</groupId>
-			<artifactId>plume-db-hibernate</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.coreoz</groupId>
 			<artifactId>plume-db-querydsl</artifactId>
 			<optional>true</optional>
 		</dependency>
