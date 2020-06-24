@@ -102,7 +102,9 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
             this.getBasicQuery()
                 .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
                 .fetchFirst()
-        ).map(this.toFileEntryDisk()).orElse(null);
+        )
+            .map(this.toFileEntryDisk())
+            .orElse(null);
     }
 
     @Override
@@ -111,7 +113,9 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
             this.getBasicQuery()
                 .where(QFileEntityQuerydsl.file.id.eq(fileId))
                 .fetchFirst()
-        ).map(this.toFileEntryDisk()).orElse(null);
+        )
+            .map(this.toFileEntryDisk())
+            .orElse(null);
     }
 
     @Override

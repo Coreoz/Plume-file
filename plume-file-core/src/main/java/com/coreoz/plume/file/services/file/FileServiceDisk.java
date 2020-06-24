@@ -21,9 +21,8 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-// TODO should be unit tested
+// TODO file creation should be unit tested
 @Singleton
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
@@ -40,7 +39,7 @@ public class FileServiceDisk implements FileService {
                            FileConfigurationService configurationService,
                            ChecksumService checksumService) {
         this.path = configurationService.mediaLocalPath();
-        this.baseUrl = configurationService.apiBasePath() + "/";
+        this.baseUrl = configurationService.apiBasePath() + configurationService.fileWsPath();
         this.fileDao = fileDao;
         this.fileTypesProvider = fileTypesProvider;
         this.checksumService = checksumService;
@@ -99,7 +98,7 @@ public class FileServiceDisk implements FileService {
 
     @Override
     public void deleteUnreferenced() {
-        Integer countDeleted = fileTypesProvider
+        long countDeleted = fileTypesProvider
             .fileTypesAvailable()
             .stream()
             .map(fileType ->
@@ -108,8 +107,7 @@ public class FileServiceDisk implements FileService {
                     fileType.getFileEntity(),
                     fileType.getJoinColumn()
                 ))
-        .collect(Collectors.toList())
-        .size();
+            .count();
 
         if(countDeleted > 0) {
             logger.debug("{} unreferenced files deleted", countDeleted);
@@ -123,14 +121,12 @@ public class FileServiceDisk implements FileService {
         }
 
         return Optional
-            // TODO instead of fecthing the whole table row, this should only fetch the file name
-            .ofNullable(this.fileDao.findByUid(fileUid))
-            .map(FileEntryDisk::getFilename)
+            .ofNullable(this.fileDao.fileName(fileUid))
             .map(fileName -> url(fileUid, fileName));
     }
 
     private String url(String fileUid, String fileName) {
-        return baseUrl + "files/" + fileUid + "/" + fileName;
+        return baseUrl + "/" + fileUid + "/" + fileName;
     }
 
     @Override
