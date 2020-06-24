@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Singleton
 public class FileServiceDatabase implements FileService {
@@ -82,9 +81,7 @@ public class FileServiceDatabase implements FileService {
 					fileType.getFileEntity(),
 					fileType.getJoinColumn()
 				)
-			)
-			.collect(Collectors.toList())
-			.size();
+			).count();
 
 		if(countDeleted > 0) {
 			logger.debug("{} unreferenced files deleted", countDeleted);
