@@ -27,19 +27,23 @@ import java.util.Optional;
 public class FileServiceDisk implements FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
 
-    protected String path;
-    private String baseUrl;
+    private final String path;
+    private final String baseUrl;
+    private final String fileWsPath;
     private final FileDaoDiskQuerydsl fileDao;
     private final FileTypesProvider fileTypesProvider;
     private final ChecksumService checksumService;
 
     @Inject
-    public FileServiceDisk(FileDaoDiskQuerydsl fileDao,
-                           FileTypesProvider fileTypesProvider,
-                           FileConfigurationService configurationService,
-                           ChecksumService checksumService) {
+    public FileServiceDisk(
+        FileDaoDiskQuerydsl fileDao,
+        FileTypesProvider fileTypesProvider,
+        FileConfigurationService configurationService,
+        ChecksumService checksumService
+    ) {
         this.path = configurationService.mediaLocalPath();
-        this.baseUrl = configurationService.apiBasePath() + configurationService.fileWsPath();
+        this.baseUrl = configurationService.apiBasePath();
+        this.fileWsPath = configurationService.fileWsPath();
         this.fileDao = fileDao;
         this.fileTypesProvider = fileTypesProvider;
         this.checksumService = checksumService;
@@ -54,7 +58,11 @@ public class FileServiceDisk implements FileService {
 
         FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, fileName);
 
-        createFile(this.path, fileData, file.getPath());
+        this.createFile(
+            this.path,
+            fileData,
+            file.getPath()
+        );
 
         return FileUploaded.of(
             file.getId(),
@@ -109,7 +117,7 @@ public class FileServiceDisk implements FileService {
                 ))
             .count();
 
-        if(countDeleted > 0) {
+        if (countDeleted > 0) {
             logger.debug("{} unreferenced files deleted", countDeleted);
         }
     }
@@ -126,7 +134,7 @@ public class FileServiceDisk implements FileService {
     }
 
     private String url(String fileUid, String fileName) {
-        return baseUrl + "/" + fileUid + "/" + fileName;
+        return FileNameUtils.formatUrl(this.baseUrl, this.fileWsPath, fileUid, fileName);
     }
 
     @Override
@@ -139,11 +147,11 @@ public class FileServiceDisk implements FileService {
         if (fileUid == null) {
             return Optional.empty();
         }
-        FileEntryDisk fileWithPath = fileDao.findByUid(fileUid);
+        FileEntryDisk fileWithPath = this.fileDao.findByUid(fileUid);
         if (fileWithPath == null) {
             return Optional.empty();
         }
-        return fetchFile(fileWithPath, path + fileWithPath.getPath());
+        return fetchFile(fileWithPath, this.path + fileWithPath.getPath());
     }
 
     @Override
@@ -169,7 +177,8 @@ public class FileServiceDisk implements FileService {
                 fileEntity.getFileType(),
                 FileNameUtils.guessMimeType(fileEntity.getFilename()),
                 checksumService.hash(fileEntity.getFilename().getBytes()),
-                Files.toByteArray(file)));
+                Files.toByteArray(file)
+            ));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

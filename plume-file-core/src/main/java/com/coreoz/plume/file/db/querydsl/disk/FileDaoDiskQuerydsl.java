@@ -98,11 +98,9 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
 
     @Override
     public FileEntryDisk findByUid(String fileUid) {
-        return Optional.ofNullable(
-            this.getBasicQuery()
-                .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
-                .fetchFirst()
-        )
+        return Optional.ofNullable(this.getBasicQuery()
+            .where(QFileEntityQuerydsl.file.uid.eq(fileUid))
+            .fetchFirst())
             .map(this.toFileEntryDisk())
             .orElse(null);
     }
@@ -113,9 +111,7 @@ public class FileDaoDiskQuerydsl implements FileDaoDisk {
             this.getBasicQuery()
                 .where(QFileEntityQuerydsl.file.id.eq(fileId))
                 .fetchFirst()
-        )
-            .map(this.toFileEntryDisk())
-            .orElse(null);
+        ).map(this.toFileEntryDisk()).orElse(null);
     }
 
     @Override
