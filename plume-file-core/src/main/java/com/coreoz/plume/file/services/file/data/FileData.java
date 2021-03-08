@@ -6,11 +6,11 @@ import lombok.Value;
 
 @Value(staticConstructor = "of")
 public class FileData implements FileEntry {
-	private final Long id;
-	private final String uid;
-	private final String filename;
-	private final String fileType;
-	private final String mimeType;
-	private final String checksum;
-	private final byte[] data;
+	Long id;
+	String uid;
+	String filename;
+	String fileType;
+	String mimeType;
+	String checksum;
+	byte[] data;
 }

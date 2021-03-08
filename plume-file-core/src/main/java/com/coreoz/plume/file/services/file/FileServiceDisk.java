@@ -9,8 +9,6 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
-import com.coreoz.plume.jersey.errors.WsError;
-import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.slf4j.Logger;
@@ -52,7 +50,7 @@ public class FileServiceDisk implements FileService {
     @Override
     public FileUploaded upload(FileType fileType, byte[] fileData, String filename) {
         if (Strings.isNullOrEmpty(filename)) {
-            throw new WsException(new WsError.WsErrorInternal("File name must be declared to be saved on disk"));
+            throw new RuntimeException("File name must be declared to be saved on disk");
         }
         String fileName = FileNameUtils.sanitize(filename);
 
@@ -133,6 +131,17 @@ public class FileServiceDisk implements FileService {
             .map(fileName -> url(fileUid, fileName));
     }
 
+    @Override
+    public Optional<String> url(Long fileId) {
+        if (fileId == null) {
+            return Optional.empty();
+        }
+
+        return Optional
+            .ofNullable(this.fileDao.findById(fileId))
+            .map(file -> url(file.getUid(), file.getFilename()));
+    }
+
     private String url(String fileUid, String fileName) {
         return FileNameUtils.formatUrl(this.baseUrl, this.fileWsPath, fileUid, fileName);
     }
@@ -147,24 +156,27 @@ public class FileServiceDisk implements FileService {
         if (fileUid == null) {
             return Optional.empty();
         }
-        FileEntryDisk fileWithPath = this.fileDao.findByUid(fileUid);
-        if (fileWithPath == null) {
+        FileEntryDisk fileEntryDisk = this.fileDao.findByUid(fileUid);
+        if (fileEntryDisk == null) {
             return Optional.empty();
         }
-        return fetchFile(fileWithPath, this.path + fileWithPath.getPath());
+        return fetchFileFromDisk(fileEntryDisk);
     }
 
     @Override
     public Optional<FileData> fetch(Long fileId) {
+        if (fileId == null) {
+            return Optional.empty();
+        }
         FileEntryDisk fileEntryDisk = this.fileDao.findById(fileId);
         if (fileEntryDisk != null) {
-            return this.fetch(fileEntryDisk.getUid());
+            return this.fetchFileFromDisk(fileEntryDisk);
         }
         return Optional.empty();
     }
 
-    private Optional<FileData> fetchFile(FileEntryDisk fileEntity, String path) {
-        File file = new File(path);
+    private Optional<FileData> fetchFileFromDisk(FileEntryDisk fileEntity) {
+        File file = new File(this.path + fileEntity.getPath());
         if (!file.exists()) {
             return Optional.empty();
         }

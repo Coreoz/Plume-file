@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 @Singleton
 public class FileServiceDatabase implements FileService {
@@ -106,6 +107,16 @@ public class FileServiceDatabase implements FileService {
     }
 
     @Override
+    public Optional<String> url(Long fileId) {
+        if (fileId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(this.fileDaoDatabase.findById(fileId))
+            .map(fileEntry -> fullFileUrl(fileEntry.getUid(), fileEntry.getFilename()));
+    }
+
+    @Override
     public String urlRaw(String fileUid) {
         return Optional.ofNullable(fileUid)
             .map(fileUidString ->
@@ -137,25 +148,13 @@ public class FileServiceDatabase implements FileService {
 
     @Override
     public Optional<FileData> fetch(Long fileId) {
-        FileEntry fileEntry = this.fileDaoDatabase.findById(fileId);
-        if (fileEntry != null) {
-            return this.fetch(fileEntry.getUid());
-        }
-        return Optional.empty();
+        return Optional.ofNullable(this.fileDaoDatabase.findById(fileId)).map(toFileData());
     }
 
     private FileData fetchUncached(String fileUid) {
         return Optional
             .ofNullable(fileDaoDatabase.findByUid(fileUid))
-            .map(file -> FileData.of(
-                file.getId(),
-                file.getUid(),
-                file.getFilename(),
-                file.getFileType(),
-                FileNameUtils.guessMimeType(file.getFilename()),
-                checksumService.hash(file.getData()),
-                file.getData()
-            ))
+            .map(toFileData())
             .orElseThrow(NotFoundException::new);
     }
 
@@ -181,6 +180,18 @@ public class FileServiceDatabase implements FileService {
         return Optional.ofNullable(fileName)
             .map(fileNameString -> FileNameUtils.formatUrl(this.basePath, this.fileWsPath, fileUid, fileNameString))
             .orElse(urlRaw(fileUid));
+    }
+
+    private Function<FileEntry, FileData> toFileData() {
+        return file -> FileData.of(
+            file.getId(),
+            file.getUid(),
+            file.getFilename(),
+            file.getFileType(),
+            FileNameUtils.guessMimeType(file.getFilename()),
+            checksumService.hash(file.getData()),
+            file.getData()
+        );
     }
 
     private static class NotFoundException extends RuntimeException {

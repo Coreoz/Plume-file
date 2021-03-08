@@ -37,9 +37,9 @@ public class FileWs {
 	}
 
 	@GET
-	@Path("/{id}{filename: (/.*)?}")
+	@Path("/{uid}{filename: (/.*)?}")
 	@ApiOperation(value = "Serve a file")
-	public Response fetch(@ApiParam(required = true) @PathParam("id") String fileUid,
+	public Response fetch(@ApiParam(required = true) @PathParam("uid") String fileUid,
 			@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader) {
 		return fileService
 			.fetch(fileUid)

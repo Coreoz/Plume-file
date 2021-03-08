@@ -29,7 +29,8 @@ public class FileServiceDiskTest {
     public void url__should_return_empty_if_id_file_is_null() {
         FileServiceDisk fileService = new FileServiceDisk(null, null, configurationService, checksumService);
 
-        assertThat(fileService.url(null)).isEmpty();
+        assertThat(fileService.url((Long) null)).isEmpty();
+        assertThat(fileService.url((String) null)).isEmpty();
     }
 
     @Test

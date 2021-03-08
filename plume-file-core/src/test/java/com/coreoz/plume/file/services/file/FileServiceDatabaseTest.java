@@ -39,7 +39,8 @@ public class FileServiceDatabaseTest {
 	public void url__should_return_empty_if_id_file_is_null() {
 		FileServiceDatabase fileService = new FileServiceDatabase(null, null, null, configurationService, fileCacheService);
 
-		assertThat(fileService.url(null)).isEmpty();
+		assertThat(fileService.url((Long) null)).isEmpty();
+		assertThat(fileService.url((String) null)).isEmpty();
 	}
 
 	@Test
