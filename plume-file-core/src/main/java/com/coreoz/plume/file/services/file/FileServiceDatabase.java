@@ -1,201 +1,56 @@
 package com.coreoz.plume.file.services.file;
 
-import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
+import com.coreoz.plume.file.db.querydsl.beans.FileEntryDatabase;
+import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
-import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
-import com.coreoz.plume.file.utils.FileNameUtils;
-import com.google.common.base.Strings;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 
 @Singleton
-public class FileServiceDatabase implements FileService {
+public class FileServiceDatabase extends FileStorageAdapter {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDatabase.class);
-
-    private final FileDaoDatabase fileDaoDatabase;
-    private final FileTypesProvider fileTypesProvider;
-    private final ChecksumService checksumService;
-
-    private final String basePath;
-    private final String fileWsPath;
-    private final LoadingCache<String, FileData> fileCache;
-    private final LoadingCache<String, String> fileUrlCache;
 
     @Inject
     public FileServiceDatabase(
-        FileDaoDatabase fileDaoDatabase,
+        FileDaoDatabaseQuerydsl fileDaoDatabase,
         FileTypesProvider fileTypesProvider,
         ChecksumService checksumService,
-        FileConfigurationService config,
+        FileConfigurationService fileConfigurationService,
         FileCacheService cacheService
     ) {
-        this.fileDaoDatabase = fileDaoDatabase;
-        this.fileTypesProvider = fileTypesProvider;
-        this.checksumService = checksumService;
-
-        this.basePath = config.apiBasePath();
-        this.fileWsPath = config.fileWsPath();
-        this.fileCache = cacheService.newFileDataCache(this::fetchUncached);
-        this.fileUrlCache = cacheService.newFileUrlCache(this::fileUrl);
+        super(fileDaoDatabase, fileTypesProvider, checksumService, fileConfigurationService, cacheService);
     }
 
     @Override
-    public FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String fileName) {
-        FileEntry file = this.fileDaoDatabase.upload(
+    public FileUploaded upload(FileType fileType, String fileExtension, byte[] fileData) {
+        FileEntry file = this.fileDao.upload(
             fileType.name(),
-            fileData,
-            FileNameUtils.sanitize(fileName)
+            fileExtension,
+            fileData
         );
 
         return FileUploaded.of(
             file.getId(),
             file.getUid(),
-            this.fullFileUrl(file.getUid(), file.getFilename())
+            super.urlRaw(file.getUid())
         );
     }
 
     @Override
-    public void delete(String fileUid) {
-        fileDaoDatabase.delete(fileUid);
-    }
-
-    @Override
-    public void deleteUnreferenced() {
-        long countDeleted = fileTypesProvider
-            .fileTypesAvailable()
-            .stream()
-            .map(fileType ->
-                fileDaoDatabase.deleteUnreferenced(
-                    fileType.name(),
-                    fileType.getFileEntity(),
-                    fileType.getJoinColumn()
-                )
-            ).count();
-
-        if (countDeleted > 0) {
-            logger.debug("{} unreferenced files deleted", countDeleted);
+    public byte[] getData(FileEntry fileEntry) {
+        if (fileEntry instanceof FileEntryDatabase) {
+            return ((FileEntryDatabase) fileEntry).getData();
         }
-    }
-
-    @Override
-    public Optional<String> url(String fileUid) {
-        if (fileUid == null) {
-            return Optional.empty();
-        }
-
-        FileData fileData = this.fileCache.getIfPresent(fileUid);
-        if (fileData != null) {
-            return Optional.of(fullFileUrl(fileUid, fileData.getFilename()));
-        }
-
-        return fileUrlCached(fileUid);
-    }
-
-    @Override
-    public Optional<String> url(Long fileId) {
-        if (fileId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(this.fileDaoDatabase.findById(fileId))
-            .map(fileEntry -> fullFileUrl(fileEntry.getUid(), fileEntry.getFilename()));
-    }
-
-    @Override
-    public String urlRaw(String fileUid) {
-        return Optional.ofNullable(fileUid)
-            .map(fileUidString ->
-                FileNameUtils.formatUrl(
-                    this.basePath,
-                    this.fileWsPath,
-                    fileUid,
-                    null
-                )
-            )
-            .orElse(null);
-    }
-
-    @Override
-    public Optional<FileData> fetch(String fileUid) {
-        if (fileUid == null) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(this.fileCache.get(fileUid));
-        } catch (ExecutionException | UncheckedExecutionException e) {
-            if (e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
-                return Optional.empty();
-            }
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Optional<FileData> fetch(Long fileId) {
-        return Optional.ofNullable(this.fileDaoDatabase.findById(fileId)).map(toFileData());
-    }
-
-    private FileData fetchUncached(String fileUid) {
-        return Optional
-            .ofNullable(fileDaoDatabase.findByUid(fileUid))
-            .map(toFileData())
-            .orElseThrow(NotFoundException::new);
-    }
-
-    private Optional<String> fileUrlCached(String fileUid) {
-        try {
-            return Optional.of(this.fileUrlCache.get(fileUid));
-        } catch (ExecutionException | UncheckedExecutionException e) {
-            if (e instanceof UncheckedExecutionException && e.getCause() instanceof NotFoundException) {
-                return Optional.empty();
-            }
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String fileUrl(String fileUid) {
-        return Optional
-            .ofNullable(fileDaoDatabase.fileName(fileUid))
-            .map(fileName -> fullFileUrl(fileUid, Strings.emptyToNull(fileName)))
-            .orElseThrow(NotFoundException::new);
-    }
-
-    private String fullFileUrl(String fileUid, String fileName) {
-        return Optional.ofNullable(fileName)
-            .map(fileNameString -> FileNameUtils.formatUrl(this.basePath, this.fileWsPath, fileUid, fileNameString))
-            .orElse(urlRaw(fileUid));
-    }
-
-    private Function<FileEntry, FileData> toFileData() {
-        return file -> FileData.of(
-            file.getId(),
-            file.getUid(),
-            file.getFilename(),
-            file.getFileType(),
-            FileNameUtils.guessMimeType(file.getFilename()),
-            checksumService.hash(file.getData()),
-            file.getData()
-        );
-    }
-
-    private static class NotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 2621559513884831969L;
+        return new byte[0];
     }
 
 }

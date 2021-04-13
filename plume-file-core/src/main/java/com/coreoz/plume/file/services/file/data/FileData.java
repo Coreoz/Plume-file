@@ -8,7 +8,8 @@ import lombok.Value;
 public class FileData implements FileEntry {
 	Long id;
 	String uid;
-	String filename;
+	String fileName;
+	String fileExtension;
 	String fileType;
 	String mimeType;
 	String checksum;

@@ -1,5 +1,3 @@
-/* If saving on database */
-
 DROP TABLE IF EXISTS `PLM_FILE`;
 DROP TABLE IF EXISTS `PLM_FILE_DATA`;
 
@@ -7,10 +5,12 @@ CREATE TABLE `PLM_FILE`
 (
   `id`        bigint(20)   NOT NULL,
   `uid`       varchar(255) NOT NULL,
-  `filename`  varchar(255) NULL,
+  `file_extension`  varchar(5) NULL,
   `file_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+/* If saving on database */
 
 CREATE TABLE `PLM_FILE_DATA`
 (

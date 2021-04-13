@@ -2,7 +2,6 @@ package com.coreoz.plume.file.services.file;
 
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
-import com.coreoz.plume.file.db.FileDaoDatabase;
 import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDatabase;
 import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
@@ -16,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,10 +54,12 @@ public class FileServiceDatabaseTest {
 						return FileData.of(1L,
 							"efaaeb68-f973-11e8-8eb2-f2801f1b9fd1",
 							"file.ext",
+							"ext",
 							null,
 							null,
 							null,
-							null);
+							new byte[0]
+						);
 					}
 
 					return null;
@@ -70,7 +72,8 @@ public class FileServiceDatabaseTest {
 			}
 		});
 
-		assertThat(fileService.url("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/efaaeb68-f973-11e8-8eb2-f2801f1b9fd1/file.ext");
+		assertThat(fileService.url("efaaeb68-f973-11e8-8eb2-f2801f1b9fd1"))
+			.hasValue("/api/files/efaaeb68-f973-11e8-8eb2-f2801f1b9fd1");
 	}
 
 	@Test
@@ -79,16 +82,8 @@ public class FileServiceDatabaseTest {
 			fileDaoMock(), null, null, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.url("846c36cc-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/846c36cc-f973-11e8-8eb2-f2801f1b9fd1/file.ext");
-	}
-
-	@Test
-	public void url__should_return_raw_url_if_file_name_is_null() {
-		FileServiceDatabase fileService = new FileServiceDatabase(
-			fileDaoMock(), null, null, configurationService, fileCacheService
-		);
-
-		assertThat(fileService.url("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1")).hasValue("/api/files/7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
+		assertThat(fileService.url("846c36cc-f973-11e8-8eb2-f2801f1b9fd1"))
+			.hasValue("/api/files/846c36cc-f973-11e8-8eb2-f2801f1b9fd1.ext");
 	}
 
 	@Test
@@ -108,7 +103,8 @@ public class FileServiceDatabaseTest {
 			fileDaoMock(), null, checksumService, configurationService, fileCacheService
 		);
 
-		assertThat(fileService.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1").map(FileData::getFilename)).hasValue("file.ext");
+		assertThat(fileService.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1")
+			.map(FileData::getFileName)).hasValue("846c36cc-f973-11e8-8eb2-f2801f1b9fd1.ext");
 	}
 
 	@Test
@@ -122,59 +118,63 @@ public class FileServiceDatabaseTest {
 
 	@Test
 	public void findById__should_return_null_if_the_file_does_not_exist_mock() {
-		FileEntry file = fileDaoMock().findById(3L);
-		assertThat(file).isNull();
+		Optional<FileEntry> file = fileDaoMock().findById(3L);
+		assertThat(file).isNotPresent();
 	}
 
 	@Test
 	public void findById__should_not_return_null_if_the_file_exists_mock() {
-		FileEntry file = fileDaoMock().findById(5L);
-		assertThat(file.getUid()).isEqualTo("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
-		assertThat(file.getFilename()).isEqualTo("file.ext");
-		assertThat(file.getData()).isNull();
-		assertThat(file.getId()).isEqualTo(5L);
+		Optional<FileEntry> file = fileDaoMock().findById(5L);
+		assertThat(file).isPresent();
+		FileEntryDatabase fileEntryDatabase = (FileEntryDatabase) file.get();
+		assertThat(fileEntryDatabase.getUid()).isEqualTo("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
+		assertThat(fileEntryDatabase.getFileName()).isEqualTo("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1.ext");
+		assertThat(fileEntryDatabase.getData()).isNull();
+		assertThat(fileEntryDatabase.getId()).isEqualTo(5L);
 	}
 
 	// utils
 
-	private FileDaoDatabase fileDaoMock() {
+	private FileDaoDatabaseQuerydsl fileDaoMock() {
 		return new FileDaoDatabaseQuerydsl(null) {
 			@Override
-			public String fileName(String fileUid) {
+			public Optional<String> fileName(String fileUid) {
 				if("846c36cc-f973-11e8-8eb2-f2801f1b9fd1".equals(fileUid)) {
-					return "file.ext";
+					return Optional.of("846c36cc-f973-11e8-8eb2-f2801f1b9fd1.ext");
 				}
 				if("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1".equals(fileUid)) {
-					return "";
+					return Optional.of("");
 				}
-				return null;
+				return Optional.empty();
 			}
 			@Override
-			public FileEntryDatabase findByUid(String uid) {
+			public Optional<FileEntry> findByUid(String uid) {
 				if("846c36cc-f973-11e8-8eb2-f2801f1b9fd1".equals(uid)) {
-					return FileEntryDatabase.of(
+					FileEntryDatabase fileEntryDatabase = FileEntryDatabase.of(
 						5L,
 						"846c36cc-f973-11e8-8eb2-f2801f1b9fd1",
-						"file.ext",
+						"ext",
 						null,
 						null
 					);
+					return Optional.of(fileEntryDatabase);
 				}
-				return null;
+				return Optional.empty();
 			}
 
 			@Override
-			public FileEntryDatabase findById(Long id) {
+			public Optional<FileEntry> findById(Long id) {
 				if(5L == id) {
-					return FileEntryDatabase.of(
+					FileEntryDatabase fileEntryDatabase = FileEntryDatabase.of(
 						5L,
 						"7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1",
-						"file.ext",
+						"ext",
 						null,
 						null
 					);
+					return Optional.of(fileEntryDatabase);
 				}
-				return null;
+				return Optional.empty();
 			}
 		};
 	}

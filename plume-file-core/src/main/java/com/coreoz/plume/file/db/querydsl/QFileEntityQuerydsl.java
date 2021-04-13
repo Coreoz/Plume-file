@@ -16,7 +16,7 @@ public class QFileEntityQuerydsl extends com.querydsl.sql.RelationalPathBase<Fil
 
 	public static final QFileEntityQuerydsl file = new QFileEntityQuerydsl("PLM_FILE");
 
-	public final StringPath filename = createString("filename");
+	public final StringPath fileExtension = createString("fileExtension");
 
 	public final StringPath fileType = createString("fileType");
 
@@ -47,7 +47,7 @@ public class QFileEntityQuerydsl extends com.querydsl.sql.RelationalPathBase<Fil
 	}
 
 	public void addMetadata() {
-		addMetadata(filename, ColumnMetadata.named("FILENAME").withIndex(2).ofType(Types.VARCHAR).withSize(255));
+		addMetadata(fileExtension, ColumnMetadata.named("file_extension").withIndex(2).ofType(Types.VARCHAR).withSize(5));
 		addMetadata(fileType, ColumnMetadata.named("FILE_TYPE").withIndex(3).ofType(Types.VARCHAR).withSize(255).notNull());
 		addMetadata(id, ColumnMetadata.named("ID").withIndex(1).ofType(Types.BIGINT).withSize(19).notNull());
 		addMetadata(uid, ColumnMetadata.named("UID").withIndex(4).ofType(Types.VARCHAR).withSize(255).notNull());

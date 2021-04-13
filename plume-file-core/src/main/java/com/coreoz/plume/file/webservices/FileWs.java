@@ -19,6 +19,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
+
 @Path("/files")
 @Api(value = "Serve binary resources")
 @Singleton
@@ -39,17 +41,18 @@ public class FileWs {
 	@GET
 	@Path("/{uid}{filename: (/.*)?}")
 	@ApiOperation(value = "Serve a file")
-	public Response fetch(@ApiParam(required = true) @PathParam("uid") String fileUid,
-			@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader) {
-		return fileService
-			.fetch(fileUid)
+	public Response fetch(
+		@ApiParam(required = true) @PathParam("uid") String fileUid,
+		@ApiParam @PathParam("filename") String filename,
+		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
+	) {
+		return fileService.fetch(fileUid)
 			.map(fileData -> {
 				if(ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileData.getChecksum())) {
 					return Response.notModified().build();
 				}
 
-				ResponseBuilder response = Response
-					.ok(fileData.getData())
+				ResponseBuilder response = Response.ok(fileData.getData())
 					.header(HttpHeaders.ETAG, fileData.getChecksum());
 				if(fileData.getMimeType() != null) {
 					response.header(HttpHeaders.CONTENT_TYPE, fileData.getMimeType());
@@ -60,7 +63,9 @@ public class FileWs {
 						"public, max-age=" + maxAgeCacheInSeconds
 					);
 				}
-				return response.build();
+				return response
+					.header(CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+					.build();
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}

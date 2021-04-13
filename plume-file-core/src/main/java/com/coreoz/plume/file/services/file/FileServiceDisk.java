@@ -1,7 +1,9 @@
 package com.coreoz.plume.file.services.file;
 
+import com.coreoz.plume.file.db.FileEntry;
 import com.coreoz.plume.file.db.querydsl.beans.FileEntryDisk;
 import com.coreoz.plume.file.db.querydsl.disk.FileDaoDiskQuerydsl;
+import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
@@ -22,60 +24,52 @@ import java.util.Optional;
 
 // TODO file creation should be unit tested
 @Singleton
-public class FileServiceDisk implements FileService {
+public class FileServiceDisk extends FileStorageAdapter {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceDisk.class);
 
     private final String path;
-    private final String baseUrl;
-    private final String fileWsPath;
-    private final FileDaoDiskQuerydsl fileDao;
-    private final FileTypesProvider fileTypesProvider;
-    private final ChecksumService checksumService;
 
     @Inject
     public FileServiceDisk(
         FileDaoDiskQuerydsl fileDao,
         FileTypesProvider fileTypesProvider,
         FileConfigurationService configurationService,
-        ChecksumService checksumService
+        ChecksumService checksumService,
+        FileCacheService fileCacheService
     ) {
+        super(fileDao, fileTypesProvider, checksumService, configurationService, fileCacheService);
         this.path = configurationService.mediaLocalPath();
-        this.baseUrl = configurationService.apiBasePath();
-        this.fileWsPath = configurationService.fileWsPath();
-        this.fileDao = fileDao;
-        this.fileTypesProvider = fileTypesProvider;
-        this.checksumService = checksumService;
     }
 
     @Override
-    public FileUploaded upload(FileType fileType, byte[] fileData, String filename) {
-        if (Strings.isNullOrEmpty(filename)) {
-            throw new RuntimeException("File name must be declared to be saved on disk");
+    public FileUploaded upload(FileType fileType, String fileExtension, byte[] fileData) {
+        if (Strings.isNullOrEmpty(fileExtension)) {
+            throw new RuntimeException("File extension must be declared to be saved on disk");
         }
-        String fileName = FileNameUtils.sanitize(filename);
 
-        FileEntryDisk file = this.fileDao.upload(fileType.name(), fileName, fileName);
+        FileEntry file = this.fileDao.upload(fileType.name(), fileExtension, null);
 
         this.createFile(
-            this.path,
-            fileData,
-            file.getPath()
+            file.getFileType(),
+            file.getFileName(),
+            fileData
         );
 
         return FileUploaded.of(
             file.getId(),
             file.getUid(),
-            url(file.getUid(), fileName)
+            urlRaw(file.getUid())
         );
     }
 
-    private void createFile(String path, byte[] fileData, String fileName) {
+    private void createFile(String fileType, String fileName, byte[] fileData) {
+        String currentPath = this.getFolderPath(fileType);
         try {
-            if (!new File(path).exists()) {
-                new File(path).mkdirs();
+            if (!new File(currentPath).exists()) {
+                new File(currentPath).mkdirs();
             }
 
-            File fileToSave = new File(path + fileName);
+            File fileToSave = new File(this.getFullPath(fileType, fileName));
             Files.write(fileData, fileToSave);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -84,9 +78,11 @@ public class FileServiceDisk implements FileService {
 
     @Override
     public void delete(String fileUid) {
-        FileEntryDisk fileEntry = this.fileDao.findByUid(fileUid);
-        deleteFile(this.path + fileEntry.getPath());
-        fileDao.delete(fileUid);
+        Optional<FileData> fileData = super.fetch(fileUid);
+        if (fileData.isPresent()) {
+            deleteFile(this.getFullPath(fileData.get().getFileType(), fileData.get().getFileName()));
+            super.delete(fileData.get().getUid());
+        }
     }
 
     private void deleteFile(String path) {
@@ -103,96 +99,25 @@ public class FileServiceDisk implements FileService {
     }
 
     @Override
-    public void deleteUnreferenced() {
-        long countDeleted = fileTypesProvider
-            .fileTypesAvailable()
-            .stream()
-            .map(fileType ->
-                this.fileDao.deleteUnreferenced(
-                    fileType.name(),
-                    fileType.getFileEntity(),
-                    fileType.getJoinColumn()
-                ))
-            .count();
-
-        if (countDeleted > 0) {
-            logger.debug("{} unreferenced files deleted", countDeleted);
-        }
-    }
-
-    @Override
-    public Optional<String> url(String fileUid) {
-        if (fileUid == null) {
-            return Optional.empty();
-        }
-
-        return Optional
-            .ofNullable(this.fileDao.fileName(fileUid))
-            .map(fileName -> url(fileUid, fileName));
-    }
-
-    @Override
-    public Optional<String> url(Long fileId) {
-        if (fileId == null) {
-            return Optional.empty();
-        }
-
-        return Optional
-            .ofNullable(this.fileDao.findById(fileId))
-            .map(file -> url(file.getUid(), file.getFilename()));
-    }
-
-    private String url(String fileUid, String fileName) {
-        return FileNameUtils.formatUrl(this.baseUrl, this.fileWsPath, fileUid, fileName);
-    }
-
-    @Override
-    public String urlRaw(String fileUid) {
-        throw new RuntimeException("This method is unavailable when files are stored on disk");
-    }
-
-    @Override
-    public Optional<FileData> fetch(String fileUid) {
-        if (fileUid == null) {
-            return Optional.empty();
-        }
-        FileEntryDisk fileEntryDisk = this.fileDao.findByUid(fileUid);
-        if (fileEntryDisk == null) {
-            return Optional.empty();
-        }
-        return fetchFileFromDisk(fileEntryDisk);
-    }
-
-    @Override
-    public Optional<FileData> fetch(Long fileId) {
-        if (fileId == null) {
-            return Optional.empty();
-        }
-        FileEntryDisk fileEntryDisk = this.fileDao.findById(fileId);
-        if (fileEntryDisk != null) {
-            return this.fetchFileFromDisk(fileEntryDisk);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<FileData> fetchFileFromDisk(FileEntryDisk fileEntity) {
-        File file = new File(this.path + fileEntity.getPath());
-        if (!file.exists()) {
-            return Optional.empty();
-        }
-
+    public byte[] getData(FileEntry fileEntry) {
         try {
-            return Optional.of(FileData.of(
-                fileEntity.getId(),
-                fileEntity.getUid(),
-                fileEntity.getFilename(),
-                fileEntity.getFileType(),
-                FileNameUtils.guessMimeType(fileEntity.getFilename()),
-                checksumService.hash(fileEntity.getFilename().getBytes()),
-                Files.toByteArray(file)
-            ));
+            if (fileEntry instanceof FileEntryDisk) {
+                File file = new File(this.getFullPath(fileEntry.getFileType(), fileEntry.getFileName()));
+                if (!file.exists()) {
+                    return new byte[0];
+                }
+                return Files.toByteArray(file);
+            }
+            return new byte[0];
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getFolderPath(String fileType) {
+        return String.format("%s/%s", this.path, fileType);
+    }
+    private String getFullPath(String fileType, String fileName) {
+        return String.format("%s/%s/%s", this.path, fileType, fileName);
     }
 }

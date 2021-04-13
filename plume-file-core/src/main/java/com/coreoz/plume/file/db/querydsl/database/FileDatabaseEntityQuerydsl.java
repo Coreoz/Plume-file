@@ -12,7 +12,6 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "id")
 @ToString(of = { "id", "idFile" })
 public class FileDatabaseEntityQuerydsl implements CrudEntity {
-
     private Long id;
     @Column("ID_FILE")
     private Long idFile;

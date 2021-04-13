@@ -1,14 +1,13 @@
 package com.coreoz.plume.file.db.database;
 
-import javax.inject.Inject;
-
-import com.coreoz.plume.file.db.FileDaoDatabase;
-import com.coreoz.plume.file.db.FileTestDbModule;
-import org.junit.runner.RunWith;
-
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
+import com.coreoz.plume.file.db.FileTestDbModule;
+import com.coreoz.plume.file.db.querydsl.FileDao;
 import com.coreoz.plume.file.db.querydsl.database.FileDaoDatabaseQuerydsl;
+import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestDbModule.class)
@@ -18,7 +17,7 @@ public class FileDaoDatabaseQuerydslTest extends FileDaoDatabaseTest {
 	private FileDaoDatabaseQuerydsl fileDao;
 
 	@Override
-	protected FileDaoDatabase fileDao() {
+	protected FileDao fileDao() {
 		return fileDao;
 	}
 

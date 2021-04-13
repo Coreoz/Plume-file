@@ -4,6 +4,7 @@ import com.coreoz.plume.file.services.file.data.FileData;
 import com.coreoz.plume.file.services.file.data.FileUploadBase64;
 import com.coreoz.plume.file.services.file.data.FileUploaded;
 import com.coreoz.plume.file.services.filetype.FileType;
+import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.io.ByteStreams;
 import lombok.SneakyThrows;
 
@@ -19,18 +20,19 @@ public interface FileService {
 	/**
 	 * Save an uploaded file.
 	 */
-	FileUploaded upload(FileType fileType, byte[] fileData, @Nullable String fileName);
+	FileUploaded upload(FileType fileType, String fileExtension, byte[] fileData);
 
 	// upload alias
 	default FileUploaded upload(FileType fileType, byte[] fileData) {
-		return upload(fileType, fileData, null);
+		return upload(fileType, null, fileData);
 	}
+
 	default Optional<FileUploaded> upload(FileType fileType, @Nullable FileUploadBase64 file) {
 		if(file == null || file.getBase64() == null) {
 			return Optional.empty();
 		}
 
-		return Optional.of(upload(fileType, Base64.getDecoder().decode(file.getBase64()), file.getFilename()));
+		return Optional.of(upload(fileType, FileNameUtils.getExtensionFromFilename(file.getFilename()), Base64.getDecoder().decode(file.getBase64())));
 	}
 	/**
 	 * Consume the stream to produce a byte array,
@@ -41,16 +43,18 @@ public interface FileService {
 	}
 	/**
 	 * Consume the stream to produce a byte array,
-	 * then call {@link #upload(FileType, byte[], String))}
+	 * then call {@link #upload(FileType, String, byte[]))}
 	 */
 	@SneakyThrows
 	default FileUploaded upload(FileType fileType, InputStream fileData, String fileName) {
-		return upload(fileType, ByteStreams.toByteArray(fileData), fileName);
+		return upload(fileType, FileNameUtils.getExtensionFromFilename(fileName), ByteStreams.toByteArray(fileData));
 	}
 
 	// delete
 
 	void delete(String fileUid);
+
+	void delete(Long fileId);
 
 	void deleteUnreferenced();
 

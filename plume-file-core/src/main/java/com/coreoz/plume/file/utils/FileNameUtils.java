@@ -1,11 +1,14 @@
 package com.coreoz.plume.file.utils;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FileNameUtils {
+
+	private FileNameUtils() {
+		// empty constructor
+	}
 
 	/**
 	 * Remove all weird characters while trying to ensure
@@ -45,40 +48,7 @@ public class FileNameUtils {
 		}
 	}
 
-	/**
-	 * format file URL to have a properly formatted URL
-	 *
-	 * can be used outside the librarie to help users to format their custom plume-file url
-	 */
-	public static String formatUrl(String basePath, String wsPath, String fileUid, @Nullable String fileName) {
-		String res = String.format(
-			"/%s/%s/%s",
-			trimSlash(basePath),
-			trimSlash(wsPath),
-			trimSlash(fileUid)
-		);
-		String trimmedFileName = trimSlash(fileName);
-		if (trimmedFileName == null) {
-			return res;
-		}
-		return res + "/" + trimmedFileName;
+	public static String getExtensionFromFilename(String fileName) {
+		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
-
-	/**
-	 * Removes beginning and trailing slashes of a string value to avoid duplicates
-	 *
-	 */
-	private static String trimSlash(String value) {
-		if (value == null) {
-			return null;
-		}
-		if (value.charAt(0) == '/') {
-			value = value.substring(1);
-		}
-		if (value.charAt(value.length() - 1)  == '/') {
-			value = value.substring(0, value.length() - 2);
-		}
-		return value;
-	}
-
 }
