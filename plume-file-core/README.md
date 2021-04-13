@@ -18,7 +18,7 @@ a good choice is something like: `project.package.services.file`
 ```java
 @AllArgsConstructor
 @Getter
-public enum ProjectFileType implements FileType {
+public enum <YourProject>FileType implements FileType {
 
 	;
 
@@ -31,7 +31,7 @@ public enum ProjectFileType implements FileType {
 that will list the file types:
 ```java
 @Singleton
-public class ProjectFileTypesProvider implements FileTypesProvider {
+public class <YourProject>FileTypesProvider implements FileTypesProvider {
 
 	@Override
 	public Collection<FileType> fileTypesAvailable() {
@@ -44,12 +44,41 @@ public class ProjectFileTypesProvider implements FileTypesProvider {
 and reference the implementation of `FileTypesProvider` that was just created:
 ```java
 // file management
-install(new GuiceFileModuleQuerydsl());
+install(new GuiceFileModule());
 bind(FileTypesProvider.class).to(ProjectFileTypesProvider.class);
 ```
-6. Install Jersey web-service: `register(FileWs.class);`
-7. Create the `plm_file` table by applying the correct [creation script](sql/)
-8. [Start using files](#usage)
+
+6. Install your File Service
+
+The file service is separated in 2 parts:
+- FileServiceDisk to store your files on the server disk
+- FileServiceDatabase to store your files directly into a blob in the database
+
+a. FileServiceDisk
+
+To use File Service Disk you must bind FileService to FileServiceDisk in the `ApplicationModule`:
+ ```java
+ // file management
+ bind(FileService.class).to(FileServiceDisk.class);
+
+ ```
+
+b. FileServiceDatabase
+
+To use File Service Database you must bind FileService to FileServiceDatabase in the `ApplicationModule`:
+ ```java
+ // file management
+ bind(FileService.class).to(FileServiceDatabase.class);
+ ```
+
+You must bind FileDaoDatabase to its implementation for MySQL:
+ ```java
+ bind(FileDaoDatabase.class).to(FileDaoDatabaseQuerydsl.class);
+```
+
+7. Install Jersey web-service: `register(FileWs.class);`
+8. Create the `plm_file` table by applying the correct [creation script](sql/) and the associated table (Disk or Database)
+9. [Start using files](#usage)
 
 Usage
 -----
@@ -97,9 +126,6 @@ application.api-base-path = "/api" # should match swagger base path
 file.ws-path = "/files"
 file.max-age-cache = 365 days # should be put to 0 if a file with the same id is updated
 file.cleaning-hour = 03:00 # the time of day at which the cleaning task is scheduled
+file.media-local-path #local path on disk
 ```
-
-Hibernate
----------
-Replace the installation of `GuiceFileModuleQuerydsl` by `GuiceFileModuleHibernate`.
 

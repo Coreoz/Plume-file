@@ -23,11 +23,15 @@ public class FileConfigurationService {
 	}
 
 	public String apiBasePath() {
-		return config.getString("application.api-base-path");
+		String apiBasePath = config.getString("application.api-base-path");
+		checkConfiguration(apiBasePath);
+		return apiBasePath;
 	}
 
 	public String fileWsPath() {
-		return config.getString("file.ws-path");
+		String wsPath = config.getString("file.ws-path");
+		checkConfiguration(wsPath);
+		return wsPath;
 	}
 
 	public Duration fileMaxAgeCache() {
@@ -40,6 +44,12 @@ public class FileConfigurationService {
 
 	public String mediaLocalPath() {
 		return config.getString("file.media-local-path");
+	}
+
+	private static void checkConfiguration(String configuration) {
+		if (!configuration.startsWith("/") || configuration.endsWith("/")) {
+			throw new RuntimeException("Path configuration should start with '/' and not end with one : " + configuration);
+		}
 	}
 
 }

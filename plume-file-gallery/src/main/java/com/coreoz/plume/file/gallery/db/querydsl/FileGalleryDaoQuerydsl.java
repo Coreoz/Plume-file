@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
+import com.coreoz.plume.file.db.querydsl.QFileEntityQuerydsl;
 import com.coreoz.plume.file.gallery.db.FileGalleryDao;
 import com.coreoz.plume.file.gallery.db.FileGalleryRaw;
 import com.coreoz.plume.file.gallery.services.gallery.data.FileGalleryPosition;
@@ -57,11 +58,12 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 	}
 
 	@Override
-	public List<FileGalleryRaw> fetch(String galleryType, Long idData) {
+	public List<FileGalleryResponse> fetch(String galleryType, Long idData) {
 		SQLQuery<Tuple> selectQuery = transactionManager
 			.selectQuery()
-			.select(QFileGallerydsl.fileGallery.idFile, QFileGallerydsl.fileGallery.position)
-			.from(QFileGallerydsl.fileGallery)
+			.select(QFileGallerydsl.fileGallery.idFile, QFileGallerydsl.fileGallery.position, QFileEntityQuerydsl.file.uid)
+			.innerJoin(QFileEntityQuerydsl.file)
+			.from(QFileGallerydsl.fileGallery).on(QFileEntityQuerydsl.file.id.eq(QFileGallerydsl.fileGallery.idFile))
 			.where(QFileGallerydsl.fileGallery.galleryType.eq(galleryType));
 
 		if(idData != null) {
@@ -73,8 +75,9 @@ public class FileGalleryDaoQuerydsl implements FileGalleryDao {
 			.fetch()
 			.stream()
 			.map(tuple -> {
-				FileGalleryQuerydsl fileGallery = new FileGalleryQuerydsl();
+				FileGalleryResponse fileGallery = new FileGalleryResponse();
 				fileGallery.setIdFile(tuple.get(QFileGallerydsl.fileGallery.idFile));
+				fileGallery.setFileUid(tuple.get(QFileEntityQuerydsl.file.uid));
 				fileGallery.setPosition(tuple.get(QFileGallerydsl.fileGallery.position));
 
 				return fileGallery;

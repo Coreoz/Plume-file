@@ -20,10 +20,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.coreoz.plume.jersey.security.permission.PublicApi;
 import org.glassfish.jersey.server.internal.LocalizationMessages;
 
 import com.coreoz.plume.admin.websession.WebSessionPermission;
-import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeHibernate;
 import com.coreoz.plume.file.gallery.services.file.GalleryFileTypeQuerydsl;
 import com.coreoz.plume.file.gallery.services.gallery.FileGalleryService;
 import com.coreoz.plume.file.gallery.webservices.data.FileGalleryAdmin;
@@ -47,6 +47,7 @@ import io.swagger.annotations.ApiOperation;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Singleton
+@PublicApi
 public class FileGalleryAdminWs {
 
 	private final FileService fileService;
@@ -66,12 +67,10 @@ public class FileGalleryAdminWs {
 			.stream()
 			.filter(fileType ->
 				fileType == GalleryFileTypeQuerydsl.PLUME_GALLERY
-				|| fileType == GalleryFileTypeHibernate.PLUME_GALLERY
 			)
 			.findAny()
 			.orElseThrow(() -> new RuntimeException(
-				"File type GalleryFileTypeQuerydsl.PLUME_GALLERY or "
-				+ "GalleryFileTypeHibernate.PLUME_GALLERY should be provided in "
+				"File type GalleryFileTypeQuerydsl.PLUME_GALLERY should be provided in "
 				+ "the FileTypesProvider implementation. See Plume File Gallery readme file."
 			));
 

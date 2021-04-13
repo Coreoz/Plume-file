@@ -6,6 +6,10 @@ import java.nio.file.Paths;
 
 public class FileNameUtils {
 
+	private FileNameUtils() {
+		// empty constructor
+	}
+
 	/**
 	 * Remove all weird characters while trying to ensure
 	 * the sanitize filename is close to the original one:
@@ -44,4 +48,7 @@ public class FileNameUtils {
 		}
 	}
 
+	public static String getExtensionFromFilename(String fileName) {
+		return fileName.substring(fileName.lastIndexOf(".") + 1);
+	}
 }
