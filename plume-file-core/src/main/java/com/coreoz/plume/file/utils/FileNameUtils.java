@@ -11,26 +11,6 @@ public class FileNameUtils {
 	}
 
 	/**
-	 * Remove all weird characters while trying to ensure
-	 * the sanitize filename is close to the original one:
-	 * accent are stripped, spaces are replaced by -,
-	 * upper case chars are converted to lower case.
-	 *
-	 * If the filename is null, null is returned
-	 */
-	public static String sanitize(String filename) {
-		if(filename == null) {
-			return null;
-		}
-
-		return StringUtils
-				.stripAccents(filename)
-				.toLowerCase()
-				.replaceAll("\\s+", "-")
-				.replaceAll("[^a-z0-9-_\\.]", "");
-	}
-
-	/**
 	 * Find the corresponding mime type for the file name.
 	 *
 	 * If no mime type if found or the file name is empty,
@@ -49,6 +29,13 @@ public class FileNameUtils {
 	}
 
 	public static String getExtensionFromFilename(String fileName) {
+		if (fileName == null) {
+			return "";
+		}
 		return fileName.substring(fileName.lastIndexOf(".") + 1);
+	}
+
+	public static String cleanExtensionName(String fileExtension) {
+		return fileExtension.toLowerCase().replaceAll("[a-z0-9]", "");
 	}
 }

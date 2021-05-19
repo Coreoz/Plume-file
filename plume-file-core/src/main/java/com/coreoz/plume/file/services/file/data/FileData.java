@@ -1,16 +1,10 @@
 package com.coreoz.plume.file.services.file.data;
 
-import com.coreoz.plume.file.db.FileEntry;
-
 import lombok.Value;
 
-@Value(staticConstructor = "of")
-public class FileData implements FileEntry {
-	Long id;
-	String uid;
-	String fileName;
-	String fileExtension;
-	String fileType;
+@Value
+public class FileData {
+	String fileUniqueName;
 	String mimeType;
 	String checksum;
 	byte[] data;

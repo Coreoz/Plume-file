@@ -2,6 +2,7 @@ package com.coreoz.plume.file.db.querydsl.database;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.FileEntry;
+import com.coreoz.plume.file.db.beans.QFileMetadataQuerydsl;
 import com.coreoz.plume.file.db.querydsl.FileDao;
 import com.coreoz.plume.file.db.querydsl.FileEntityQuerydsl;
 import com.coreoz.plume.file.db.querydsl.QFileEntityQuerydsl;
@@ -28,10 +29,10 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
             FileEntityQuerydsl file = super.uploadEntity(fileType, fileExtension, connection);
 
             transactionManager
-                .insert(QFileDatabaseEntityQuerydsl.fileData, connection)
+                .insert(QFileMetadataQuerydsl.fileData, connection)
                 .columns(
-                    QFileDatabaseEntityQuerydsl.fileData.idFile,
-                    QFileDatabaseEntityQuerydsl.fileData.data
+                    QFileMetadataQuerydsl.fileData.idFile,
+                    QFileMetadataQuerydsl.fileData.data
                 )
                 .values(file.getId(), fileData)
                 .execute();
@@ -49,8 +50,8 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
     @Override
     public boolean delete(Long id, Connection connection) {
         transactionManager
-            .delete(QFileDatabaseEntityQuerydsl.fileData, connection)
-            .where(QFileDatabaseEntityQuerydsl.fileData.idFile.eq(id))
+            .delete(QFileMetadataQuerydsl.fileData, connection)
+            .where(QFileMetadataQuerydsl.fileData.idFile.eq(id))
             .execute();
         return super.delete(id, connection);
     }
@@ -63,11 +64,11 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
                 QFileEntityQuerydsl.file.uid,
                 QFileEntityQuerydsl.file.fileType,
                 QFileEntityQuerydsl.file.fileExtension,
-                QFileDatabaseEntityQuerydsl.fileData.data
+                QFileMetadataQuerydsl.fileData.data
             )
             .from(QFileEntityQuerydsl.file)
-            .innerJoin(QFileDatabaseEntityQuerydsl.fileData)
-            .on(QFileEntityQuerydsl.file.id.eq(QFileDatabaseEntityQuerydsl.fileData.idFile));
+            .innerJoin(QFileMetadataQuerydsl.fileData)
+            .on(QFileEntityQuerydsl.file.id.eq(QFileMetadataQuerydsl.fileData.idFile));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
                 row.get(QFileEntityQuerydsl.file.uid),
                 row.get(QFileEntityQuerydsl.file.fileExtension),
                 row.get(QFileEntityQuerydsl.file.fileType),
-                row.get(QFileDatabaseEntityQuerydsl.fileData.data)
+                row.get(QFileMetadataQuerydsl.fileData.data)
             );
     }
 

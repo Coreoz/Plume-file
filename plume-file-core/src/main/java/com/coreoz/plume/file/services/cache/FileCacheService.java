@@ -1,14 +1,18 @@
 package com.coreoz.plume.file.services.cache;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import com.coreoz.plume.file.services.file.data.FileData;
-import com.google.common.cache.LoadingCache;
 
 public interface FileCacheService {
 
-	LoadingCache<String, FileData> newFileDataCache(Function<String, FileData> loadingData);
+	void initializeFileDataCache(Function<String, Optional<FileData>> fileDataLoader);
 
-	LoadingCache<String, String> newFileUrlCache(Function<String, String> loadingData);
+	void initializeFileIdCache(Function<Long, Optional<String>> fileIdLoader);
+
+	Optional<FileData> fetchFileData(String fileUuid);
+
+	Optional<String> fetchFileUniqueName(Long fileId);
 
 }

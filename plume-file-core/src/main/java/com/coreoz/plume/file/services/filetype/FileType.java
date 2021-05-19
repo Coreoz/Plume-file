@@ -8,6 +8,7 @@ public interface FileType {
 
 	String name();
 
+	// TODO faire une autre interface pour ces 2 méthodes dédiées à la BDD
 	/**
 	 * The entity that contains a column that referenced the {@link FileEntry} ID
 	 */

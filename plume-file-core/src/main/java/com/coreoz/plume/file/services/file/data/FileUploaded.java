@@ -5,6 +5,6 @@ import lombok.Value;
 @Value(staticConstructor = "of")
 public class FileUploaded {
 	long id;
-	String uid;
+	String uniqueName;
 	String url;
 }
