@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class FileMetadata {
 	private String fileType;
-	private String fileExtension;
+	private String mimeType;
 }

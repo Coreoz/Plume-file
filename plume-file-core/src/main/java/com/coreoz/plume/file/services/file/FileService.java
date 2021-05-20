@@ -70,6 +70,7 @@ public class FileService {
 		long fileId = fileMetadataService.upload(
 			fileUniqueName,
 			fileType.name(),
+			FileNameUtils.guessMimeType(fileUniqueName),
 			fileData.length * 4L // *4L to convert Java Bytes length to bytes
 		);
 		fileStorageService.upload(fileType.name(), fileUniqueName, fileData);
@@ -150,7 +151,7 @@ public class FileService {
     			.fetch(fileMetadata.getFileType(), fileUniqueName)
     			.map(fileData -> new FileData(
     				fileUniqueName,
-    				FileNameUtils.guessMimeType(fileUniqueName),
+    				fileMetadata.getMimeType(),
     				checksumService.hash(fileData),
     				fileData
     			))

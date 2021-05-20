@@ -9,7 +9,7 @@ import com.coreoz.plume.file.services.filetype.FileType;
 public class FileMetadataDatabaseService implements FileMetadataService {
 
 	@Override
-	public long upload(String fileUniqueName, String fileType, long fileSize) {
+	public long upload(String fileUniqueName, String fileType, String mimeType, long fileSize) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

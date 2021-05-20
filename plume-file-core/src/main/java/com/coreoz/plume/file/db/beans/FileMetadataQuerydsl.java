@@ -19,6 +19,8 @@ public class FileMetadataQuerydsl implements CrudEntity {
     private String uniqueName;
 	@Column("fileType")
     private String fileType;
+	@Column("mimeType")
+    private String mimeType;
 	@Column("fileSize")
     private Long fileSize;
 	@Column("creationDate")
