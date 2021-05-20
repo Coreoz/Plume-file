@@ -17,7 +17,7 @@ public class QFileMetadataQuerydsl extends com.querydsl.sql.RelationalPathBase<F
 
     private static final long serialVersionUID = 43454386;
 
-    public static final QFileMetadataQuerydsl fileData = new QFileMetadataQuerydsl("PLM_FILE");
+    public static final QFileMetadataQuerydsl fileMetadata = new QFileMetadataQuerydsl("PLM_FILE");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
     public final StringPath uniqueName = createString("uniqueName");

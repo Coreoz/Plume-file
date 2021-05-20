@@ -29,10 +29,10 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
             FileEntityQuerydsl file = super.uploadEntity(fileType, fileExtension, connection);
 
             transactionManager
-                .insert(QFileMetadataQuerydsl.fileData, connection)
+                .insert(QFileMetadataQuerydsl.fileMetadata, connection)
                 .columns(
-                    QFileMetadataQuerydsl.fileData.idFile,
-                    QFileMetadataQuerydsl.fileData.data
+                    QFileMetadataQuerydsl.fileMetadata.idFile,
+                    QFileMetadataQuerydsl.fileMetadata.data
                 )
                 .values(file.getId(), fileData)
                 .execute();
@@ -50,8 +50,8 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
     @Override
     public boolean delete(Long id, Connection connection) {
         transactionManager
-            .delete(QFileMetadataQuerydsl.fileData, connection)
-            .where(QFileMetadataQuerydsl.fileData.idFile.eq(id))
+            .delete(QFileMetadataQuerydsl.fileMetadata, connection)
+            .where(QFileMetadataQuerydsl.fileMetadata.idFile.eq(id))
             .execute();
         return super.delete(id, connection);
     }
@@ -64,11 +64,11 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
                 QFileEntityQuerydsl.file.uid,
                 QFileEntityQuerydsl.file.fileType,
                 QFileEntityQuerydsl.file.fileExtension,
-                QFileMetadataQuerydsl.fileData.data
+                QFileMetadataQuerydsl.fileMetadata.data
             )
             .from(QFileEntityQuerydsl.file)
-            .innerJoin(QFileMetadataQuerydsl.fileData)
-            .on(QFileEntityQuerydsl.file.id.eq(QFileMetadataQuerydsl.fileData.idFile));
+            .innerJoin(QFileMetadataQuerydsl.fileMetadata)
+            .on(QFileEntityQuerydsl.file.id.eq(QFileMetadataQuerydsl.fileMetadata.idFile));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class FileDaoDatabaseQuerydsl extends FileDao {
                 row.get(QFileEntityQuerydsl.file.uid),
                 row.get(QFileEntityQuerydsl.file.fileExtension),
                 row.get(QFileEntityQuerydsl.file.fileType),
-                row.get(QFileMetadataQuerydsl.fileData.data)
+                row.get(QFileMetadataQuerydsl.fileMetadata.data)
             );
     }
 

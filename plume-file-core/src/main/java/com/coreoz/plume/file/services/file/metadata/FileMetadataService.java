@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import com.coreoz.plume.file.db.dao.FileMetadata;
 import com.coreoz.plume.file.services.filetype.FileType;
 
 public interface FileMetadataService {

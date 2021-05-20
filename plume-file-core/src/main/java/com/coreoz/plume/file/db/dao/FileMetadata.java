@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.file.metadata;
+package com.coreoz.plume.file.db.dao;
 
 import lombok.Value;
 
