@@ -1,14 +1,17 @@
 package com.coreoz.plume.file.db.dao;
 
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.db.utils.IdGenerator;
 import com.coreoz.plume.file.db.beans.FileMetadataQuerydsl;
 import com.coreoz.plume.file.db.beans.QFileMetadataQuerydsl;
+import com.coreoz.plume.file.services.filetype.FileType;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class FileMetadataDao {
@@ -21,8 +24,8 @@ public class FileMetadataDao {
     }
 
     public FileMetadataQuerydsl upload(String fileUniqueName, String fileType, String mimeType, long fileSize) {
-    	FileMetadataQuerydsl file = new FileMetadataQuerydsl();
-    	file.setId(IdGenerator.generate());
+        FileMetadataQuerydsl file = new FileMetadataQuerydsl();
+        file.setId(IdGenerator.generate());
         file.setUniqueName(fileUniqueName);
         file.setFileType(fileType);
         file.setMimeType(mimeType);
@@ -35,15 +38,6 @@ public class FileMetadataDao {
 
         return file;
     }
-
-	public String fetchUniqueName(Long fileId) {
-		return transactionManager
-			.selectQuery()
-			.select(QFileMetadataQuerydsl.fileMetadata.uniqueName)
-			.from(QFileMetadataQuerydsl.fileMetadata)
-			.where(QFileMetadataQuerydsl.fileMetadata.id.eq(fileId))
-			.fetchOne();
-	}
 
 	public Optional<FileMetadata> fetch(String fileUniqueName) {
 		return Optional.ofNullable(
@@ -62,5 +56,21 @@ public class FileMetadataDao {
 				tuple.get(QFileMetadataQuerydsl.fileMetadata.mimeType)
 			));
 	}
+
+	public List<String> findUnreferencedFiles(Collection<FileType> fileTypes) {
+		return this.transactionManager.selectQuery()
+			.select(QFileMetadataQuerydsl.fileMetadata.uniqueName)
+			.from(QFileMetadataQuerydsl.fileMetadata)
+			.where(QFileMetadataQuerydsl.fileMetadata.fileType.in(
+				fileTypes.stream().map(FileType::name).collect(Collectors.toList()))
+			)
+			.fetch();
+	}
+
+    public void deleteFilesMetadata(List<String> fileUniqueNames) {
+        this.transactionManager.delete(QFileMetadataQuerydsl.fileMetadata)
+            .where(QFileMetadataQuerydsl.fileMetadata.uniqueName.in(fileUniqueNames))
+            .execute();
+    }
 
 }

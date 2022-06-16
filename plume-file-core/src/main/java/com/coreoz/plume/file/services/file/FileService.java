@@ -1,18 +1,5 @@
 package com.coreoz.plume.file.services.file;
 
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.file.data.FileData;
@@ -25,8 +12,18 @@ import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.utils.FileNameUtils;
 import com.google.common.io.ByteStreams;
-
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class FileService {
@@ -41,11 +38,15 @@ public class FileService {
 
 	private final String fileApiBaseUrl;
 
-	@SuppressWarnings("deprecation")
 	@Inject
-	public FileService(FileMetadataService fileMetadataService, FileStorageService fileStorageService,
-			FileCacheService fileCacheService, ChecksumService checksumService,
-			FileTypesProvider fileTypesProvider, FileConfigurationService configurationService) {
+	public FileService(
+		FileMetadataService fileMetadataService,
+		FileStorageService fileStorageService,
+		FileCacheService fileCacheService,
+		ChecksumService checksumService,
+		FileTypesProvider fileTypesProvider,
+		FileConfigurationService configurationService
+	) {
 		this.fileMetadataService = fileMetadataService;
 		this.fileStorageService = fileStorageService;
 		this.fileCacheService = fileCacheService;
@@ -54,7 +55,6 @@ public class FileService {
 
 		this.fileApiBaseUrl = configurationService.apiBasePath() + configurationService.fileWsPath();
 
-		this.fileCacheService.initializeFileIdCache(fileMetadataService::fetchUniqueName);
 		this.fileCacheService.initializeFileDataCache(this::fetchUncached);
 	}
 
@@ -65,15 +65,14 @@ public class FileService {
 	 */
 	public FileUploaded upload(FileType fileType, String fileExtension, byte[] fileData) {
 		String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
-		String fileUniqueName = UUID.randomUUID().toString()
-				+ (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
+		String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
 		long fileId = fileMetadataService.upload(
 			fileUniqueName,
 			fileType.name(),
 			FileNameUtils.guessMimeType(fileUniqueName),
 			fileData.length * 4L // *4L to convert Java Bytes length to bytes
 		);
-		fileStorageService.upload(fileType.name(), fileUniqueName, fileData);
+		fileStorageService.upload(fileId, fileUniqueName, fileData);
 
 		return FileUploaded.of(fileId, fileUniqueName, url(fileUniqueName));
 	}
@@ -114,16 +113,6 @@ public class FileService {
 
 	// file URL
 
-    /**
-     * @deprecated Unique name should be used instead of the raw identifier, see {@link FileService#url(String)}
-     */
-    @Deprecated
-    public Optional<String> url(Long fileId) {
-        return fileCacheService
-        	.fetchFileUniqueName(fileId)
-        	.map(this::url);
-    }
-
     public String url(String fileUniqueName) {
     	return fileApiBaseUrl + "/" + fileUniqueName;
     }
@@ -132,16 +121,6 @@ public class FileService {
 
 	public Optional<FileData> fetch(String fileUniqueName) {
 		return fileCacheService.fetchFileData(fileUniqueName);
-	}
-
-	/**
-     * @deprecated Unique name should be used instead of the raw identifier, see {@link FileService#fetch(String)}
-     */
-	@Deprecated
-	public Optional<FileData> fetch(Long fileId) {
-		return fileCacheService
-			.fetchFileUniqueName(fileId)
-			.flatMap(this::fetch);
 	}
 
 	private Optional<FileData> fetchUncached(String fileUniqueName) {

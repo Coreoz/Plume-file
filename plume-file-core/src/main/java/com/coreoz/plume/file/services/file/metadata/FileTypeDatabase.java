@@ -1,10 +1,11 @@
 package com.coreoz.plume.file.services.file.metadata;
 
 import com.coreoz.plume.file.db.FileEntry;
+import com.coreoz.plume.file.services.filetype.FileType;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.NumberPath;
 
-public interface FileTypeDatabase {
+public interface FileTypeDatabase extends FileType {
 	/**
 	 * The entity that contains a column that referenced the {@link FileEntry} ID
 	 */

@@ -1,6 +1,6 @@
 CREATE TABLE plm_file
 (
-  id NUMBER (19,0) NOT NULL,
+  id        NUMBER (19,0) NOT NULL,
   uid       varchar(255) NOT NULL,
   file_extension  varchar(5) NULL,
   file_type varchar(255) NOT NULL,

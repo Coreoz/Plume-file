@@ -1,20 +1,18 @@
 package com.coreoz.plume.file.services.cache;
 
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
-import javax.inject.Singleton;
-
 import com.coreoz.plume.file.services.file.data.FileData;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-
 import lombok.SneakyThrows;
+
+import javax.inject.Singleton;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Singleton
 public class FileCacheServiceGuava implements FileCacheService {
@@ -29,15 +27,6 @@ public class FileCacheServiceGuava implements FileCacheService {
 			.expireAfterAccess(1, TimeUnit.DAYS)
 			.maximumSize(100)
 			.build(CacheLoader.from(optionalLoaderToExceptionLoader(fileDataLoader::apply)));
-	}
-
-	@Override
-	public void initializeFileIdCache(Function<Long, Optional<String>> fileIdLoader) {
-		fileIdCache = CacheBuilder
-			.newBuilder()
-			.expireAfterAccess(1, TimeUnit.DAYS)
-			.maximumSize(1000)
-			.build(CacheLoader.from(optionalLoaderToExceptionLoader(fileIdLoader::apply)));
 	}
 
 	@Override
@@ -57,7 +46,7 @@ public class FileCacheServiceGuava implements FileCacheService {
 
 	@SneakyThrows
     private <K, V> Optional<V> fetch(LoadingCache<K, V> cache, K cacheKey) {
-		Preconditions.checkNotNull(cache, "Cache has not been initiliazed");
+		Preconditions.checkNotNull(cache, "Cache has not been initialized");
         if (cacheKey == null) {
             return Optional.empty();
         }

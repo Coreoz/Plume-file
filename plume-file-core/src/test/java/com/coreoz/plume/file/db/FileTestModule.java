@@ -6,7 +6,7 @@ import com.coreoz.plume.db.guice.GuiceDbTestModule;
 import com.coreoz.plume.db.querydsl.guice.GuiceQuerydslModule;
 import com.google.inject.AbstractModule;
 
-public class FileTestDbModule extends AbstractModule {
+public class FileTestModule extends AbstractModule {
 
 	@Override
 	protected void configure() {

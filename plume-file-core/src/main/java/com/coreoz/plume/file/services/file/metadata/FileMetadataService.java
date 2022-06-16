@@ -9,8 +9,6 @@ import com.coreoz.plume.file.services.filetype.FileType;
 
 public interface FileMetadataService {
 	long upload(String fileUniqueName, String fileType, String mimeType, long fileSize);
-	@Deprecated
-	Optional<String> fetchUniqueName(Long fileId);
 	Optional<FileMetadata> fetch(String fileUniqueName);
 	List<String> findUnreferencedFiles(Collection<FileType> fileTypes);
 	void deleteFiles(List<String> fileUniqueNamesDeleted);

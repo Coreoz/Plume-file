@@ -1,17 +1,16 @@
 package com.coreoz.plume.file.dagger;
 
-import javax.inject.Singleton;
-
 import com.coreoz.plume.file.services.cache.FileCacheService;
 import com.coreoz.plume.file.services.cache.FileCacheServiceGuava;
-import com.coreoz.plume.file.services.file.FileService;
-import com.coreoz.plume.file.services.file.FileServiceDatabase;
+import com.coreoz.plume.file.services.file.FileStorageDatabase;
+import com.coreoz.plume.file.services.file.storage.FileStorageService;
 import com.coreoz.plume.file.services.hash.ChecksumService;
 import com.coreoz.plume.file.services.hash.ChecksumServiceSha1;
 import com.coreoz.plume.scheduler.dagger.DaggerSchedulerModule;
-
 import dagger.Module;
 import dagger.Provides;
+
+import javax.inject.Singleton;
 
 @Module(includes = DaggerSchedulerModule.class)
 public class DaggerFileModule {
@@ -24,8 +23,8 @@ public class DaggerFileModule {
 
 	@Provides
 	@Singleton
-	static FileService provideFileService(FileServiceDatabase fileServiceDatabase) {
-		return fileServiceDatabase;
+	static FileStorageService provideFileService(FileStorageDatabase fileStorageDatabase) {
+		return fileStorageDatabase;
 	}
 
 	@Provides

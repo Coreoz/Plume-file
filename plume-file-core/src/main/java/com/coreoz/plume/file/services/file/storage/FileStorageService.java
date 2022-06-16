@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FileStorageService {
-	void upload(String fileType, String fileUniqueName, byte[] fileData);
+	void upload(Long fileId, String fileUniqueName, byte[] fileData);
 
 	Optional<byte[]> fetch(String fileType, String fileUniqueName);
 
 	/**
-	 * Must not failed if the files have already been deleted
+	 * Must not fail if the files have already been deleted
 	 * @param fileUniqueNames The file unique names for which files should be deleted
 	 * @return The file unique names that have been deleted OR that did not exist.
 	 * Only files that exist and that have failed to be deleted must not be present in this list

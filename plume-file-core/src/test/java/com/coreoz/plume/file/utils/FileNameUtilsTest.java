@@ -8,8 +8,8 @@ public class FileNameUtilsTest {
 
 	@Test
 	public void test_sanitize() {
-		assertThat(FileNameUtils.sanitize("éàù  	P$^/'\\\"_1.jpg"))
-			.isEqualTo("eau-p_1.jpg");
+		assertThat(FileNameUtils.cleanExtensionName(".jpg"))
+			.isEqualTo("bonjour");
 	}
 
 }
