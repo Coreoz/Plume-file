@@ -9,7 +9,7 @@ public class FileNameUtilsTest {
 	@Test
 	public void test_sanitize() {
 		assertThat(FileNameUtils.cleanExtensionName(".jpg"))
-			.isEqualTo("bonjour");
+			.isEqualTo(".");
 	}
 
 }

@@ -13,7 +13,7 @@
 
 	<organization>
 		<name>Coreoz</name>
-		<url>http://coreoz.com/</url>
+		<url>https://coreoz.com/</url>
 	</organization>
 
 	<licenses>
@@ -29,7 +29,7 @@
 			<name>Aurélien Manteaux</name>
 			<email>amanteaux@coreoz.com</email>
 			<organization>Coreoz</organization>
-			<organizationUrl>http://coreoz.com/</organizationUrl>
+			<organizationUrl>https://coreoz.com/</organizationUrl>
 		</developer>
 	</developers>
 
@@ -72,7 +72,10 @@
 
 	<modules>
 		<module>plume-file-core</module>
-		<module>plume-file-gallery</module>
+		<module>plume-file-web-jersey</module>
+		<module>plume-file-storage-database</module>
+		<module>plume-file-storage-system</module>
+		<module>plume-file-metadata-database</module>
 	</modules>
 
 	<profiles>

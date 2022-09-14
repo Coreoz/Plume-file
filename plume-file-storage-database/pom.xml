@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.coreoz</groupId>
+		<artifactId>plume-file-parent</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>plume-file-storage-database</artifactId>
+	<packaging>jar</packaging>
+	<name>Plume File Storage Database</name>
+	<description>A toolkit to store files in database and serve it with Jersey</description>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.conf</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-conf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-db-querydsl</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.google.dagger</groupId>
+			<artifactId>dagger</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-db-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-framework-dependencies</artifactId>
+				<version>${plume-framework-dependencies.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
+
