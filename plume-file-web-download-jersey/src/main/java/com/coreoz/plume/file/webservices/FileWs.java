@@ -48,7 +48,7 @@ public class FileWs {
 		@ApiParam @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		return this.fileService.fetchFile(fileUid)
+		return this.fileService.fetchCachedFile(fileUid)
 			.map(fileData -> {
 				if(ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileData.getChecksum())) {
 					return Response.notModified().build();

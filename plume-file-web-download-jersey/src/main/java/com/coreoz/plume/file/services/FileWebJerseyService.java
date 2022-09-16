@@ -5,6 +5,8 @@ import com.coreoz.plume.file.hash.ChecksumService;
 import com.coreoz.plume.file.services.beans.FileData;
 import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
 import com.google.common.io.ByteStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,6 +15,7 @@ import java.util.Optional;
 
 @Singleton
 public class FileWebJerseyService {
+    private static final Logger logger = LoggerFactory.getLogger(FileWebJerseyService.class);
 
     private final FileWebJerseyConfigurationService configurationService;
     private final FileService fileService;
@@ -36,7 +39,7 @@ public class FileWebJerseyService {
                 try {
                     return Optional.of(ByteStreams.toByteArray(data));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error while fetching file {} : ", uid, e);
                 }
                 return Optional.empty();
             })
@@ -44,7 +47,7 @@ public class FileWebJerseyService {
         this.fileCacheService.initializeFileMetadataCache(this.fileService::fetchMetadata);
     }
 
-    public Optional<FileData> fetchFile(String fileUniqueName) {
+    public Optional<FileData> fetchCachedFile(String fileUniqueName) {
         return this.fileCacheService.fetchFileMetadata(fileUniqueName)
             .flatMap(metadata -> this.fileCacheService.fetchFileData(fileUniqueName)
                 .map(data -> new FileData(
