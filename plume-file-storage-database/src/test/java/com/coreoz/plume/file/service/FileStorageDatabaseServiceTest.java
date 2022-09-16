@@ -3,6 +3,7 @@ package com.coreoz.plume.file.service;
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileStorageDao;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,20 +27,20 @@ public class FileStorageDatabaseServiceTest {
 
     @Test
     public void fetch_file_with_known_unique_file_name_must_return_byte_array() throws IOException {
-        Optional<InputStream> fileMetadata = this.fileStorageDatabase.fetch("random-uid-to-fetch");
+        Optional<MeasuredSizeInputStream> fileMetadata = this.fileStorageDatabase.fetch("random-uid-to-fetch");
         Assert.assertTrue(fileMetadata.isPresent());
         Assert.assertEquals(-1, fileMetadata.get().read());
     }
 
     @Test
     public void fetch_file_with_unknown_unique_file_name_must_return_empty() {
-        Optional<InputStream> bytes = this.fileStorageDatabase.fetch("unknown-uid-to-fetch");
+        Optional<MeasuredSizeInputStream> bytes = this.fileStorageDatabase.fetch("unknown-uid-to-fetch");
         Assert.assertFalse(bytes.isPresent());
     }
 
     @Test
     public void upload_file_should_not_fail() {
-        this.fileStorageDatabase.add("random-uid-to-add", new ByteArrayInputStream(new byte[1]));
+        this.fileStorageDatabase.add("random-uid-to-add", new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[1])));
         Assert.assertTrue(true);
     }
 
@@ -58,15 +58,15 @@ public class FileStorageDatabaseServiceTest {
 
     private final FileStorageDao mockDao = new FileStorageDao(null) {
         @Override
-        public Optional<InputStream> fetch(String fileUniqueName) {
+        public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
             if (!"random-uid-to-fetch".equals(fileUniqueName)) {
                 return Optional.empty();
             }
-            return Optional.of(new ByteArrayInputStream(new byte[0]));
+            return Optional.of(new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[0])));
         }
 
         @Override
-        public long add(String fileUniqueName, InputStream inputStream) {
+        public long add(String fileUniqueName, MeasuredSizeInputStream inputStream) {
             return 0;
         }
 

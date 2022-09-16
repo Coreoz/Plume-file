@@ -1,6 +1,7 @@
 package com.coreoz.plume.file.service;
 
-import com.coreoz.plume.file.services.configuration.FileConfigurationService;
+import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,25 +22,24 @@ public class FileStorageSystemService implements FileStorageService {
     private final String path;
 
     @Inject
-    public FileStorageSystemService(FileConfigurationService configurationService) {
+    public FileStorageSystemService(FileStorageConfigurationService configurationService) {
         this.path = configurationService.mediaLocalPath();
     }
 
     @Override
-    public long add(String fileUniqueName, InputStream inputStream) {
+    public long add(String fileUniqueName, MeasuredSizeInputStream inputStream) {
         logger.debug("Creating file : {}", fileUniqueName);
         this.createFile(
             fileUniqueName,
             inputStream
         );
-        // TODO FETCH SIZE
-        return 0;
+        return inputStream.getInputStreamTotalSize();
     }
 
     @Override
-    public Optional<InputStream> fetch(String fileUniqueName) {
+    public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
         logger.debug("Fetching file {}", fileUniqueName);
-        try (FileInputStream fileInputStream = new FileInputStream(this.getFullPath(fileUniqueName))) {
+        try (MeasuredSizeInputStream fileInputStream = new MeasuredSizeInputStream(new FileInputStream(this.getFullPath(fileUniqueName)))) {
             return Optional.of(fileInputStream);
         } catch (IOException e) {
             logger.error("Exception while retrieving file :", e);

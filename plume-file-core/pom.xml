@@ -11,7 +11,7 @@
 	<artifactId>plume-file-core</artifactId>
 	<packaging>jar</packaging>
 	<name>Plume File Core</name>
-	<description>A toolkit to store files in database and serve it with Jersey</description>
+	<description>A toolkit to manage files</description>
 
 	<build>
 		<resources>
@@ -35,23 +35,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.coreoz</groupId>
-			<artifactId>plume-web-jersey</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>com.coreoz</groupId>
-			<artifactId>plume-db-querydsl</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-annotations</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
@@ -62,16 +45,14 @@
 			<artifactId>guice</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.google.dagger</groupId>
-			<artifactId>dagger</artifactId>
-			<optional>true</optional>
-		</dependency>
 
 		<dependency>
-			<groupId>com.coreoz</groupId>
-			<artifactId>plume-db-test</artifactId>
-			<scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 	</dependencies>
 

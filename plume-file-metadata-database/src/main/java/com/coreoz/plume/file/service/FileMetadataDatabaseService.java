@@ -29,6 +29,11 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
+    public void updateFileSize(String fileUniqueName, long fileSize) {
+        fileMetadataDao.updateFileSize(fileUniqueName, fileSize);
+    }
+
+    @Override
     public Optional<FileMetadata> fetch(String fileUniqueName) {
         return fileMetadataDao.fetch(fileUniqueName);
     }

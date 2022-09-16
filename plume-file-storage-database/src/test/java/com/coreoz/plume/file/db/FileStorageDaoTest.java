@@ -2,6 +2,8 @@ package com.coreoz.plume.file.db;
 
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
+import com.google.common.io.ByteStreams;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +11,6 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
@@ -19,14 +20,14 @@ public class FileStorageDaoTest {
     private FileStorageDao fileDao;
 
     @Test
-    public void fetch_existing_file_should_return_the_file() throws IOException {
-        Optional<InputStream> file = fileDao.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1");
+    public void fetch_existing_file_should_return_the_file() {
+        Optional<MeasuredSizeInputStream> file = fileDao.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1");
         Assert.assertTrue(file.isPresent());
     }
 
     @Test
     public void fetch_unknown_file_should_return_empty() {
-        Optional<InputStream> file = fileDao.fetch("unknown");
+        Optional<MeasuredSizeInputStream> file = fileDao.fetch("unknown");
         Assert.assertFalse(file.isPresent());
     }
 
@@ -44,7 +45,13 @@ public class FileStorageDaoTest {
 
     @Test
     public void upload_should_not_fail() {
-        fileDao.add("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd1", new ByteArrayInputStream(new byte[0]));
-        Assert.assertTrue(true);
+        try {
+            byte[] bytes = ByteStreams.toByteArray(new ByteArrayInputStream(new byte[127]));
+            System.out.println(bytes.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        long size = fileDao.add("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd1", new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[127])));
+        Assert.assertTrue(size > 1);
     }
 }

@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.db.beans;
 
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.dsl.SimplePath;
@@ -18,7 +19,7 @@ public class QFileDataQueryDsl extends com.querydsl.sql.RelationalPathBase<FileD
     public static final QFileDataQueryDsl file = new QFileDataQueryDsl("PLM_FILE_DATA");
 
     public final StringPath uniqueName = createString("unique_name");
-    public final SimplePath<ByteArrayInputStream> data = createSimple("data", ByteArrayInputStream.class);
+    public final SimplePath<MeasuredSizeInputStream> data = createSimple("data", MeasuredSizeInputStream.class);
 
     public QFileDataQueryDsl(String variable) {
         super(FileDataQueryDsl.class, forVariable(variable), "PLM", "PLM_FILE_DATA");

@@ -2,6 +2,7 @@ package com.coreoz.plume.file.db;
 
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,7 +18,7 @@ public class FileStorageDao {
         this.transactionManager = transactionManager;
     }
 
-    public long add(String uniqueName, InputStream fileData) {
+    public long add(String uniqueName, MeasuredSizeInputStream fileData) {
         transactionManager
             .insert(QFileDataQueryDsl.file)
             .columns(
@@ -30,10 +31,10 @@ public class FileStorageDao {
             )
             .execute();
 
-        return 0;
+        return fileData.getInputStreamTotalSize();
     }
 
-    public Optional<InputStream> fetch(String fileUniqueName) {
+    public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
         return Optional.ofNullable(
             this.transactionManager.selectQuery()
                 .select(QFileDataQueryDsl.file.data)

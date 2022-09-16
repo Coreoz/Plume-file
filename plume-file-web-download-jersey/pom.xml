@@ -8,10 +8,10 @@
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>plume-file-web-jersey</artifactId>
+	<artifactId>plume-file-web-download-jersey</artifactId>
 	<packaging>jar</packaging>
-	<name>Plume File Web Jersey</name>
-	<description>A toolkit to store files in database and serve it with Jersey</description>
+	<name>Plume File Web Download Jersey</name>
+	<description>A Plume File toolkit to serve stored files with Jersey</description>
 
 	<build>
 		<resources>

@@ -51,6 +51,13 @@ public class FileMetadataDatabaseDao {
         return fileMetadata;
     }
 
+    public void updateFileSize(String fileUniqueName, long fileSize) {
+        transactionManager.update(QFileMetadataQuerydsl.fileMetadata)
+            .set(QFileMetadataQuerydsl.fileMetadata.fileSize, fileSize)
+            .where(QFileMetadataQuerydsl.fileMetadata.uniqueName.eq(fileUniqueName))
+            .execute();
+    }
+
     public Optional<FileMetadata> fetch(String fileUniqueName) {
         return Optional.ofNullable(
             transactionManager.selectQuery()

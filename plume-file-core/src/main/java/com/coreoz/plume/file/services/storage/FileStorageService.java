@@ -1,6 +1,7 @@
 package com.coreoz.plume.file.services.storage;
 
-import java.io.InputStream;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -11,9 +12,9 @@ public interface FileStorageService {
 	 * @param fileData the file input stream
 	 * @return the file size
 	 */
-	long add(String fileUniqueName, InputStream fileData);
+	long add(String fileUniqueName, MeasuredSizeInputStream fileData);
 
-	Optional<InputStream> fetch(String fileUniqueName);
+	Optional<MeasuredSizeInputStream> fetch(String fileUniqueName);
 
 	/**
 	 * Must not fail if the files have already been deleted

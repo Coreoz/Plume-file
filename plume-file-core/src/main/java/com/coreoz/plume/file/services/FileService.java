@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.services;
 
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,7 +41,7 @@ public class FileService {
 	/**
 	 * Save a new  file.
 	 */
-	public String add(String originalName, FileType fileType, String fileExtension, InputStream inputStream) {
+	public String add(FileType fileType, MeasuredSizeInputStream inputStream, String originalName, String fileExtension, long expectedFileSize) {
 		String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
 		String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
 		this.fileMetadataService.add(
@@ -50,33 +50,35 @@ public class FileService {
 			fileType.name(),
 			fileExtension,
 			FileNameUtils.guessMimeType(fileUniqueName),
-			// TODO FETCH SIZE
-			4L // *4L to convert Java Bytes length to bytes
+			expectedFileSize
 		);
-		this.fileStorageService.add(fileUniqueName, inputStream);
+		long actualSize = this.fileStorageService.add(fileUniqueName, inputStream);
+		if (expectedFileSize != actualSize) {
+			this.fileMetadataService.updateFileSize(fileUniqueName, actualSize);
+		}
 
 		return fileUniqueName;
 	}
 
 	/**
 	 * Consume the stream to produce a byte array,
-	 * then call {@link #add(FileType, InputStream, String)}
+	 * then call {@link #add(FileType, MeasuredSizeInputStream, String)}
 	 */
-	public String add(FileType fileType, InputStream fileData) {
+	public String add(FileType fileType, MeasuredSizeInputStream fileData) {
 		return add(fileType, fileData, null);
 	}
 
 	/**
 	 * Consume the stream to produce a byte array,
-	 * then call {@link #add(String, FileType, String, InputStream)}
+	 * then call {@link #add(FileType, MeasuredSizeInputStream, String, String, long)}
 	 */
-	public String add(FileType fileType, InputStream fileData, String fileName) {
-		return add(fileName, fileType, FileNameUtils.getExtensionFromFilename(fileName), fileData);
+	public String add(FileType fileType, MeasuredSizeInputStream fileData, String fileName) {
+		return add(fileType, fileData, FileNameUtils.getExtensionFromFilename(fileName), fileName, 0);
 	}
 
 	// file data
 
-	public Optional<InputStream> fetchData(String fileUniqueName) {
+	public Optional<MeasuredSizeInputStream> fetchData(String fileUniqueName) {
 		return this.fileStorageService.fetch(fileUniqueName);
 	}
 
