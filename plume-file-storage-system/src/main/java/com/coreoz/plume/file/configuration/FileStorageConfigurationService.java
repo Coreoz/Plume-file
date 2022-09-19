@@ -14,7 +14,7 @@ public class FileStorageConfigurationService {
         // the reference file is not located in src/main/resources/ to ensure
         // that it is not overridden by another config file when a "fat jar" is created.
         this.config = config.withFallback(
-            ConfigFactory.parseResources(FileConfigurationService.class, "reference.conf")
+            ConfigFactory.parseResources(FileStorageConfigurationService.class, "reference.conf")
         );
     }
 
