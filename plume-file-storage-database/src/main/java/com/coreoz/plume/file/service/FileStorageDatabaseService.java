@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,17 +25,18 @@ public class FileStorageDatabaseService implements FileStorageService {
     }
 
     @Override
-    public long add(String fileUniqueName, MeasuredSizeInputStream fileData) {
+    public long add(String fileUniqueName, InputStream fileData) {
         logger.info("Uploading file {}", fileUniqueName);
+        MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(fileData);
         this.fileStorageDao.add(
             fileUniqueName,
-            fileData
+            measuredSizeInputStream
         );
-        return fileData.getInputStreamTotalSize();
+        return measuredSizeInputStream.getInputStreamTotalSize();
     }
 
     @Override
-    public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
+    public Optional<InputStream> fetch(String fileUniqueName) {
         return this.fileStorageDao.fetch(fileUniqueName);
     }
 

@@ -27,19 +27,20 @@ public class FileStorageSystemService implements FileStorageService {
     }
 
     @Override
-    public long add(String fileUniqueName, MeasuredSizeInputStream inputStream) {
+    public long add(String fileUniqueName, InputStream fileData) {
         logger.debug("Creating file : {}", fileUniqueName);
+        MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(fileData);
         this.createFile(
             fileUniqueName,
-            inputStream
+            measuredSizeInputStream
         );
-        return inputStream.getInputStreamTotalSize();
+        return measuredSizeInputStream.getInputStreamTotalSize();
     }
 
     @Override
-    public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
+    public Optional<InputStream> fetch(String fileUniqueName) {
         logger.debug("Fetching file {}", fileUniqueName);
-        try (MeasuredSizeInputStream fileInputStream = new MeasuredSizeInputStream(new FileInputStream(this.getFullPath(fileUniqueName)))) {
+        try (InputStream fileInputStream = new FileInputStream(this.getFullPath(fileUniqueName))) {
             return Optional.of(fileInputStream);
         } catch (IOException e) {
             logger.error("Exception while retrieving file :", e);

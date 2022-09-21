@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,14 +28,14 @@ public class FileStorageDatabaseServiceTest {
 
     @Test
     public void fetch_file_with_known_unique_file_name_must_return_byte_array() throws IOException {
-        Optional<MeasuredSizeInputStream> fileMetadata = this.fileStorageDatabase.fetch("random-uid-to-fetch");
+        Optional<InputStream> fileMetadata = this.fileStorageDatabase.fetch("random-uid-to-fetch");
         Assert.assertTrue(fileMetadata.isPresent());
         Assert.assertEquals(-1, fileMetadata.get().read());
     }
 
     @Test
     public void fetch_file_with_unknown_unique_file_name_must_return_empty() {
-        Optional<MeasuredSizeInputStream> bytes = this.fileStorageDatabase.fetch("unknown-uid-to-fetch");
+        Optional<InputStream> bytes = this.fileStorageDatabase.fetch("unknown-uid-to-fetch");
         Assert.assertFalse(bytes.isPresent());
     }
 
@@ -58,11 +59,11 @@ public class FileStorageDatabaseServiceTest {
 
     private final FileStorageDao mockDao = new FileStorageDao(null) {
         @Override
-        public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
+        public Optional<InputStream> fetch(String fileUniqueName) {
             if (!"random-uid-to-fetch".equals(fileUniqueName)) {
                 return Optional.empty();
             }
-            return Optional.of(new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[0])));
+            return Optional.of(new ByteArrayInputStream(new byte[0]));
         }
 
         @Override

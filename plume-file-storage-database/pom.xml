@@ -11,7 +11,7 @@
 	<artifactId>plume-file-storage-database</artifactId>
 	<packaging>jar</packaging>
 	<name>Plume File Storage Database</name>
-	<description>Plume File Core implementation of FileStorageService to store file in database</description>
+	<description>Plume File Core implementation of FileStorageService to store metadata in database</description>
 
 	<build>
 		<resources>

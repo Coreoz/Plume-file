@@ -34,7 +34,7 @@ public class FileStorageDao {
         return fileData.getInputStreamTotalSize();
     }
 
-    public Optional<MeasuredSizeInputStream> fetch(String fileUniqueName) {
+    public Optional<InputStream> fetch(String fileUniqueName) {
         return Optional.ofNullable(
             this.transactionManager.selectQuery()
                 .select(QFileDataQueryDsl.file.data)

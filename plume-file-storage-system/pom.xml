@@ -11,7 +11,7 @@
 	<artifactId>plume-file-storage-system</artifactId>
 	<packaging>jar</packaging>
 	<name>Plume File Storage System</name>
-	<description>Plume File Core implementation of FileStorageService to store file on System disk</description>
+	<description>Plume File Core implementation of FileStorageService to store file on the system disk</description>
 
 	<build>
 		<resources>

@@ -19,11 +19,11 @@ a good choice is something like: `project.package.services.file`
 @AllArgsConstructor
 @Getter
 public enum <YourProject>FileType implements FileType {
-
+    TYPE(QExample.example, QExample.example.fileExampleUniqueName)
 	;
 
 	private final EntityPath<?> fileEntity;
-	private final NumberPath<Long> joinColumn;
+	private final StringPath joinColumn;
 
 }
 ```

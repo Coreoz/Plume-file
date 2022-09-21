@@ -1,4 +1,18 @@
-Plume File Storage Database
+Plume File Storage System
 ===========================
 
-Store uploaded files into database and serve them with a single web-service.
+A Plume File module to help store file data on the system disk.
+
+Installation
+------------
+1. Install Maven dependency:
+```xml
+<dependency>
+  <groupId>com.coreoz</groupId>
+  <artifactId>plume-file-storage-system</artifactId>
+</dependency>
+```
+2. In the `ApplicationModule` class, install the following Guice module:
+```java
+install(new GuiceFileStorageSystemModule());
+```

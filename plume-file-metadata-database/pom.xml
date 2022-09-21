@@ -11,7 +11,7 @@
 	<artifactId>plume-file-metadata-database</artifactId>
 	<packaging>jar</packaging>
 	<name>Plume File Metadata Database</name>
-	<description>Plume File Core implementation of FileMetadataService to store them in database</description>
+	<description>Plume File Core implementation of FileMetadataService to store files in database</description>
 
 	<build>
 		<resources>
