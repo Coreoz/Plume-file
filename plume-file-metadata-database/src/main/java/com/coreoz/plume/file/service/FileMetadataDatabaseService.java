@@ -2,13 +2,12 @@ package com.coreoz.plume.file.service;
 
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
+import com.coreoz.plume.file.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
-import com.coreoz.plume.file.services.filetype.FileType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -17,10 +16,12 @@ import java.util.Optional;
 public class FileMetadataDatabaseService implements FileMetadataService {
 
     private final FileMetadataDatabaseDao fileMetadataDao;
+    private final Collection<FileTypeDatabase> fileTypes;
 
     @Inject
-    public FileMetadataDatabaseService(FileMetadataDatabaseDao fileMetadataDao) {
+    public FileMetadataDatabaseService(FileMetadataDatabaseDao fileMetadataDao, FileTypesProvider fileTypesProvider) {
         this.fileMetadataDao = fileMetadataDao;
+        this.fileTypes = fileTypesProvider.fileTypesAvailable();
     }
 
     @Override
@@ -39,16 +40,8 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
-    public List<String> findUnreferencedFiles(Collection<FileType> fileTypes) {
-        Collection<FileTypeDatabase> fileTypesDatabase = new ArrayList<>();
-        for (FileType fileType : fileTypes) {
-            if (fileType instanceof FileTypeDatabase) {
-                fileTypesDatabase.add((FileTypeDatabase) fileType);
-                continue;
-            }
-            throw new IllegalArgumentException();
-        }
-        return this.fileMetadataDao.findUnreferencedFiles(fileTypesDatabase);
+    public List<String> findUnreferencedFiles() {
+        return this.fileMetadataDao.findUnreferencedFiles(this.fileTypes);
     }
 
     @Override

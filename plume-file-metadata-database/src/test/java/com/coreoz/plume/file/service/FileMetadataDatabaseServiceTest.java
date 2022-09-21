@@ -5,6 +5,7 @@ import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
 import com.coreoz.plume.file.db.beans.FileMetadataQuerydsl;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
+import com.coreoz.plume.file.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.querydsl.core.types.EntityPath;
@@ -15,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +29,7 @@ public class FileMetadataDatabaseServiceTest {
 
     @Before
     public void init_metadata_service() {
-        this.fileMetadataService = new FileMetadataDatabaseService(this.mockDao);
+        this.fileMetadataService = new FileMetadataDatabaseService(this.mockDao, new TestTypeProvider());
     }
 
     @Test
@@ -52,7 +54,7 @@ public class FileMetadataDatabaseServiceTest {
 
     @Test
     public void unreferenced_files_must_return_valid_list() {
-        List<String> unreferencedFiles = this.fileMetadataService.findUnreferencedFiles(Collections.singleton(TestFileType.TEST));
+        List<String> unreferencedFiles = this.fileMetadataService.findUnreferencedFiles();
         Assert.assertEquals(0, unreferencedFiles.size());
     }
 
@@ -95,6 +97,14 @@ public class FileMetadataDatabaseServiceTest {
             return 0;
         }
     };
+
+    private static class TestTypeProvider implements FileTypesProvider {
+
+        @Override
+        public Collection<FileTypeDatabase> fileTypesAvailable() {
+            return Arrays.asList(TestFileType.values());
+        }
+    }
 
     private enum TestFileType implements FileTypeDatabase {
         TEST;
