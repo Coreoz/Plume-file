@@ -1,11 +1,12 @@
 package com.coreoz.plume.file.db.beans;
 
+import java.sql.Blob;
+
 import com.querydsl.sql.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.InputStream;
 
 @Setter
 @Getter
@@ -14,5 +15,5 @@ public class FileDataQueryDsl {
     @Column("unique_name")
     private String uniqueName;
     @Column("data")
-    private InputStream data;
+    private Blob data;
 }

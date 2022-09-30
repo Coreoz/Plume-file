@@ -1,20 +1,21 @@
 package com.coreoz.plume.file.service;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
-import com.coreoz.plume.file.db.FileStorageDao;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.carlosbecker.guice.GuiceModules;
+import com.carlosbecker.guice.GuiceTestRunner;
+import com.coreoz.plume.file.db.FileStorageDao;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestModule.class)
@@ -67,8 +68,7 @@ public class FileStorageDatabaseServiceTest {
         }
 
         @Override
-        public long add(String fileUniqueName, MeasuredSizeInputStream inputStream) {
-            return 0;
+        public void add(String fileUniqueName, InputStream inputStream) {
         }
 
         @Override

@@ -1,11 +1,6 @@
 package com.coreoz.plume.file.webservices;
 
-import com.coreoz.plume.file.services.FileWebJerseyService;
-import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
-import com.coreoz.plume.jersey.security.permission.PublicApi;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,10 +13,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
+import com.coreoz.plume.file.services.FileWebJerseyService;
+import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
+import com.coreoz.plume.jersey.security.permission.PublicApi;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/files")
-@Api(value = "Serve binary resources")
+@Tag(name = "files", description = "Serve binary resources")
 @Singleton
 @PublicApi
 public class FileWs {
@@ -41,10 +42,10 @@ public class FileWs {
 
 	@GET
 	@Path("/{uid}{filename: (/.*)?}")
-	@ApiOperation(value = "Serve a file")
+	@Operation(description = "Serve a file")
 	public Response fetch(
-		@ApiParam(required = true) @PathParam("uid") String fileUid,
-		@ApiParam @PathParam("filename") String filename,
+		@Parameter(required = true) @PathParam("uid") String fileUid,
+		@Parameter @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		return this.fileService.fetchCachedFile(fileUid)

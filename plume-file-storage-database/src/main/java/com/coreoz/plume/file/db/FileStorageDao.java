@@ -1,13 +1,16 @@
 package com.coreoz.plume.file.db;
 
-import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
-import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.InputStream;
-import java.util.Optional;
+
+import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
+import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
+
+import lombok.SneakyThrows;
 
 @Singleton
 public class FileStorageDao {
@@ -18,7 +21,7 @@ public class FileStorageDao {
         this.transactionManager = transactionManager;
     }
 
-    public long add(String uniqueName, MeasuredSizeInputStream fileData) {
+    public void add(String uniqueName, InputStream fileData) {
         transactionManager
             .insert(QFileDataQueryDsl.file)
             .columns(
@@ -30,18 +33,16 @@ public class FileStorageDao {
                 fileData
             )
             .execute();
-
-        return fileData.getInputStreamTotalSize();
     }
 
+    @SneakyThrows
     public Optional<InputStream> fetch(String fileUniqueName) {
-        return Optional.ofNullable(
-            this.transactionManager.selectQuery()
+        Blob fileData = this.transactionManager.selectQuery()
                 .select(QFileDataQueryDsl.file.data)
                 .from(QFileDataQueryDsl.file)
                 .where(QFileDataQueryDsl.file.uniqueName.eq(fileUniqueName))
-                .fetchOne()
-        );
+                .fetchFirst();
+        return fileData == null ? Optional.empty() : Optional.of(fileData.getBinaryStream());
     }
 
     public boolean delete(String fileUniqueName) {

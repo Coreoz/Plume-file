@@ -1,18 +1,19 @@
 package com.coreoz.plume.file.db;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
-import com.google.common.io.ByteStreams;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.carlosbecker.guice.GuiceModules;
+import com.carlosbecker.guice.GuiceTestRunner;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestModule.class)
@@ -46,13 +47,18 @@ public class FileStorageDaoTest {
 
     @Test
     public void upload_should_not_fail() {
-        try {
-            byte[] bytes = ByteStreams.toByteArray(new ByteArrayInputStream(new byte[127]));
-            System.out.println(bytes.length);
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
-        long size = fileDao.add("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd1", new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[127])));
-        Assert.assertTrue(size > 1);
+        fileDao.add("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd1", new ByteArrayInputStream(new byte[127]));
+        Optional<InputStream> uploadedFile = fileDao.fetch("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd1");
+        Assertions.assertThat(uploadedFile).isPresent();
+    }
+
+    @Test
+    public void download_should_return_a_correct_file_data_stream() throws IOException {
+    	InputStream data = new ByteArrayInputStream(new byte[] { 'A', 'B', 'C' });
+        fileDao.add("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd2", data);
+        Optional<InputStream> uploadedFile = fileDao.fetch("5yt69yuf-r879-zc5h-8eb2-g5469f1c9fd2");
+
+        Assertions.assertThat(uploadedFile).isPresent();
+        Assertions.assertThat(uploadedFile.get()).hasContent("ABC");
     }
 }
