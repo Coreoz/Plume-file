@@ -1,16 +1,15 @@
 package com.coreoz.plume.file.db;
 
-import java.io.InputStream;
-import java.sql.Blob;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
 
-import lombok.SneakyThrows;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Singleton
 public class FileStorageDao {
@@ -35,14 +34,14 @@ public class FileStorageDao {
             .execute();
     }
 
-    @SneakyThrows
     public Optional<InputStream> fetch(String fileUniqueName) {
         Blob fileData = this.transactionManager.selectQuery()
                 .select(QFileDataQueryDsl.file.data)
                 .from(QFileDataQueryDsl.file)
                 .where(QFileDataQueryDsl.file.uniqueName.eq(fileUniqueName))
                 .fetchFirst();
-        return fileData == null ? Optional.empty() : Optional.of(fileData.getBinaryStream());
+        return Optional.ofNullable(fileData)
+            .map(unwrapBlob());
     }
 
     public boolean delete(String fileUniqueName) {
@@ -51,5 +50,15 @@ public class FileStorageDao {
             .where(QFileDataQueryDsl.file.uniqueName.eq(fileUniqueName))
             .execute();
         return nbDeleted > 0;
+    }
+
+    private static Function<Blob, InputStream> unwrapBlob() {
+        return blob -> {
+            try {
+                return blob.getBinaryStream();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 }

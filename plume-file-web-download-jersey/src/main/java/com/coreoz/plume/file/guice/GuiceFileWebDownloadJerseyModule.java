@@ -6,7 +6,7 @@ import com.coreoz.plume.file.hash.ChecksumService;
 import com.coreoz.plume.file.hash.ChecksumServiceSha1;
 import com.google.inject.AbstractModule;
 
-public class GuiceFileWebserviceModule extends AbstractModule {
+public class GuiceFileWebDownloadJerseyModule extends AbstractModule {
 
     @Override
     protected void configure() {

@@ -3,7 +3,6 @@ package com.coreoz.plume.file.service;
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
 import com.coreoz.plume.file.filetype.FileTypesProvider;
-import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 
@@ -38,13 +37,6 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     @Override
     public Optional<FileMetadata> fetch(String fileUniqueName) {
         return fileMetadataDao.fetch(fileUniqueName);
-    }
-
-    @Override
-    public FileType fileType(String fileType) {
-        return this.fileTypes.stream().filter(fileTypeDatabase -> fileTypeDatabase.name().equals(fileType))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

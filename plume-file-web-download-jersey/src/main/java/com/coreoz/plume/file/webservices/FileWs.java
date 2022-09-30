@@ -54,7 +54,7 @@ public class FileWs {
 					return Response.notModified().build();
 				}
 
-				ResponseBuilder response = Response.ok(fileData)
+				ResponseBuilder response = Response.ok(fileData.getData())
 					.header(HttpHeaders.ETAG, fileData.getChecksum());
 				if(fileData.getMimeType() != null) {
 					response.header(HttpHeaders.CONTENT_TYPE, fileData.getMimeType());

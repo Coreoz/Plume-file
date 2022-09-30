@@ -108,10 +108,6 @@ public class FileService {
             .fetch(fileUniqueName);
     }
 
-    public FileType fileTypeFromName(String fileType) {
-        return this.fileMetadataService.fileType(fileType);
-    }
-
     // clean up
 
     public void deleteUnreferenced() {
