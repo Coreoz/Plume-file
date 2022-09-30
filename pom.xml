@@ -112,6 +112,7 @@
 						</executions>
 						<configuration>
 							<stylesheet>java</stylesheet>
+							<source>${javadoc.java-version}</source>
 						</configuration>
 					</plugin>
 					<plugin>
