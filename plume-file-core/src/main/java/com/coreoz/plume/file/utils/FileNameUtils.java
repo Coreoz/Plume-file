@@ -39,6 +39,6 @@ public class FileNameUtils {
 		if (fileExtension == null) {
 			return "";
 		}
-		return fileExtension.toLowerCase().replaceAll("[a-z0-9]", "");
+		return fileExtension.toLowerCase().replace(".", "");
 	}
 }

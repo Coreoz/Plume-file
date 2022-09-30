@@ -58,13 +58,4 @@ public class FileWebJerseyService {
                 ))
             );
     }
-
-    public Optional<String> url(String fileUniqueName) {
-        return this.fileCacheService.fetchFileMetadata(fileUniqueName)
-            .map(fileMetadata ->
-                this.configurationService.apiBasePath()
-                    + this.configurationService.fileWsPath()
-                    + fileMetadata.getUniqueName()
-            );
-    }
 }

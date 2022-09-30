@@ -73,6 +73,7 @@
 	<modules>
 		<module>plume-file-core</module>
 		<module>plume-file-web-download-jersey</module>
+		<module>plume-file-web-upload-jersey</module>
 		<module>plume-file-storage-database</module>
 		<module>plume-file-storage-system</module>
 		<module>plume-file-metadata-database</module>

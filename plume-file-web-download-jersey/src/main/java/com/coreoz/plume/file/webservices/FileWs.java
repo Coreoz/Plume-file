@@ -2,7 +2,6 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.services.FileWebJerseyService;
 import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
-import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

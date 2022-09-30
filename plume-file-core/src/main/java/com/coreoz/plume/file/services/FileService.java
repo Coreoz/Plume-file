@@ -42,10 +42,11 @@ public class FileService {
      * @param inputStream      the file data
      * @param originalName     the original name of the file. This won't be the name under the one the file will be saved
      * @param fileExtension    the file extension
+     * @param mimeType         the mime type
      * @param expectedFileSize the expected file size in bytes
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      */
-    public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, long expectedFileSize) {
+    public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, String mimeType, long expectedFileSize) {
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
@@ -53,7 +54,7 @@ public class FileService {
             originalName,
             fileType.name(),
             fileExtension,
-            FileNameUtils.guessMimeType(fileUniqueName),
+            mimeType,
             expectedFileSize
         );
         long actualSize = this.fileStorageService.add(fileUniqueName, new MeasuredSizeInputStream(inputStream));
@@ -74,10 +75,26 @@ public class FileService {
 
     /**
      * Consume the stream to produce a byte array,
-     * then call {@link #add(FileType, InputStream, String, String, long)}
+     * then call {@link #add(FileType, InputStream, String, String, String, long)}
+     */
+    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType, long expectedFileSize) {
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, expectedFileSize);
+    }
+
+    /**
+     * Consume the stream to produce a byte array,
+     * then call {@link #add(FileType, InputStream, String, String, String, long)}
+     */
+    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) {
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, -1);
+    }
+
+    /**
+     * Consume the stream to produce a byte array,
+     * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) {
-        return add(fileType, fileData, FileNameUtils.getExtensionFromFilename(fileName), fileName, 0);
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName), -1);
     }
 
     // file data
@@ -89,6 +106,10 @@ public class FileService {
     public Optional<FileMetadata> fetchMetadata(String fileUniqueName) {
         return fileMetadataService
             .fetch(fileUniqueName);
+    }
+
+    public FileType fileTypeFromName(String fileType) {
+        return this.fileMetadataService.fileType(fileType);
     }
 
     // clean up

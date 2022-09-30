@@ -1,6 +1,5 @@
 package com.coreoz.plume.file.configuration;
 
-import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

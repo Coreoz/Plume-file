@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.InputStream;
+
 @Setter
 @Getter
 @ToString
@@ -12,5 +14,5 @@ public class FileDataQueryDsl {
     @Column("unique_name")
     private String uniqueName;
     @Column("data")
-    private byte[] data;
+    private InputStream data;
 }
