@@ -1,15 +1,17 @@
 package com.coreoz.plume.file.db;
 
-import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
-import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
+import com.coreoz.plume.file.db.beans.QFileDataQueryDsl;
 
 @Singleton
 public class FileStorageDao {
@@ -44,12 +46,11 @@ public class FileStorageDao {
             .map(unwrapBlob());
     }
 
-    public boolean delete(String fileUniqueName) {
-        long nbDeleted = transactionManager
+    public void deleteAll(List<String> fileUniqueNames) {
+        transactionManager
             .delete(QFileDataQueryDsl.file)
-            .where(QFileDataQueryDsl.file.uniqueName.eq(fileUniqueName))
+            .where(QFileDataQueryDsl.file.uniqueName.in(fileUniqueNames))
             .execute();
-        return nbDeleted > 0;
     }
 
     private static Function<Blob, InputStream> unwrapBlob() {

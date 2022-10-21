@@ -1,19 +1,20 @@
 package com.coreoz.plume.file.service;
 
-import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
-import com.coreoz.plume.file.services.storage.FileStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
+import com.coreoz.plume.file.services.storage.FileStorageService;
 
 @Singleton
 public class FileStorageSystemService implements FileStorageService {
@@ -49,22 +50,18 @@ public class FileStorageSystemService implements FileStorageService {
     }
 
     @Override
-    public List<String> deleteAll(List<String> fileUniqueNames) {
+    public void deleteAll(List<String> fileUniqueNames) throws IOException {
         logger.debug("Deleting files");
         boolean directoryExists = FileUtils.directoryExists(this.getFolderPath());
-        List<String> filesInError = new ArrayList<>();
         if (!directoryExists) {
-            logger.warn("The file directory {} can't be created", this.getFolderPath());
-            return fileUniqueNames;
+        	throw new IOException("Files directory " + this.getFolderPath() + " does not exist");
         }
         for (String fileToDelete : fileUniqueNames) {
             boolean hasBeenDeleted = FileUtils.deleteFile(fileToDelete);
             if (!hasBeenDeleted) {
                 logger.warn("File {} hase not been deleted", fileToDelete);
-                filesInError.add(fileToDelete);
             }
         }
-        return filesInError;
     }
 
     private void createFile(String fileName, InputStream inputStream) {

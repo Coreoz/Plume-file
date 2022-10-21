@@ -3,6 +3,7 @@ package com.coreoz.plume.file.db;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -34,15 +35,13 @@ public class FileStorageDaoTest {
     }
 
     @Test
-    public void delete_existing_file_should_return_true() {
-        boolean hasBeenDeleted = fileDao.delete("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1");
-        Assert.assertTrue(hasBeenDeleted);
+    public void delete_existing_file_should_not_fail() {
+        fileDao.deleteAll(List.of("7b3cf3de-f973-11e8-8eb2-f2801f1b9fd1"));
     }
 
     @Test
-    public void delete_unknown_file_should_return_false() {
-        boolean hasBeenDeleted = fileDao.delete("unknown");
-        Assert.assertFalse(hasBeenDeleted);
+    public void delete_unknown_file_should_not_fail() {
+        fileDao.deleteAll(List.of("unknown"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.services;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,8 @@ import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.utils.FileNameUtils;
+
+import lombok.SneakyThrows;
 
 @Singleton
 public class FileService {
@@ -112,11 +115,18 @@ public class FileService {
 
     // clean up
 
+    /**
+     * Delete unreferenced files.
+     * 
+     * @throws IOException is a file could not be deleted.
+     * It is possible to retry if the deletion failed.
+     */
+    @SneakyThrows
     public void deleteUnreferenced() {
         List<String> fileUniqueNamesToDelete = fileMetadataService.findUnreferencedFiles();
-        List<String> fileUniqueNamesDeleted = fileStorageService.deleteAll(fileUniqueNamesToDelete);
-        fileMetadataService.deleteAll(fileUniqueNamesDeleted);
-        logger.debug("{} unreferenced files deleted", fileUniqueNamesDeleted.size());
+        fileStorageService.deleteAll(fileUniqueNamesToDelete);
+        fileMetadataService.deleteAll(fileUniqueNamesToDelete);
+        logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
     }
 
 }

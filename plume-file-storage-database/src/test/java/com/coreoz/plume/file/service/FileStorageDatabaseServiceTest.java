@@ -3,7 +3,6 @@ package com.coreoz.plume.file.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ import org.junit.runner.RunWith;
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileStorageDao;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestModule.class)
@@ -42,20 +40,8 @@ public class FileStorageDatabaseServiceTest {
 
     @Test
     public void upload_file_should_not_fail() {
-        this.fileStorageDatabase.add("random-uid-to-add", new MeasuredSizeInputStream(new ByteArrayInputStream(new byte[1])));
+        this.fileStorageDatabase.add("random-uid-to-add", new ByteArrayInputStream(new byte[1]));
         Assert.assertTrue(true);
-    }
-
-    @Test
-    public void delete_valid_files_should_return_empty_list() {
-        List<String> filesNotDeleted = this.fileStorageDatabase.deleteAll(Collections.singletonList("random-uid-to-fetch"));
-        Assert.assertTrue(filesNotDeleted.isEmpty());
-    }
-
-    @Test
-    public void delete_not_valid_files_should_return_list() {
-        List<String> filesNotDeleted = this.fileStorageDatabase.deleteAll(Collections.singletonList("unknown-uid-to-fetch"));
-        Assert.assertFalse(filesNotDeleted.isEmpty());
     }
 
     private final FileStorageDao mockDao = new FileStorageDao(null) {
@@ -72,8 +58,7 @@ public class FileStorageDatabaseServiceTest {
         }
 
         @Override
-        public boolean delete(String fileUniqueName) {
-            return "random-uid-to-fetch".equals(fileUniqueName);
+        public void deleteAll(List<String> fileUniqueNames) {
         }
     };
 }

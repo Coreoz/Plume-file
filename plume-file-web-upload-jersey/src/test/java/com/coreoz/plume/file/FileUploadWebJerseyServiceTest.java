@@ -1,20 +1,22 @@
 package com.coreoz.plume.file;
 
-import com.coreoz.plume.file.services.FileService;
-import com.coreoz.plume.file.services.filetype.FileType;
-import com.coreoz.plume.file.services.metadata.FileMetadata;
-import com.coreoz.plume.file.services.metadata.FileMetadataService;
-import com.coreoz.plume.file.services.storage.FileStorageService;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+
+import javax.ws.rs.core.MediaType;
+
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
+import com.coreoz.plume.file.services.FileService;
+import com.coreoz.plume.file.services.filetype.FileType;
+import com.coreoz.plume.file.services.metadata.FileMetadata;
+import com.coreoz.plume.file.services.metadata.FileMetadataService;
+import com.coreoz.plume.file.services.storage.FileStorageService;
 
 public class FileUploadWebJerseyServiceTest {
 
@@ -87,7 +89,7 @@ public class FileUploadWebJerseyServiceTest {
     private static class FileMetadataServiceTest implements FileMetadataService {
 
         @Override
-        public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, long fileSize) {
+        public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
             // empty method
         }
 
@@ -125,8 +127,7 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
-        public List<String> deleteAll(List<String> fileUniqueNames) {
-            return null;
+        public void deleteAll(List<String> fileUniqueNames) {
         }
     }
 

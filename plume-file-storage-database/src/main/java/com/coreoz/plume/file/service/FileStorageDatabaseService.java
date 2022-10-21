@@ -1,17 +1,19 @@
 package com.coreoz.plume.file.service;
 
-import com.coreoz.plume.file.db.FileStorageDao;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
-import com.coreoz.plume.file.services.storage.FileStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.coreoz.plume.file.db.FileStorageDao;
+import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
+import com.coreoz.plume.file.services.storage.FileStorageService;
 
 @Singleton
 public class FileStorageDatabaseService implements FileStorageService {
@@ -41,14 +43,11 @@ public class FileStorageDatabaseService implements FileStorageService {
     }
 
     @Override
-    public List<String> deleteAll(List<String> filesUid) {
-        List<String> filesNotDeleted = new ArrayList<>();
-        for (String fileToDelete : filesUid) {
-            boolean hasBeenDeleted = this.fileStorageDao.delete(fileToDelete);
-            if (!hasBeenDeleted) {
-                filesNotDeleted.add(fileToDelete);
-            }
-        }
-        return filesNotDeleted;
+    public void deleteAll(List<String> fileUniqueNames) throws IOException {
+    	try {
+    		this.fileStorageDao.deleteAll(fileUniqueNames);
+    	} catch (Exception e) {
+			throw new IOException(e);
+		}
     }
 }

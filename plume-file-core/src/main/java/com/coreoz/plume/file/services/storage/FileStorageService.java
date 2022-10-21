@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.services.storage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +17,13 @@ public interface FileStorageService {
 	Optional<InputStream> fetch(String fileUniqueName);
 
 	/**
+	 * Delete the files data identified by the fileUniqueNames.
+	 * 
+	 * If a file is already deleted, no exception must be raised
+	 * 
 	 * Must not fail if the files have already been deleted
 	 * @param fileUniqueNames The unique names of the files that should be deleted
-	 * @return The file unique names that have not been deleted OR that did not exist.
-	 * Only files that exist and that have failed to be deleted must not be present in this list
+	 * @throws IOException is a file could not be deleted
 	 */
-	List<String> deleteAll(List<String> fileUniqueNames);
+	void deleteAll(List<String> fileUniqueNames) throws IOException;
 }
