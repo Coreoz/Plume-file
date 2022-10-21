@@ -3,6 +3,10 @@ package com.coreoz.plume.file.services.data;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * An input stream wrapper that exposes a method to know
+ * the number of bytes that has been read in the stream.
+ */
 public class MeasuredSizeInputStream extends InputStream {
     private final InputStream baseInputStream;
     private long inputStreamTotalSize;
@@ -30,6 +34,9 @@ public class MeasuredSizeInputStream extends InputStream {
         return read;
     }
 
+    /**
+     * Returns the number of bytes that has been read
+     */
     public long getInputStreamTotalSize() {
         return inputStreamTotalSize;
     }
