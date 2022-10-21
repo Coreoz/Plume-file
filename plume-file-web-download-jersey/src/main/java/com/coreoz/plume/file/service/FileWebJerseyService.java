@@ -1,9 +1,10 @@
-package com.coreoz.plume.file.services;
+package com.coreoz.plume.file.service;
 
 import com.coreoz.plume.file.cache.FileCacheService;
 import com.coreoz.plume.file.hash.ChecksumService;
-import com.coreoz.plume.file.services.beans.FileData;
-import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
+import com.coreoz.plume.file.service.beans.FileData;
+import com.coreoz.plume.file.services.FileService;
+import com.coreoz.plume.file.service.configuration.FileWebJerseyConfigurationService;
 import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

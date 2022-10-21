@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.services.beans;
+package com.coreoz.plume.file.service.beans;
 
 import lombok.Value;
 

@@ -13,8 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import com.coreoz.plume.file.services.FileWebJerseyService;
-import com.coreoz.plume.file.services.configuration.FileWebJerseyConfigurationService;
+import com.coreoz.plume.file.service.FileWebJerseyService;
+import com.coreoz.plume.file.service.configuration.FileWebJerseyConfigurationService;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 
 import io.swagger.v3.oas.annotations.Operation;
