@@ -1,7 +1,7 @@
 Plume File Metadata Database
 ===========================
 
-A Plume File module to help store file metadata into database.
+A [Plume File](../) module to store file metadata into database.
 
 Installation
 ------------

@@ -1,10 +1,11 @@
 Plume File Web Download Jersey
 ==============================
 
-A Plume File module to help serve file with Jersey.
+A [Plume File](../) module to help serve file with Jersey.
 
 Installation
 ------------
+
 1. Install Maven dependency:
 ```xml
 <dependency>

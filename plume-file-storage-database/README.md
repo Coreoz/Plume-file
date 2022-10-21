@@ -1,7 +1,7 @@
 Plume File Storage Database
 ===========================
 
-A Plume File module to help store file data into database.
+A [Plume File](../) module to store file data into database.
 
 Installation
 ------------
