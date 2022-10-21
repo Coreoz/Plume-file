@@ -2,6 +2,9 @@ package com.coreoz.plume.file.services.metadata;
 
 import java.time.Instant;
 
+/**
+ * File metadata information
+ */
 public interface FileMetadata {
     String getUniqueName();
     String getFileOriginalName();
