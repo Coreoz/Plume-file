@@ -1,20 +1,22 @@
 package com.coreoz.plume.file.services;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.utils.FileNameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class FileService {
@@ -46,7 +48,7 @@ public class FileService {
      * @param expectedFileSize the expected file size in bytes
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      */
-    public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, String mimeType, long expectedFileSize) {
+    public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, String mimeType, Long expectedFileSize) {
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
@@ -58,7 +60,7 @@ public class FileService {
             expectedFileSize
         );
         long actualSize = this.fileStorageService.add(fileUniqueName, new MeasuredSizeInputStream(inputStream));
-        if (expectedFileSize != actualSize) {
+        if (expectedFileSize == null || expectedFileSize != actualSize) {
             this.fileMetadataService.updateFileSize(fileUniqueName, actualSize);
         }
 
@@ -77,7 +79,7 @@ public class FileService {
      * Consume the stream to produce a byte array,
      * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
-    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType, long expectedFileSize) {
+    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType, Long expectedFileSize) {
         return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, expectedFileSize);
     }
 
@@ -86,7 +88,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, -1);
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, null);
     }
 
     /**
@@ -94,7 +96,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName), -1);
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName), null);
     }
 
     // file data

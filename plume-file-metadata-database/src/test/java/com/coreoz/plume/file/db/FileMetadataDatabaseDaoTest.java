@@ -1,19 +1,21 @@
 package com.coreoz.plume.file.db;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.StringPath;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestModule.class)
@@ -32,7 +34,7 @@ public class FileMetadataDatabaseDaoTest {
     @Test
     public void add_should_not_fail() {
         String uid = "c70f9b94-30e2-4e10-b84d-b964ef972067";
-        fileMetadataDao.add(uid, "original_name", "TEST", "pdf", "application/pdf", 12);
+        fileMetadataDao.add(uid, "original_name", "TEST", "pdf", "application/pdf", 12L);
         Assert.assertTrue(true);
     }
 

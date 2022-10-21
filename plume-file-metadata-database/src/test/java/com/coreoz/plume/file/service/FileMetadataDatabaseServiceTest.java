@@ -1,5 +1,17 @@
 package com.coreoz.plume.file.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
@@ -10,17 +22,6 @@ import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.StringPath;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileTestModule.class)
@@ -48,7 +49,7 @@ public class FileMetadataDatabaseServiceTest {
 
     @Test
     public void upload_file_must_return_valid_id() {
-        this.fileMetadataService.add("unknown-uid-to-fetch", "original_name", "TEST", "pdf", "application/pdf", 0);
+        this.fileMetadataService.add("unknown-uid-to-fetch", "original_name", "TEST", "pdf", "application/pdf", null);
         Assert.assertTrue(true);
     }
 
@@ -66,7 +67,7 @@ public class FileMetadataDatabaseServiceTest {
 
     private final FileMetadataDatabaseDao mockDao = new FileMetadataDatabaseDao(null) {
         @Override
-        public FileMetadataQuerydsl add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, long fileSize) {
+        public FileMetadataQuerydsl add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
             FileMetadataQuerydsl fileMetadataQuerydsl = new FileMetadataQuerydsl();
             fileMetadataQuerydsl.setFileSize(fileSize);
             fileMetadataQuerydsl.setFileType(fileType);

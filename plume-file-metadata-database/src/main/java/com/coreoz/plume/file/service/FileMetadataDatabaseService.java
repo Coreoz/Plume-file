@@ -1,16 +1,17 @@
 package com.coreoz.plume.file.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
 import com.coreoz.plume.file.filetype.FileTypesProvider;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class FileMetadataDatabaseService implements FileMetadataService {
@@ -25,7 +26,7 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
-    public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, long fileSize) {
+    public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
         fileMetadataDao.add(fileUniqueName, originalName, fileType, fileExtension, mimeType, fileSize);
     }
 

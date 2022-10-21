@@ -1,5 +1,14 @@
 package com.coreoz.plume.file.db;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.beans.FileMetadataQuerydsl;
 import com.coreoz.plume.file.db.beans.QFileMetadataQuerydsl;
@@ -8,14 +17,6 @@ import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLExpressions;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class FileMetadataDatabaseDao {
@@ -32,7 +33,7 @@ public class FileMetadataDatabaseDao {
         String fileType,
         String fileExtension,
         String mimeType,
-        long fileSize
+        Long fileSize
     ) {
         FileMetadataQuerydsl fileMetadata = new FileMetadataQuerydsl();
         fileMetadata.setUniqueName(fileUniqueName);
