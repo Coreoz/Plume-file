@@ -2,13 +2,17 @@ package com.coreoz.plume.file.db;
 
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
+import com.coreoz.plume.file.filetype.FileTypeDatabase;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.StringPath;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
@@ -37,5 +41,36 @@ public class FileMetadataDatabaseDaoTest {
         String uid = "846c36cc-f973-11e8-8eb2-f2801f1b9fd1";
         long deleted = fileMetadataDao.deleteFilesMetadata(Collections.singletonList(uid));
         Assert.assertEquals(1, deleted);
+    }
+
+    @Test
+    public void update_file_size_should_update_file_size() {
+        String uid = "c70f9b94-30e2-4e10-b84d-b964ef972067";
+        fileMetadataDao.updateFileSize(uid, 1L);
+
+        FileMetadata metadata = fileMetadataDao.fetch(uid).orElse(null);
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(1, metadata.getFileSize().intValue());
+    }
+
+    @Test
+    public void find_unreferenced_files_should_not_be_empty() {
+        List<String> unreferencedFiles = fileMetadataDao.findUnreferencedFiles(List.of(TestFileType.TEST));
+
+        Assert.assertFalse(unreferencedFiles.isEmpty());
+    }
+
+    private enum TestFileType implements FileTypeDatabase {
+        TEST;
+
+        @Override
+        public EntityPath<?> getFileEntity() {
+            return QUserFile.userFile;
+        }
+
+        @Override
+        public StringPath getJoinColumn() {
+            return QUserFile.userFile.uniqueName;
+        }
     }
 }
