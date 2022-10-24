@@ -2,6 +2,9 @@ package com.coreoz.plume.file.services;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +15,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
@@ -28,14 +32,17 @@ public class FileService {
 
     private final FileMetadataService fileMetadataService;
     private final FileStorageService fileStorageService;
+    private final String checksumAlgorithm;
 
     @Inject
     public FileService(
         FileMetadataService fileMetadataService,
-        FileStorageService fileStorageService
+        FileStorageService fileStorageService,
+        FileConfigurationService fileConfigurationService
     ) {
         this.fileMetadataService = fileMetadataService;
         this.fileStorageService = fileStorageService;
+        this.checksumAlgorithm = fileConfigurationService.checksumAlgorithm();
     }
 
     // upload
@@ -44,16 +51,15 @@ public class FileService {
      * Save a new file
      *
      * @param fileType         the type of the file {@link FileType}
-     * @param inputStream      The file data stream, that will be closed automatically in this method
+     * @param fileInputStream      The file data stream, that will be closed automatically in this method
      * @param originalName     the original name of the file. This won't be the name under the one the file will be saved
      * @param fileExtension    the file extension
      * @param mimeType         the mime type
-     * @param expectedFileSize the expected file size in bytes
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      * @throws IOException in case the file could not be saved
      */
     @SneakyThrows
-    public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, String mimeType, Long expectedFileSize) {
+    public String add(FileType fileType, InputStream fileInputStream, String originalName, String fileExtension, String mimeType) {
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
@@ -61,14 +67,16 @@ public class FileService {
             originalName,
             fileType.name(),
             fileExtension,
-            mimeType,
-            expectedFileSize
+            mimeType
         );
-        try (MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(inputStream)) {
+        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, MessageDigest.getInstance(checksumAlgorithm));
+        try (MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(digestInputStream)) {
         	this.fileStorageService.add(fileUniqueName, measingSizeInputStream);
-            if (expectedFileSize == null || expectedFileSize != measingSizeInputStream.getInputStreamTotalSize()) {
-                this.fileMetadataService.updateFileSize(fileUniqueName, measingSizeInputStream.getInputStreamTotalSize());
-            }
+        	this.fileMetadataService.updateFileSizeAndChecksum(
+    			fileUniqueName,
+    			measingSizeInputStream.getInputStreamTotalSize(),
+    			Base64.getEncoder().encodeToString(digestInputStream.getMessageDigest().digest())
+        	);
         }
 
         return fileUniqueName;
@@ -86,16 +94,8 @@ public class FileService {
      * Consume the stream to produce a byte array,
      * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
-    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType, Long expectedFileSize) {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, expectedFileSize);
-    }
-
-    /**
-     * Consume the stream to produce a byte array,
-     * then call {@link #add(FileType, InputStream, String, String, String, long)}
-     */
     public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType, null);
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType);
     }
 
     /**
@@ -103,7 +103,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String, long)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName), null);
+        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName));
     }
 
     // file data
@@ -132,5 +132,4 @@ public class FileService {
         fileMetadataService.deleteAll(fileUniqueNamesToDelete);
         logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
     }
-
 }

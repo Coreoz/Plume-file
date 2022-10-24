@@ -34,7 +34,7 @@ public class FileMetadataDatabaseDaoTest {
     @Test
     public void add_should_not_fail() {
         String uid = "c70f9b94-30e2-4e10-b84d-b964ef972067";
-        fileMetadataDao.add(uid, "original_name", "TEST", "pdf", "application/pdf", 12L);
+        fileMetadataDao.add(uid, "original_name", "TEST", "pdf", "application/pdf");
         Assert.assertTrue(true);
     }
 
@@ -48,7 +48,7 @@ public class FileMetadataDatabaseDaoTest {
     @Test
     public void update_file_size_should_update_file_size() {
         String uid = "c70f9b94-30e2-4e10-b84d-b964ef972067";
-        fileMetadataDao.updateFileSize(uid, 1L);
+        fileMetadataDao.updateFileSizeAndChecksum(uid, 1L, "sha256");
 
         FileMetadata metadata = fileMetadataDao.fetch(uid).orElse(null);
         Assert.assertNotNull(metadata);

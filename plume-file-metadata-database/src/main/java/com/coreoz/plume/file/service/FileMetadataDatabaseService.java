@@ -26,13 +26,13 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
-    public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
-        fileMetadataDao.add(fileUniqueName, originalName, fileType, fileExtension, mimeType, fileSize);
+    public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType) {
+        fileMetadataDao.add(fileUniqueName, originalName, fileType, fileExtension, mimeType);
     }
 
     @Override
-    public void updateFileSize(String fileUniqueName, long fileSize) {
-        fileMetadataDao.updateFileSize(fileUniqueName, fileSize);
+    public void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksump) {
+        fileMetadataDao.updateFileSizeAndChecksum(fileUniqueName, fileSize, checksump);
     }
 
     @Override

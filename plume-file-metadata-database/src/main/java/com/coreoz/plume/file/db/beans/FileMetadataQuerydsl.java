@@ -1,12 +1,13 @@
 package com.coreoz.plume.file.db.beans;
 
+import java.time.Instant;
+
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.querydsl.sql.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.Instant;
 
 @Setter
 @Getter
@@ -22,6 +23,8 @@ public class FileMetadataQuerydsl implements FileMetadata {
     private String fileExtension;
 	@Column("mime_type")
     private String mimeType;
+	@Column("checksum")
+	private String checksum;
 	@Column("file_size")
     private Long fileSize;
 	@Column("creation_date")

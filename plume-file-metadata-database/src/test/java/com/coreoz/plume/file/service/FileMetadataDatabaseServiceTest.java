@@ -49,7 +49,7 @@ public class FileMetadataDatabaseServiceTest {
 
     @Test
     public void upload_file_must_return_valid_id() {
-        this.fileMetadataService.add("unknown-uid-to-fetch", "original_name", "TEST", "pdf", "application/pdf", null);
+        this.fileMetadataService.add("unknown-uid-to-fetch", "original_name", "TEST", "pdf", "application/pdf");
         Assert.assertTrue(true);
     }
 
@@ -67,9 +67,8 @@ public class FileMetadataDatabaseServiceTest {
 
     private final FileMetadataDatabaseDao mockDao = new FileMetadataDatabaseDao(null) {
         @Override
-        public FileMetadataQuerydsl add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
+        public FileMetadataQuerydsl add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType) {
             FileMetadataQuerydsl fileMetadataQuerydsl = new FileMetadataQuerydsl();
-            fileMetadataQuerydsl.setFileSize(fileSize);
             fileMetadataQuerydsl.setFileType(fileType);
             fileMetadataQuerydsl.setMimeType(mimeType);
             fileMetadataQuerydsl.setUniqueName(fileUniqueName);

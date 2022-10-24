@@ -32,8 +32,7 @@ public class FileMetadataDatabaseDao {
         String fileOriginalName,
         String fileType,
         String fileExtension,
-        String mimeType,
-        Long fileSize
+        String mimeType
     ) {
         FileMetadataQuerydsl fileMetadata = new FileMetadataQuerydsl();
         fileMetadata.setUniqueName(fileUniqueName);
@@ -41,7 +40,6 @@ public class FileMetadataDatabaseDao {
         fileMetadata.setFileType(fileType);
         fileMetadata.setFileExtension(fileExtension);
         fileMetadata.setMimeType(mimeType);
-        fileMetadata.setFileSize(fileSize);
         fileMetadata.setCreationDate(Instant.now());
 
         transactionManager
@@ -52,9 +50,10 @@ public class FileMetadataDatabaseDao {
         return fileMetadata;
     }
 
-    public void updateFileSize(String fileUniqueName, long fileSize) {
+    public void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksum) {
         transactionManager.update(QFileMetadataQuerydsl.fileMetadata)
             .set(QFileMetadataQuerydsl.fileMetadata.fileSize, fileSize)
+            .set(QFileMetadataQuerydsl.fileMetadata.checksum, checksum)
             .where(QFileMetadataQuerydsl.fileMetadata.uniqueName.eq(fileUniqueName))
             .execute();
     }

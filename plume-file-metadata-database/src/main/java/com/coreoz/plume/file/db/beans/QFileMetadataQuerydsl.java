@@ -1,5 +1,10 @@
 package com.coreoz.plume.file.db.beans;
 
+import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+
+import java.sql.Types;
+import java.time.Instant;
+
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.dsl.DateTimePath;
@@ -7,11 +12,6 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.PrimaryKey;
-
-import java.sql.Types;
-import java.time.Instant;
-
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
 /**
  * QFileMetadataQuerydsl is a Querydsl query type for FileMetadataQuerydsl
@@ -27,6 +27,7 @@ public class QFileMetadataQuerydsl extends com.querydsl.sql.RelationalPathBase<F
     public final StringPath fileExtension = createString("fileExtension");
     public final StringPath fileType = createString("fileType");
     public final StringPath mimeType = createString("mimeType");
+    public final StringPath checksum = createString("checksum");
     public final NumberPath<Long> fileSize = createNumber("fileSize", Long.class);
     public final DateTimePath<Instant> creationDate = createDateTime("creationDate", Instant.class);
 
@@ -65,5 +66,6 @@ public class QFileMetadataQuerydsl extends com.querydsl.sql.RelationalPathBase<F
         addMetadata(fileOriginalName, ColumnMetadata.named("file_original_name").withIndex(5).ofType(Types.VARCHAR).withSize(255).notNull());
         addMetadata(fileExtension, ColumnMetadata.named("file_extension").withIndex(6).ofType(Types.VARCHAR).withSize(5).notNull());
         addMetadata(creationDate, ColumnMetadata.named("creation_date").withIndex(7).ofType(Types.TIMESTAMP).withSize(19).notNull());
+        addMetadata(checksum, ColumnMetadata.named("checksum").withIndex(8).ofType(Types.VARCHAR).withSize(255).notNull());
     }
 }

@@ -11,6 +11,7 @@ public interface FileMetadata {
     String getFileType();
     String getFileExtension();
     String getMimeType();
+    String getChecksum();
     Long getFileSize();
     Instant getCreationDate();
 }
