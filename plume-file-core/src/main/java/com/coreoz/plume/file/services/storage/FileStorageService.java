@@ -11,7 +11,7 @@ public interface FileStorageService {
 	 * @param fileUniqueName the file unique name
 	 * @param fileData the file input stream
 	 */
-	void add(String fileUniqueName, InputStream fileData);
+	void add(String fileUniqueName, InputStream fileData) throws IOException;
 
 	Optional<InputStream> fetch(String fileUniqueName);
 

@@ -26,12 +26,16 @@ public class FileStorageDatabaseService implements FileStorageService {
     }
 
     @Override
-    public void add(String fileUniqueName, InputStream fileData) {
+    public void add(String fileUniqueName, InputStream fileData) throws IOException {
         logger.debug("Saving file '{}' to database...", fileUniqueName);
-        this.fileStorageDao.add(
-            fileUniqueName,
-            fileData
-        );
+        try {
+	        this.fileStorageDao.add(
+	            fileUniqueName,
+	            fileData
+	        );
+        } catch (Exception e) {
+			throw new IOException(e);
+		}
     }
 
     @Override
