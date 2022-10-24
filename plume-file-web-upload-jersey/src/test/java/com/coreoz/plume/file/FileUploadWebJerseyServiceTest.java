@@ -115,10 +115,8 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     private static class FileStorageServiceTest implements FileStorageService {
-
         @Override
-        public long add(String fileUniqueName, InputStream fileData) {
-            return 0;
+        public void add(String fileUniqueName, InputStream fileData) {
         }
 
         @Override

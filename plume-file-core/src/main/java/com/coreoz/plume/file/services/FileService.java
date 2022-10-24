@@ -62,9 +62,10 @@ public class FileService {
             mimeType,
             expectedFileSize
         );
-        long actualSize = this.fileStorageService.add(fileUniqueName, new MeasuredSizeInputStream(inputStream));
-        if (expectedFileSize == null || expectedFileSize != actualSize) {
-            this.fileMetadataService.updateFileSize(fileUniqueName, actualSize);
+        MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(inputStream);
+        this.fileStorageService.add(fileUniqueName, measingSizeInputStream);
+        if (expectedFileSize == null || expectedFileSize != measingSizeInputStream.getInputStreamTotalSize()) {
+            this.fileMetadataService.updateFileSize(fileUniqueName, measingSizeInputStream.getInputStreamTotalSize());
         }
 
         return fileUniqueName;

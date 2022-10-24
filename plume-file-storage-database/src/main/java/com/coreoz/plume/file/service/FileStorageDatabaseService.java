@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coreoz.plume.file.db.FileStorageDao;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 
 @Singleton
@@ -27,14 +26,12 @@ public class FileStorageDatabaseService implements FileStorageService {
     }
 
     @Override
-    public long add(String fileUniqueName, InputStream fileData) {
-        logger.info("Uploading file {}", fileUniqueName);
-        MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(fileData);
+    public void add(String fileUniqueName, InputStream fileData) {
+        logger.debug("Saving file '{}' to database...", fileUniqueName);
         this.fileStorageDao.add(
             fileUniqueName,
-            measuredSizeInputStream
+            fileData
         );
-        return measuredSizeInputStream.getInputStreamTotalSize();
     }
 
     @Override

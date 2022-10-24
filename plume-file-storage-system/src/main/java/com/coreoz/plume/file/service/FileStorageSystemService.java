@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
-import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 
 @Singleton
@@ -28,14 +27,12 @@ public class FileStorageSystemService implements FileStorageService {
     }
 
     @Override
-    public long add(String fileUniqueName, InputStream fileData) {
-        logger.debug("Creating file : {}", fileUniqueName);
-        MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(fileData);
+    public void add(String fileUniqueName, InputStream fileData) {
+    	logger.debug("Saving file '{}' to disk...", fileUniqueName);
         this.createFile(
             fileUniqueName,
-            measuredSizeInputStream
+            fileData
         );
-        return measuredSizeInputStream.getInputStreamTotalSize();
     }
 
     @Override

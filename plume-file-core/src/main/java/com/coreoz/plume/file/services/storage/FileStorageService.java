@@ -7,12 +7,11 @@ import java.util.Optional;
 
 public interface FileStorageService {
 	/**
-	 * Add file
+	 * Add a file
 	 * @param fileUniqueName the file unique name
 	 * @param fileData the file input stream
-	 * @return the file size
 	 */
-	long add(String fileUniqueName, InputStream fileData);
+	void add(String fileUniqueName, InputStream fileData);
 
 	Optional<InputStream> fetch(String fileUniqueName);
 
