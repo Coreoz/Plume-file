@@ -40,4 +40,10 @@ public class MeasuredSizeInputStream extends InputStream {
     public long getInputStreamTotalSize() {
         return inputStreamTotalSize;
     }
+
+	@Override
+	public void close() throws IOException {
+		baseInputStream.close();
+		super.close();
+	}
 }

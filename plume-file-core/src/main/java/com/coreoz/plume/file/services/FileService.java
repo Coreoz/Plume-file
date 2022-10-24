@@ -44,13 +44,15 @@ public class FileService {
      * Save a new file
      *
      * @param fileType         the type of the file {@link FileType}
-     * @param inputStream      the file data
+     * @param inputStream      The file data stream, that will be closed automatically in this method
      * @param originalName     the original name of the file. This won't be the name under the one the file will be saved
      * @param fileExtension    the file extension
      * @param mimeType         the mime type
      * @param expectedFileSize the expected file size in bytes
      * @return the unique file name of the file. This will be the name under the one the file will be saved
+     * @throws IOException in case the file could not be saved
      */
+    @SneakyThrows
     public String add(FileType fileType, InputStream inputStream, String originalName, String fileExtension, String mimeType, Long expectedFileSize) {
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
@@ -62,10 +64,11 @@ public class FileService {
             mimeType,
             expectedFileSize
         );
-        MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(inputStream);
-        this.fileStorageService.add(fileUniqueName, measingSizeInputStream);
-        if (expectedFileSize == null || expectedFileSize != measingSizeInputStream.getInputStreamTotalSize()) {
-            this.fileMetadataService.updateFileSize(fileUniqueName, measingSizeInputStream.getInputStreamTotalSize());
+        try (MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(inputStream)) {
+        	this.fileStorageService.add(fileUniqueName, measingSizeInputStream);
+            if (expectedFileSize == null || expectedFileSize != measingSizeInputStream.getInputStreamTotalSize()) {
+                this.fileMetadataService.updateFileSize(fileUniqueName, measingSizeInputStream.getInputStreamTotalSize());
+            }
         }
 
         return fileUniqueName;

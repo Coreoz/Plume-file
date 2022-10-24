@@ -1,13 +1,13 @@
 package com.coreoz.plume.file.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
@@ -31,13 +31,9 @@ public class FileUtils {
     public static void writeFile(InputStream inputStream, String filePath) {
         File fileToSave = new File(filePath);
         try (FileOutputStream outputStream = new FileOutputStream(fileToSave)) {
-            byte[] buffer = new byte[8192];
-            int length;
-            while ((length = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, length);
-            }
+        	inputStream.transferTo(outputStream);
         } catch (IOException e) {
-            logger.error("An error occurred during file creation : ", e);
+            logger.error("An error occurred during file creation", e);
         }
     }
 
