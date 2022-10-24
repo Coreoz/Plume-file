@@ -40,7 +40,7 @@ The storage modules implements the FileStorageService:
 
 #### Metadata module
 
-The metadata module implements the FileStorageService:
+The metadata module implements the FileMetadataService:
 
 - [plume-file-metadata-database](plume-file-metadata-database): store file metadata in a database
 
