@@ -39,7 +39,7 @@ public class FileStorageDatabaseServiceTest {
     }
 
     @Test
-    public void upload_file_should_not_fail() {
+    public void upload_file_should_not_fail() throws IOException {
         this.fileStorageDatabase.add("random-uid-to-add", new ByteArrayInputStream(new byte[1]));
         Assert.assertTrue(true);
     }
