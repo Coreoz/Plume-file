@@ -17,9 +17,7 @@ public class FileUploadWebJerseyService {
     private final FileService fileService;
 
     @Inject
-    public FileUploadWebJerseyService(
-        FileService fileService
-    ) {
+    public FileUploadWebJerseyService(FileService fileService) {
         this.fileService = fileService;
     }
 
@@ -36,8 +34,7 @@ public class FileUploadWebJerseyService {
             fileType,
             fileData,
             fileMetadata.getOriginalName(),
-            fileMetadata.getMimeType(),
-            fileMetadata.getFileSize()
+            fileMetadata.getMimeType()
         );
     }
 

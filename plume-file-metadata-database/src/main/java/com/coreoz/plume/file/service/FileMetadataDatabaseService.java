@@ -31,8 +31,8 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
-    public void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksump) {
-        fileMetadataDao.updateFileSizeAndChecksum(fileUniqueName, fileSize, checksump);
+    public void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksum) {
+        fileMetadataDao.updateFileSizeAndChecksum(fileUniqueName, fileSize, checksum);
     }
 
     @Override

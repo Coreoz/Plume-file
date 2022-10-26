@@ -70,11 +70,11 @@ public class FileService {
             mimeType
         );
         DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, MessageDigest.getInstance(checksumAlgorithm));
-        try (MeasuredSizeInputStream measingSizeInputStream = new MeasuredSizeInputStream(digestInputStream)) {
-        	this.fileStorageService.add(fileUniqueName, measingSizeInputStream);
+        try (MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(digestInputStream)) {
+        	this.fileStorageService.add(fileUniqueName, measuredSizeInputStream);
         	this.fileMetadataService.updateFileSizeAndChecksum(
     			fileUniqueName,
-    			measingSizeInputStream.getInputStreamTotalSize(),
+                measuredSizeInputStream.getInputStreamTotalSize(),
     			Base64.getEncoder().encodeToString(digestInputStream.getMessageDigest().digest())
         	);
         }
@@ -92,7 +92,7 @@ public class FileService {
 
     /**
      * Consume the stream to produce a byte array,
-     * then call {@link #add(FileType, InputStream, String, String, String, long)}
+     * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) {
         return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType);
@@ -100,7 +100,7 @@ public class FileService {
 
     /**
      * Consume the stream to produce a byte array,
-     * then call {@link #add(FileType, InputStream, String, String, String, long)}
+     * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) {
         return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName));

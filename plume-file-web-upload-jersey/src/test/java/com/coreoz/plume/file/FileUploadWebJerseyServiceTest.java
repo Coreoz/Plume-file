@@ -1,26 +1,43 @@
 package com.coreoz.plume.file;
 
+import com.carlosbecker.guice.GuiceModules;
+import com.carlosbecker.guice.GuiceTestRunner;
+import com.coreoz.plume.file.services.FileService;
+import com.coreoz.plume.file.services.configuration.FileConfigurationService;
+import com.coreoz.plume.file.services.filetype.FileType;
+import com.coreoz.plume.file.services.metadata.FileMetadata;
+import com.coreoz.plume.file.services.metadata.FileMetadataService;
+import com.coreoz.plume.file.services.storage.FileStorageService;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
-
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.coreoz.plume.file.services.FileService;
-import com.coreoz.plume.file.services.filetype.FileType;
-import com.coreoz.plume.file.services.metadata.FileMetadata;
-import com.coreoz.plume.file.services.metadata.FileMetadataService;
-import com.coreoz.plume.file.services.storage.FileStorageService;
-
+@RunWith(GuiceTestRunner.class)
+@GuiceModules(FileUploadTestModule.class)
 public class FileUploadWebJerseyServiceTest {
 
-    FileUploadWebJerseyService fileUploadWebJerseyService = new FileUploadWebJerseyService(new FileServiceTest());
+    @Inject
+    FileConfigurationService fileConfigurationService;
+    FileUploadWebJerseyService fileUploadWebJerseyService;
+
+    @Before
+    public void before_test() {
+        FileMetadataService fileMetadataService = new FileMetadataServiceTest();
+        FileStorageService fileStorageService = new FileStorageServiceTest();
+        this.fileUploadWebJerseyService = new FileUploadWebJerseyService(
+            new FileService(fileMetadataService, fileStorageService, fileConfigurationService)
+        );
+    }
 
     @Test
     public void add_file_with_all_metadata_should_not_fail() {
@@ -80,21 +97,15 @@ public class FileUploadWebJerseyServiceTest {
         );
     }
 
-    private static class FileServiceTest extends FileService {
-        public FileServiceTest() {
-            super(new FileMetadataServiceTest(), new FileStorageServiceTest());
-        }
-    }
-
     private static class FileMetadataServiceTest implements FileMetadataService {
 
         @Override
-        public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType, Long fileSize) {
+        public void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType) {
             // empty method
         }
 
         @Override
-        public void updateFileSize(String fileUniqueName, long fileSize) {
+        public void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksum) {
             // empty method
         }
 

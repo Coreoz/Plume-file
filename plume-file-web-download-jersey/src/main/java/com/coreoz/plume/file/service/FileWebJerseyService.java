@@ -17,8 +17,6 @@ import java.util.Optional;
 @Singleton
 public class FileWebJerseyService {
     private static final Logger logger = LoggerFactory.getLogger(FileWebJerseyService.class);
-
-    private final FileWebJerseyConfigurationService configurationService;
     private final FileService fileService;
     private final FileCacheService fileCacheService;
     private final ChecksumService checksumService;
@@ -30,7 +28,6 @@ public class FileWebJerseyService {
         FileCacheService fileCacheService,
         ChecksumService checksumService
     ) {
-        this.configurationService = configurationService;
         this.fileService = fileService;
         this.checksumService = checksumService;
         this.fileCacheService = fileCacheService;
