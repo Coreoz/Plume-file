@@ -1,21 +1,11 @@
 package com.coreoz.plume.file.service;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 
-@RunWith(GuiceTestRunner.class)
-@GuiceModules(FileTestModule.class)
 public class FileStorageSystemServiceTest {
 
-    @Inject
     private FileStorageSystemService fileStorageSystemService;
 
     @Test
