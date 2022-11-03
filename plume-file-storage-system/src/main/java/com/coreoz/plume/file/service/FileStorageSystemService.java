@@ -70,19 +70,19 @@ public class FileStorageSystemService implements FileStorageService {
     private String computeFilePath(String fileName) {
         return this.path + fileName;
     }
-    
+
     /**
      * Create or use the directory specified by the path directoryPath
      *
-     * @param directoryPath
-     * @throws IOException If the directory 
+     * @param directoryPath the directory path
+     * @throws IOException If the directory
      */
     public static void useMediaDirectory(String directoryPath) throws IOException {
         File filePath = new File(directoryPath);
         if(!filePath.exists()) {
         	logger.debug("Creating file directory {}...", directoryPath);
         	if (!filePath.mkdirs()) {
-        		throw new IOException("Directory " + directoryPath + " does not exist and could be created");
+        		throw new IOException("Directory " + directoryPath + " does not exist and could not be created");
         	}
         }
     }
