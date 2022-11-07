@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.io.InputStream;
 
 @Singleton
@@ -26,7 +25,7 @@ public class FileUploadWebJerseyService {
         FileType fileType,
         InputStream fileData,
         FormDataBodyPart formDataBodyPart
-    ) throws IOException {
+    ) {
         logger.info("uploading file with type {}", fileType);
         FileUploadMetadata fileMetadata = FileUploadMetadata.of(
             formDataBodyPart.getContentDisposition().getFileName(),

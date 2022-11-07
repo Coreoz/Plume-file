@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,7 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     @Test
-    public void add_file_with_all_metadata_should_not_fail() throws IOException {
+    public void add_file_with_all_metadata_should_not_fail() {
         FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
         FormDataContentDisposition formDataContentDisposition = FormDataContentDisposition.name("test")
             .fileName("File Name")
@@ -60,7 +59,7 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_mime_type_should_fail() throws IOException {
+    public void add_file_with_no_file_mime_type_should_fail() {
         FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
         FormDataContentDisposition formDataContentDisposition = FormDataContentDisposition.name("test")
             .fileName("File Name")
@@ -77,7 +76,7 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_should_fail() throws IOException {
+    public void add_file_with_no_file_should_fail() {
         FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
 
         this.fileUploadWebJerseyService.add(
@@ -88,7 +87,7 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_type_should_fail() throws IOException {
+    public void add_file_with_no_file_type_should_fail() {
         FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
 
         this.fileUploadWebJerseyService.add(

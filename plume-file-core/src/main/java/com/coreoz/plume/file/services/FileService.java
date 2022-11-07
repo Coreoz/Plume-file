@@ -7,6 +7,7 @@ import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.utils.FileNameUtils;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -55,13 +55,14 @@ public class FileService {
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      * @throws IOException in case the file could not be saved
      */
+    @SneakyThrows
     public String add(
         FileType fileType,
         InputStream fileInputStream,
         String originalName,
         String fileExtension,
         String mimeType
-    ) throws IOException {
+    ) {
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
@@ -71,7 +72,7 @@ public class FileService {
             fileExtension,
             mimeType
         );
-        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, algorithmMessageDigest(checksumAlgorithm));
+        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, MessageDigest.getInstance(checksumAlgorithm));
         try (MeasuredSizeInputStream measuredSizeInputStream = new MeasuredSizeInputStream(digestInputStream)) {
             this.fileStorageService.add(fileUniqueName, measuredSizeInputStream);
             this.fileMetadataService.updateFileSizeAndChecksum(
@@ -88,7 +89,7 @@ public class FileService {
      * Consume the stream to produce a byte array,
      * then call {@link #add(FileType, InputStream, String)}
      */
-    public String add(FileType fileType, InputStream fileData) throws IOException {
+    public String add(FileType fileType, InputStream fileData) {
         return add(fileType, fileData, null);
     }
 
@@ -96,7 +97,7 @@ public class FileService {
      * Consume the stream to produce a byte array,
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
-    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) throws IOException {
+    public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) {
         return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType);
     }
 
@@ -104,7 +105,7 @@ public class FileService {
      * Consume the stream to produce a byte array,
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
-    public String add(FileType fileType, InputStream fileData, String fileName) throws IOException {
+    public String add(FileType fileType, InputStream fileData, String fileName) {
         return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName));
     }
 
@@ -127,18 +128,11 @@ public class FileService {
      * @throws IOException is a file could not be deleted.
      * It is possible to retry if the deletion failed.
      */
-    public void deleteUnreferenced() throws IOException {
+    @SneakyThrows
+    public void deleteUnreferenced() {
         List<String> fileUniqueNamesToDelete = fileMetadataService.findUnreferencedFiles();
         fileStorageService.deleteAll(fileUniqueNamesToDelete);
         fileMetadataService.deleteAll(fileUniqueNamesToDelete);
         logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
-    }
-
-    private static MessageDigest algorithmMessageDigest(String checksumAlgorithm) {
-        try {
-            return MessageDigest.getInstance(checksumAlgorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
