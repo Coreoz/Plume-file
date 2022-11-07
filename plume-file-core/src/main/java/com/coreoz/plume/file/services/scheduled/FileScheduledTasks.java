@@ -7,6 +7,7 @@ import com.coreoz.wisp.schedule.Schedules;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
 
 @Singleton
 public class FileScheduledTasks {
@@ -29,7 +30,13 @@ public class FileScheduledTasks {
     public void scheduleJobs() {
         scheduler.schedule(
             "File cleaner",
-            fileService::deleteUnreferenced,
+            () -> {
+                try {
+                    this.fileService.deleteUnreferenced();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            },
             Schedules.executeAt(fileConfigurationService.cleaningHour())
         );
     }

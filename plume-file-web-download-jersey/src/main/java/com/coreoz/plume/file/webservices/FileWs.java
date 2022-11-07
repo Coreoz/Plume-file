@@ -1,6 +1,11 @@
 package com.coreoz.plume.file.webservices;
 
-import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
+import com.coreoz.plume.file.service.FileDownloadJerseyService;
+import com.coreoz.plume.file.service.configuration.FileWebJerseyConfigurationService;
+import com.coreoz.plume.jersey.security.permission.PublicApi;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,29 +18,21 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import com.coreoz.plume.file.service.FileWebJerseyService;
-import com.coreoz.plume.file.service.configuration.FileWebJerseyConfigurationService;
-import com.coreoz.plume.jersey.security.permission.PublicApi;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @Path("/files")
 @Tag(name = "files", description = "Serve binary resources")
 @Singleton
 @PublicApi
 public class FileWs {
 
-	private final FileWebJerseyService fileService;
+	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
 
 	@Inject
 	public FileWs(
-		FileWebJerseyService fileService,
+		FileDownloadJerseyService fileDownloadService,
 		FileWebJerseyConfigurationService config
 	) {
-		this.fileService = fileService;
+		this.fileDownloadService = fileDownloadService;
 
 		this.maxAgeCacheInSeconds = config.fileCacheMaxAge().getSeconds();
 	}
@@ -48,7 +45,7 @@ public class FileWs {
 		@Parameter @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		return this.fileService.fetchCachedFile(fileUid)
+		return this.fileDownloadService.fetchFile(fileUid)
 			.map(fileData -> {
 				if(ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileData.getChecksum())) {
 					return Response.notModified().build();
@@ -66,7 +63,7 @@ public class FileWs {
 					);
 				}
 				return response
-					.header(CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
 					.build();
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
