@@ -1,7 +1,8 @@
 package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
-import com.coreoz.plume.file.service.configuration.FileWebJerseyConfigurationService;
+import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
+import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import java.util.Optional;
 
 @Path("/files")
 @Tag(name = "files", description = "Serve binary resources")
@@ -30,7 +32,7 @@ public class FileWs {
 	@Inject
 	public FileWs(
 		FileDownloadJerseyService fileDownloadService,
-		FileWebJerseyConfigurationService config
+		FileDownloadConfigurationService config
 	) {
 		this.fileDownloadService = fileDownloadService;
 
@@ -45,16 +47,20 @@ public class FileWs {
 		@Parameter @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		return this.fileDownloadService.fetchFile(fileUid)
+		Optional<FileMetadata> fileMetadata = this.fileDownloadService.fetchMetadata(fileUid);
+		if (fileMetadata.isEmpty()) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return this.fileDownloadService.fetchData(fileUid)
 			.map(fileData -> {
-				if(ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileData.getChecksum())) {
+				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.get().getChecksum())) {
 					return Response.notModified().build();
 				}
 
-				ResponseBuilder response = Response.ok(fileData.getData())
-					.header(HttpHeaders.ETAG, fileData.getChecksum());
-				if(fileData.getMimeType() != null) {
-					response.header(HttpHeaders.CONTENT_TYPE, fileData.getMimeType());
+				ResponseBuilder response = Response.ok(fileData)
+					.header(HttpHeaders.ETAG, fileMetadata.get().getChecksum());
+				if (fileMetadata.get().getMimeType() != null) {
+					response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.get().getMimeType());
 				}
 				if(maxAgeCacheInSeconds > 0) {
 					response.header(

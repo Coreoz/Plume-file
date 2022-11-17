@@ -9,11 +9,11 @@ import javax.inject.Singleton;
 import java.time.Duration;
 
 @Singleton
-public class FileWebJerseyConfigurationService {
+public class FileDownloadConfigurationService {
     private final Config config;
 
     @Inject
-    public FileWebJerseyConfigurationService(Config config) {
+    public FileDownloadConfigurationService(Config config) {
         // the reference file is not located in src/main/resources/ to ensure
         // that it is not overridden by another config file when a "fat jar" is created.
         this.config = config.withFallback(
@@ -37,7 +37,7 @@ public class FileWebJerseyConfigurationService {
         return config.getDuration("file.cache.max-age");
     }
 
-    public long fileCacheMaxSize() {
+    public long fileCacheMaxSizeInMb() {
         return config.getLong("file.max-file-mb-size");
     }
 

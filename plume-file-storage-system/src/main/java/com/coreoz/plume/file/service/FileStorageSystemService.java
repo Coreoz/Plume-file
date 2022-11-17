@@ -1,5 +1,13 @@
 package com.coreoz.plume.file.service;
 
+import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
+import com.coreoz.plume.file.services.storage.FileStorageService;
+import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,17 +16,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
-import com.coreoz.plume.file.services.storage.FileStorageService;
-
-import lombok.SneakyThrows;
 
 @Singleton
 public class FileStorageSystemService implements FileStorageService {
@@ -46,8 +43,8 @@ public class FileStorageSystemService implements FileStorageService {
     @Override
     public Optional<InputStream> fetch(String fileUniqueName) {
         logger.debug("Fetching file {}...", fileUniqueName);
-        try (InputStream fileInputStream = new FileInputStream(computeFilePath(fileUniqueName))) {
-            return Optional.of(fileInputStream);
+        try {
+            return Optional.of(new FileInputStream(computeFilePath(fileUniqueName)));
         } catch (IOException e) {
             logger.error("Could not retrieve file {}", fileUniqueName, e);
             return Optional.empty();

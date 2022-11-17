@@ -1,14 +1,20 @@
 package com.coreoz.plume.file.cache;
 
+import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
+import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.Weigher;
+import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import lombok.SneakyThrows;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -17,24 +23,31 @@ import java.util.function.Function;
 @Singleton
 public class FileCacheServiceGuava implements FileCacheService {
 
-    private LoadingCache<String, byte[]> fileDataCache;
-    private LoadingCache<String, FileMetadata> fileMetadataCache;
+    private final LoadingCache<String, byte[]> fileDataCache;
+    private final LoadingCache<String, FileMetadata> fileMetadataCache;
 
-	@Override
-	public void initializeFileDataCache(Function<String, Optional<byte[]>> fileDataLoader) {
-		fileDataCache = CacheBuilder.newBuilder()
-			.expireAfterAccess(1, TimeUnit.DAYS)
-			.maximumSize(100)
-			.build(CacheLoader.from(optionalLoaderToExceptionLoader(fileDataLoader::apply)));
-	}
+    @Inject
+    public FileCacheServiceGuava(FileService fileService, FileDownloadConfigurationService configurationService) {
+        this.fileDataCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.DAYS)
+            .maximumWeight(configurationService.fileCacheMaxSizeInMb() * 1000000)
+            .weigher((Weigher<String, byte[]>) (k, g) -> g.length)
+            .build(CacheLoader.from(optionalLoaderToExceptionLoader(
+                uid -> fileService.fetchData(uid)
+                    .flatMap(data -> {
+                        try {
+                            return Optional.of(ByteStreams.toByteArray(data));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+            )));
 
-	@Override
-	public void initializeFileMetadataCache(Function<String, Optional<FileMetadata>> fileMetadataLoader) {
-		fileMetadataCache = CacheBuilder.newBuilder()
-			.expireAfterAccess(1, TimeUnit.DAYS)
-			.maximumSize(100)
-			.build(CacheLoader.from(optionalLoaderToExceptionLoader(fileMetadataLoader::apply)));
-	}
+        this.fileMetadataCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.DAYS)
+            .maximumSize(1000)
+            .build(CacheLoader.from(optionalLoaderToExceptionLoader(fileService::fetchMetadata)));
+    }
 
 	@Override
 	public Optional<byte[]> fetchFileData(String fileUniqueName) {

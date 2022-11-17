@@ -17,9 +17,7 @@ public interface FileStorageService {
 
 	/**
 	 * Delete the files data identified by the fileUniqueNames.
-	 * 
 	 * If a file is already deleted, no exception must be raised
-	 * 
 	 * Must not fail if the files have already been deleted
 	 * @param fileUniqueNames The unique names of the files that should be deleted
 	 * @throws IOException is a file could not be deleted
