@@ -33,6 +33,7 @@ public class FileStorageSystemService implements FileStorageService {
 
     @Override
     public void add(String fileUniqueName, InputStream fileData) throws IOException {
+    	// To handle gracefully the case where the target files folder has been deleted
     	useMediaDirectory(path);
     	logger.debug("Saving file '{}' to disk...", fileUniqueName);
         File fileToSave = new File(computeFilePath(fileUniqueName));
@@ -55,6 +56,7 @@ public class FileStorageSystemService implements FileStorageService {
     @Override
     public void deleteAll(List<String> fileUniqueNames) throws IOException {
         logger.debug("Deleting {} files...", fileUniqueNames.size());
+        // To handle gracefully the case where the target files folder has been deleted
         useMediaDirectory(path);
         for (String fileNameToDelete : fileUniqueNames) {
         	String filePath = computeFilePath(fileNameToDelete);
