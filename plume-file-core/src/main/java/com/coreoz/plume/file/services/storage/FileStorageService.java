@@ -10,6 +10,7 @@ public interface FileStorageService {
 	 * Add a file
 	 * @param fileUniqueName the file unique name
 	 * @param fileData the file input stream
+	 * @throws IOException is a file could not be stored
 	 */
 	void add(String fileUniqueName, InputStream fileData) throws IOException;
 

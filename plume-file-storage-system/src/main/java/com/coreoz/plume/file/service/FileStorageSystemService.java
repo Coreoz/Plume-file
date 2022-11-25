@@ -1,13 +1,5 @@
 package com.coreoz.plume.file.service;
 
-import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
-import com.coreoz.plume.file.services.storage.FileStorageService;
-import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,6 +9,15 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.coreoz.plume.file.configuration.FileStorageConfigurationService;
+import com.coreoz.plume.file.services.storage.FileStorageService;
+
 @Singleton
 public class FileStorageSystemService implements FileStorageService {
     private static final Logger logger = LoggerFactory.getLogger(FileStorageSystemService.class);
@@ -24,9 +25,9 @@ public class FileStorageSystemService implements FileStorageService {
     private final String path;
 
     @Inject
-    @SneakyThrows
-    public FileStorageSystemService(FileStorageConfigurationService configurationService) {
+    public FileStorageSystemService(FileStorageConfigurationService configurationService) throws IOException {
         this.path = configurationService.mediaLocalPath();
+        // verify on startup that the target folder to store files exists or else try to create it
         useMediaDirectory(this.path);
     }
 
@@ -72,7 +73,7 @@ public class FileStorageSystemService implements FileStorageService {
      * Create or use the directory specified by the path directoryPath
      *
      * @param directoryPath the directory path
-     * @throws IOException If the directory
+     * @throws IOException If the directory does not exist and could not be created
      */
     public static void useMediaDirectory(String directoryPath) throws IOException {
         File filePath = new File(directoryPath);
