@@ -1,5 +1,21 @@
 package com.coreoz.plume.file;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.services.FileService;
@@ -8,19 +24,6 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileUploadTestModule.class)
@@ -31,7 +34,7 @@ public class FileUploadWebJerseyServiceTest {
     FileUploadWebJerseyService fileUploadWebJerseyService;
 
     @Before
-    public void before_test() {
+    public void before_test() throws NoSuchAlgorithmException {
         FileMetadataService fileMetadataService = new FileMetadataServiceTest();
         FileStorageService fileStorageService = new FileStorageServiceTest();
         this.fileUploadWebJerseyService = new FileUploadWebJerseyService(
