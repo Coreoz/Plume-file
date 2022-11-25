@@ -28,6 +28,7 @@ public class FileWs {
 
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
+	private final boolean keepOriginalNameOnDownload;
 
 	@Inject
 	public FileWs(
@@ -37,6 +38,7 @@ public class FileWs {
 		this.fileDownloadService = fileDownloadService;
 
 		this.maxAgeCacheInSeconds = config.fileCacheMaxAge().getSeconds();
+		this.keepOriginalNameOnDownload = config.keepOriginalNameOnDownload();
 	}
 
 	@GET
@@ -57,8 +59,11 @@ public class FileWs {
 					return Response.notModified().build();
 				}
 
-				ResponseBuilder response = Response.ok(fileData)
-					.header(HttpHeaders.ETAG, fileMetadata.get().getChecksum());
+				ResponseBuilder response = Response.ok(fileData);
+
+				// adding checksum in etag to avoid corrupted data
+				response.header(HttpHeaders.ETAG, fileMetadata.get().getChecksum());
+
 				if (fileMetadata.get().getMimeType() != null) {
 					response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.get().getMimeType());
 				}
@@ -68,8 +73,12 @@ public class FileWs {
 						"public, max-age=" + maxAgeCacheInSeconds
 					);
 				}
+				String contentFilename = filename;
+				if (keepOriginalNameOnDownload && fileMetadata.get().getFileOriginalName() != null) {
+					contentFilename = fileMetadata.get().getFileOriginalName();
+				}
 				return response
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + contentFilename + "\"")
 					.build();
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());

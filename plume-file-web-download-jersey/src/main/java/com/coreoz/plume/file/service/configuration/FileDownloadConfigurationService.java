@@ -1,6 +1,5 @@
 package com.coreoz.plume.file.service.configuration;
 
-import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -17,7 +16,7 @@ public class FileDownloadConfigurationService {
         // the reference file is not located in src/main/resources/ to ensure
         // that it is not overridden by another config file when a "fat jar" is created.
         this.config = config.withFallback(
-            ConfigFactory.parseResources(FileConfigurationService.class, "reference.conf")
+            ConfigFactory.parseResources(FileDownloadConfigurationService.class, "reference.conf")
         );
     }
 
@@ -38,7 +37,11 @@ public class FileDownloadConfigurationService {
     }
 
     public long fileCacheMaxSizeInMb() {
-        return config.getLong("file.max-file-mb-size");
+        return config.getLong("file.cache.max-file-mb-size");
+    }
+
+    public boolean keepOriginalNameOnDownload() {
+        return config.getBoolean("file.keep-original-name-on-download");
     }
 
     private static void checkPathConfiguration(String configuration) {
