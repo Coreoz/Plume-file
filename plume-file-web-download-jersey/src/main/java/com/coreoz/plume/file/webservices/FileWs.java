@@ -46,7 +46,6 @@ public class FileWs {
 	@Operation(description = "Serve a file")
 	public Response fetch(
 		@Parameter(required = true) @PathParam("uid") String fileUid,
-		@Parameter @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		Optional<FileMetadata> fileMetadata = this.fileDownloadService.fetchMetadata(fileUid);
@@ -73,15 +72,12 @@ public class FileWs {
 						"public, max-age=" + maxAgeCacheInSeconds
 					);
 				}
-				String contentFilename = filename;
 				if (keepOriginalNameOnDownload && fileMetadata.get().getFileOriginalName() != null) {
-					contentFilename = fileMetadata.get().getFileOriginalName();
+					response
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.get().getFileOriginalName() + "\"");
 				}
-				return response
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + contentFilename + "\"")
-					.build();
+				return response.build();
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
-
 }
