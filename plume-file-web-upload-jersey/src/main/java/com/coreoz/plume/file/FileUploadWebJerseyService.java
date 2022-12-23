@@ -11,6 +11,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.InputStream;
 
+// TODO proposer une classe FileUploadValidators en plus qui va contenir
+//  - De quoi valider la taille maximale d'un fichier (en se basant sur la taille retournée par Jersey)
+//  - De quoi valider les extensions autorisées d'un fichier
+//  - De quoi valider la longueur des noms de fichier
 @Singleton
 public class FileUploadWebJerseyService {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadWebJerseyService.class);
@@ -26,7 +30,7 @@ public class FileUploadWebJerseyService {
         InputStream fileData,
         FormDataBodyPart formDataBodyPart
     ) {
-        logger.info("uploading file with type {}", fileType);
+        logger.trace("uploading file with type {}", fileType);
         FileUploadMetadata fileMetadata = FileUploadMetadata.of(
             formDataBodyPart.getContentDisposition().getFileName(),
             formDataBodyPart.getMediaType().toString(),
@@ -42,7 +46,10 @@ public class FileUploadWebJerseyService {
         );
     }
 
+    // TODO à mettre dans une classe static dédiée : FileUploadValidators
+    // TODO méthode à supprimer pour intégrer directement dans add(...)
     private static void checkFile(FileType fileType, InputStream fileData) {
+        // TODO remplacer par Guava : Objects.requireNonNull()
         if (fileType == null) {
             throw new RuntimeException("File must have a type");
         }
@@ -51,7 +58,9 @@ public class FileUploadWebJerseyService {
         }
     }
 
+    // TODO à renommer en verifyRequiredMetadata()
     private static void checkFileMetadata(FileUploadMetadata fileMetadata) {
+        // TODO remplacer par Guava : Objects.requireNonNull()
         if (fileMetadata == null) {
             throw new RuntimeException("File must have metadata");
         }
