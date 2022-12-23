@@ -22,12 +22,12 @@ public class FileDownloadService implements FileDownloadJerseyService {
     }
 
     public Optional<FileMetadata> fetchMetadata(String fileUniqueName) {
-        logger.debug("Fetching metadata of file {}", fileUniqueName);
+        logger.trace("Fetching metadata of file {}", fileUniqueName);
         return this.fileService.fetchMetadata(fileUniqueName);
     }
 
     public Optional<InputStream> fetchData(String fileUniqueName) {
-        logger.debug("Fetching file {}", fileUniqueName);
+        logger.trace("Fetching file {}", fileUniqueName);
         return this.fileService.fetchData(fileUniqueName);
     }
 }
