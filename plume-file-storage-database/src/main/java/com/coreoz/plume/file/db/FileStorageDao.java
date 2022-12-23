@@ -1,6 +1,8 @@
 package com.coreoz.plume.file.db;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
@@ -58,7 +60,7 @@ public class FileStorageDao {
             try {
                 return blob.getBinaryStream();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new UncheckedIOException(new IOException(e));
             }
         };
     }
