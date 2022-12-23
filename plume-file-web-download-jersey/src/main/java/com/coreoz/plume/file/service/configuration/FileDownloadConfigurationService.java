@@ -36,8 +36,10 @@ public class FileDownloadConfigurationService {
         return config.getDuration("file.cache.max-age");
     }
 
-    public long fileCacheMaxSizeInMb() {
-        return config.getLong("file.cache.max-file-mb-size");
+    public long fileCacheMaxSize() {
+        // TODO use config.getBytes() so dev can specify the unit directly: https://github.com/lightbend/config/blob/main/HOCON.md#size-in-bytes-format
+        // TODO il faudra renommer la clé de config après ça
+        return config.getLong("file.cache.max-file-mb-size") * 1000000;
     }
 
     public boolean keepOriginalNameOnDownload() {

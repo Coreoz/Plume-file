@@ -3,6 +3,12 @@ Plume File Web Upload Jersey
 
 A [Plume File](../) module to help upload file with Jersey, using Form Data Part.
 
+TODO speak about Validators included that should be used
+
+TODO reference OWASP file upload
+TODO speak about anti virus
+TODO speak about how dangerous it is to allow file upload from users
+
 Installation
 ------------
 
