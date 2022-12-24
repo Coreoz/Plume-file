@@ -5,6 +5,7 @@ package com.coreoz.plume.file.services.url;
  *
  * Can be implemented by the download layer (Jersey) or the upload layer (S3)
  */
+// TODO à implémenter
 public interface FileUrlService {
     String url(String uniqueName);
 }
