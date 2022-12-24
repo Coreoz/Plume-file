@@ -30,8 +30,8 @@ public class FileCacheServiceGuava implements FileCacheService {
             .maximumWeight(configurationService.fileCacheMaxSize())
             .weigher((String key, Optional<byte[]> fileData) -> fileData
                 .map(data -> data.length)
-                // Orphan keys handling
-                .orElse(Integer.MAX_VALUE)
+                // Orphan keys handling, this case will almost never happen because the metadata will be fetched first
+                .orElse(key.length())
             )
             .build(CacheLoader.from(uid -> fileService.fetchData(uid)
                 .map(data -> {
@@ -47,7 +47,7 @@ public class FileCacheServiceGuava implements FileCacheService {
             // TODO rendre la durée configurable
             .expireAfterAccess(Duration.ofDays(1))
             // TODO rendre la taille configurable
-            .maximumSize(1000)
+            .maximumSize(10000)
             .build(CacheLoader.from(fileService::fetchMetadata));
     }
 
