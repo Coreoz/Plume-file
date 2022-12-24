@@ -42,6 +42,7 @@ public class FileWs {
 	}
 
 	@GET
+	// TODO c'est pas filename en fait, c'est file extension non ??
 	@Path("/{uid}{filename: (/.*)?}")
 	@Operation(description = "Serve a file")
 	public Response fetch(
