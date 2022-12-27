@@ -42,41 +42,50 @@ public class FileWs {
 	}
 
 	@GET
+	// TODO c'est pas filename en fait, c'est file extension non ??
 	@Path("/{uid}{filename: (/.*)?}")
 	@Operation(description = "Serve a file")
 	public Response fetch(
 		@Parameter(required = true) @PathParam("uid") String fileUid,
+		@Parameter(required = false) @PathParam("filename") String filename,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		Optional<FileMetadata> fileMetadata = this.fileDownloadService.fetchMetadata(fileUid);
-		if (fileMetadata.isEmpty()) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		return this.fileDownloadService.fetchData(fileUid)
-			.map(fileData -> {
-				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.get().getChecksum())) {
-					return Response.notModified().build();
+		// TODO vérifier la taille de l'UID, ça évite de pourrir le cache et les appels inutiles
+		// => si ça match pas l'UID, on renvoie une 404 directement
+
+		return this.fileDownloadService
+			.fetchMetadata(fileUid)
+			.flatMap(fileMetadata -> {
+				// TODO il faut valider l'extension du fichier si elle est transmise avec les métadonnées, si c'est différent, il faut retourner une 404
+				// TODO sinon on risque une attaque de quelqu'un qui upload un fichier .txt et ensuite l'expose en .exe
+
+				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.getChecksum())) {
+					return Optional.of(Response.notModified().build());
 				}
 
-				ResponseBuilder response = Response.ok(fileData);
+				return this.fileDownloadService.fetchData(fileUid)
+					.map(fileData -> {
+						ResponseBuilder response = Response.ok(fileData);
 
-				// adding checksum in etag to avoid corrupted data
-				response.header(HttpHeaders.ETAG, fileMetadata.get().getChecksum());
+						// Adding checksum in etag to enable client basic caching
+						response.header(HttpHeaders.ETAG, fileMetadata.getChecksum());
 
-				if (fileMetadata.get().getMimeType() != null) {
-					response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.get().getMimeType());
-				}
-				if(maxAgeCacheInSeconds > 0) {
-					response.header(
-						HttpHeaders.CACHE_CONTROL,
-						"public, max-age=" + maxAgeCacheInSeconds
-					);
-				}
-				if (keepOriginalNameOnDownload && fileMetadata.get().getFileOriginalName() != null) {
-					response
-						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.get().getFileOriginalName() + "\"");
-				}
-				return response.build();
+						if (fileMetadata.getMimeType() != null) {
+							response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.getMimeType());
+						}
+
+						if(maxAgeCacheInSeconds > 0) {
+							response.header(
+								HttpHeaders.CACHE_CONTROL,
+								"public, max-age=" + maxAgeCacheInSeconds
+							);
+						}
+						if (keepOriginalNameOnDownload && fileMetadata.getFileOriginalName() != null) {
+							response
+								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.getFileOriginalName() + "\"");
+						}
+						return response.build();
+					});
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}

@@ -3,6 +3,8 @@ Plume File Metadata Database
 
 A [Plume File](../) module to store file metadata into database.
 
+TODO expliquer comment utiliser FileTypeDatabase et FileTypesProvider 
+
 Installation
 ------------
 1. Install Maven dependency:

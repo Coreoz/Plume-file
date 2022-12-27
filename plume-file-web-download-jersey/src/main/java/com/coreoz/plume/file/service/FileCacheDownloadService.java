@@ -23,13 +23,13 @@ public class FileCacheDownloadService implements FileDownloadJerseyService {
 
     @Override
     public Optional<FileMetadata> fetchMetadata(String fileUniqueName) {
-        logger.debug("Fetching metadata in cache of file {}", fileUniqueName);
+        logger.trace("Fetching metadata in cache of file {}", fileUniqueName);
         return this.fileCacheService.fetchFileMetadata(fileUniqueName);
     }
 
     @Override
     public Optional<InputStream> fetchData(String fileUniqueName) {
-        logger.debug("Fetching data in cache of file {}", fileUniqueName);
+        logger.trace("Fetching data in cache of file {}", fileUniqueName);
         return this.fileCacheService.fetchFileData(fileUniqueName)
             .map(ByteArrayInputStream::new);
     }
