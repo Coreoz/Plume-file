@@ -7,8 +7,8 @@ import com.coreoz.plume.jersey.errors.WsException;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class FileUploadValidators {
 
@@ -21,22 +21,23 @@ public class FileUploadValidators {
         Objects.requireNonNull(fileMetadata.getMimeType());
     }
 
-    public static void verifyFileNameLength(FormDataBodyPart formDataBodyPart, long fileMaxSize) {
+    public static void verifyFileNameLength(FormDataBodyPart formDataBodyPart, long fileNameMaxSize) {
         String fileName = formDataBodyPart.getContentDisposition().getFileName();
         Objects.requireNonNull(fileName);
-        if (fileName.length() > fileMaxSize) {
+        if (fileName.length() > fileNameMaxSize) {
             throw new WsException(WsError.REQUEST_INVALID, "Filename too long");
         }
     }
 
-    public static void verifyFileSize(FormDataBodyPart formDataBodyPart, long fileMaxSize) {
+    public static void verifyFileSize(FormDataBodyPart formDataBodyPart, long fileMaxSizeInBytes) {
+        // 1 000 000 bytes = 1 000 000 octets = 1MB ~= 8Mb ~= 0,95Mio
         long fileSize = formDataBodyPart.getFormDataContentDisposition().getSize();
-        if (fileSize > fileMaxSize) {
+        if (fileSize > fileMaxSizeInBytes) {
             throw new WsException(WsError.REQUEST_INVALID, "File too large");
         }
     }
 
-    public static void verifyFileExtension(FormDataBodyPart formDataBodyPart, List<String> authorizedExtension) {
+    public static void verifyFileExtension(FormDataBodyPart formDataBodyPart, Set<String> authorizedExtension) {
         String fileExtension = FileNameUtils.getExtensionFromFilename(
             formDataBodyPart.getContentDisposition().getFileName()
         );
@@ -48,7 +49,7 @@ public class FileUploadValidators {
         }
     }
 
-    public static void verifyFileMediaType(FormDataBodyPart formDataBodyPart, List<String> authorizedMimeTypes) {
+    public static void verifyFileMediaType(FormDataBodyPart formDataBodyPart, Set<String> authorizedMimeTypes) {
         String fileMimeType = FileNameUtils.getExtensionFromFilename(
             formDataBodyPart.getMediaType().toString()
         );

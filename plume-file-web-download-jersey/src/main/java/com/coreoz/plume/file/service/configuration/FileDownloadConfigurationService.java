@@ -32,12 +32,12 @@ public class FileDownloadConfigurationService {
         return config.getDuration("file.cache.metadata.expires-after-access-duration");
     }
 
-    public long fileDataCacheMaximumWeight() {
-        return config.getBytes("file.cache.data.max-file-weight");
+    public long fileDataCacheMaximumSize() {
+        return config.getBytes("file.cache.data.max-cache-size");
     }
 
     public long fileMetadataCacheMaximumSize() {
-        return config.getBytes("file.cache.metadata.max-size");
+        return config.getLong("file.cache.metadata.max-elements");
     }
 
     public boolean keepOriginalNameOnDownload() {

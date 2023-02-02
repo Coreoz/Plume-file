@@ -32,7 +32,11 @@ public class FileNameUtils {
 		if (fileName == null) {
 			return "";
 		}
-		return fileName.substring(fileName.lastIndexOf(".") + 1);
+		int dotIndex = fileName.lastIndexOf(".");
+		if (dotIndex == -1) {
+			return "";
+		}
+		return fileName.substring(dotIndex + 1);
 	}
 
 	public static String cleanExtensionName(String fileExtension) {

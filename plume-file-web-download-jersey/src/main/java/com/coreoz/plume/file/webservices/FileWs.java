@@ -2,6 +2,7 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
+import com.coreoz.plume.file.utils.FileNameUtils;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,13 +50,18 @@ public class FileWs {
 		@Parameter(required = true) @PathParam("fileUniqueName") String fileUniqueName,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		if (fileUniqueName.length() < fileUidMinimumLength) {
+		String fileExtension = FileNameUtils.getExtensionFromFilename(fileUniqueName);
+		String fileUid = fileUniqueName.substring(0, fileUniqueName.length() - fileExtension.length() - 1);
+		if (fileUid.length() != fileUidMinimumLength) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
 			.flatMap(fileMetadata -> {
+				if (!fileMetadata.getFileExtension().equals(fileExtension)) {
+					return Optional.of(Response.status(Status.NOT_FOUND).build());
+				}
 				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.getChecksum())) {
 					return Optional.of(Response.notModified().build());
 				}
