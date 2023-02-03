@@ -29,7 +29,7 @@ public class FileWs {
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
 	private final boolean keepOriginalNameOnDownload;
-	private final int fileUidMinimumLength;
+	private final int fileUidLength;
 
 	@Inject
 	public FileWs(
@@ -40,7 +40,7 @@ public class FileWs {
 
 		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
 		this.keepOriginalNameOnDownload = config.keepOriginalNameOnDownload();
-		this.fileUidMinimumLength = config.fileUidMinimumLength();
+		this.fileUidLength = config.fileUidLength();
 	}
 
 	@GET
@@ -52,7 +52,7 @@ public class FileWs {
 	) {
 		String fileExtension = FileNameUtils.getExtensionFromFilename(fileUniqueName);
 		String fileUid = fileUniqueName.substring(0, fileUniqueName.length() - fileExtension.length() - 1);
-		if (fileUid.length() != fileUidMinimumLength) {
+		if (fileUid.length() != fileUidLength) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 

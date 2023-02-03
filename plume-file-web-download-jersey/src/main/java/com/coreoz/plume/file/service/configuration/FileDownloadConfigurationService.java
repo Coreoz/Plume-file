@@ -44,7 +44,7 @@ public class FileDownloadConfigurationService {
         return config.getBoolean("file.keep-original-name-on-download");
     }
 
-    public int fileUidMinimumLength() {
-        return config.getInt("file.uid.minimum-length");
+    public int fileUidLength() {
+        return config.getInt("file.uid.length");
     }
 }
