@@ -2,7 +2,7 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.services.metadata.FileMetadata;
+import com.coreoz.plume.file.utils.FileNameUtils;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +29,7 @@ public class FileWs {
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
 	private final boolean keepOriginalNameOnDownload;
+	private final int fileUidLength;
 
 	@Inject
 	public FileWs(
@@ -37,33 +38,35 @@ public class FileWs {
 	) {
 		this.fileDownloadService = fileDownloadService;
 
-		this.maxAgeCacheInSeconds = config.fileCacheMaxAge().getSeconds();
+		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
 		this.keepOriginalNameOnDownload = config.keepOriginalNameOnDownload();
+		this.fileUidLength = config.fileUidLength();
 	}
 
 	@GET
-	// TODO c'est pas filename en fait, c'est file extension non ??
-	@Path("/{uid}{filename: (/.*)?}")
+	@Path("/{fileUniqueName}")
 	@Operation(description = "Serve a file")
 	public Response fetch(
-		@Parameter(required = true) @PathParam("uid") String fileUid,
-		@Parameter(required = false) @PathParam("filename") String filename,
+		@Parameter(required = true) @PathParam("fileUniqueName") String fileUniqueName,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		// TODO vérifier la taille de l'UID, ça évite de pourrir le cache et les appels inutiles
-		// => si ça match pas l'UID, on renvoie une 404 directement
+		String fileExtension = FileNameUtils.getExtensionFromFilename(fileUniqueName);
+		String fileUid = fileUniqueName.substring(0, fileUniqueName.length() - fileExtension.length() - 1);
+		if (fileUid.length() != fileUidLength) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
 
 		return this.fileDownloadService
-			.fetchMetadata(fileUid)
+			.fetchMetadata(fileUniqueName)
 			.flatMap(fileMetadata -> {
-				// TODO il faut valider l'extension du fichier si elle est transmise avec les métadonnées, si c'est différent, il faut retourner une 404
-				// TODO sinon on risque une attaque de quelqu'un qui upload un fichier .txt et ensuite l'expose en .exe
-
+				if (!fileMetadata.getFileExtension().equals(fileExtension)) {
+					return Optional.of(Response.status(Status.NOT_FOUND).build());
+				}
 				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.getChecksum())) {
 					return Optional.of(Response.notModified().build());
 				}
 
-				return this.fileDownloadService.fetchData(fileUid)
+				return this.fileDownloadService.fetchData(fileUniqueName)
 					.map(fileData -> {
 						ResponseBuilder response = Response.ok(fileData);
 

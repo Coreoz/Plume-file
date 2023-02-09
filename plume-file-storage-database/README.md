@@ -3,8 +3,10 @@ Plume File Storage Database
 
 A [Plume File](../) module to store file data into database.
 
-Installation
-------------
+The file-storage-database module implements the `FileStorageService` of the [core module](../plume-file-core).
+
+Setup
+-----
 1. Install Maven dependency:
 ```xml
 <dependency>

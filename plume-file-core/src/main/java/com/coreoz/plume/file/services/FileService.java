@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,6 +71,9 @@ public class FileService {
         String fileExtension,
         String mimeType
     ) throws UncheckedIOException {
+        Objects.requireNonNull(fileType);
+        Objects.requireNonNull(fileInputStream);
+
         String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
@@ -133,7 +137,7 @@ public class FileService {
 
     /**
      * Delete unreferenced files.
-     * 
+     *
      * @throws UncheckedIOException is a file could not be deleted.
      * It is possible to retry if the deletion failed.
      */

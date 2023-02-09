@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 import java.util.Optional;
 
 @Singleton
@@ -25,15 +24,14 @@ public class FileCacheServiceGuava implements FileCacheService {
     @Inject
     public FileCacheServiceGuava(FileService fileService, FileDownloadConfigurationService configurationService) {
         this.fileDataCache = CacheBuilder.newBuilder()
-            // TODO rendre la durée configurable
-            .expireAfterAccess(Duration.ofDays(1))
-            .maximumWeight(configurationService.fileCacheMaxSize())
+            .expireAfterAccess(configurationService.fileDataCacheExpiresAfterAccessDuration())
+            .maximumWeight(configurationService.fileDataCacheMaximumSize())
             .weigher((String key, Optional<byte[]> fileData) -> fileData
                 .map(data -> data.length)
                 // Orphan keys handling, this case will almost never happen because the metadata will be fetched first
                 .orElse(key.length())
             )
-            .build(CacheLoader.from(uid -> fileService.fetchData(uid)
+            .build(CacheLoader.from(fileUniqueName -> fileService.fetchData(fileUniqueName)
                 .map(data -> {
                     try {
                         return ByteStreams.toByteArray(data);
@@ -44,10 +42,8 @@ public class FileCacheServiceGuava implements FileCacheService {
             ));
 
         this.fileMetadataCache = CacheBuilder.newBuilder()
-            // TODO rendre la durée configurable
-            .expireAfterAccess(Duration.ofDays(1))
-            // TODO rendre la taille configurable
-            .maximumSize(10000)
+            .expireAfterAccess(configurationService.fileMetadataCacheExpiresAfterAccessDuration())
+            .maximumSize(configurationService.fileMetadataCacheMaximumSize())
             .build(CacheLoader.from(fileService::fetchMetadata));
     }
 

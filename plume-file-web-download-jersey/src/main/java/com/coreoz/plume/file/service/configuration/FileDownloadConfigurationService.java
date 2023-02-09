@@ -20,35 +20,31 @@ public class FileDownloadConfigurationService {
         );
     }
 
-    public String apiBasePath() {
-        String apiBasePath = config.getString("application.api-base-path");
-        checkPathConfiguration(apiBasePath);
-        return apiBasePath;
+    public Duration fileCacheControlMaxAge() {
+        return config.getDuration("file.cache.http.max-age");
     }
 
-    public String fileWsPath() {
-        String wsPath = config.getString("file.ws-path");
-        checkPathConfiguration(wsPath);
-        return wsPath;
+    public Duration fileDataCacheExpiresAfterAccessDuration() {
+        return config.getDuration("file.cache.data.expires-after-access-duration");
     }
 
-    public Duration fileCacheMaxAge() {
-        return config.getDuration("file.cache.max-age");
+    public Duration fileMetadataCacheExpiresAfterAccessDuration() {
+        return config.getDuration("file.cache.metadata.expires-after-access-duration");
     }
 
-    public long fileCacheMaxSize() {
-        // TODO use config.getBytes() so dev can specify the unit directly: https://github.com/lightbend/config/blob/main/HOCON.md#size-in-bytes-format
-        // TODO il faudra renommer la clé de config après ça
-        return config.getLong("file.cache.max-file-mb-size") * 1000000;
+    public long fileDataCacheMaximumSize() {
+        return config.getBytes("file.cache.data.max-cache-size");
+    }
+
+    public long fileMetadataCacheMaximumSize() {
+        return config.getLong("file.cache.metadata.max-elements");
     }
 
     public boolean keepOriginalNameOnDownload() {
         return config.getBoolean("file.keep-original-name-on-download");
     }
 
-    private static void checkPathConfiguration(String configuration) {
-        if (!configuration.startsWith("/") || configuration.endsWith("/")) {
-            throw new RuntimeException("Path configuration should start with '/' and not end with one : " + configuration);
-        }
+    public int fileUidLength() {
+        return config.getInt("file.uid.length");
     }
 }
