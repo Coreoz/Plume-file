@@ -3,9 +3,7 @@ Plume File Metadata Database
 
 A [Plume File](../) module to store file metadata into database, with a strong reference to a database object through a foreign key.
 
-The metadata-database module implements the `FileMetadataService` of the [core module](../plume-file-core). 
-
-TODO expliquer comment utiliser FileTypeDatabase et FileTypesProvider 
+The metadata-database module implements the `FileMetadataService` of the [core module](../plume-file-core).
 
 Setup
 -----
@@ -33,6 +31,8 @@ CREATE TABLE `PLM_USER_FILE`
 )
     DEFAULT CHARSET = utf8;
 ```
+
+Each table that references the PLM_FILE table must have a `FileTypeDatabase` enum entry.
 
 5. Create a `FileTypeDatabase` enum
 
