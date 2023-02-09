@@ -11,6 +11,7 @@ Glossary
 
 Setup
 -----
+1. Install Maven dependency:
 ```xml
 <dependency>
     <groupId>com.coreoz</groupId>
@@ -18,23 +19,18 @@ Setup
 </dependency>
 ```
 
-Jackson
--------
-The module `GuiceFileModule` provides a `GuiceSchedulerModule`.
-Install the module in your ApplicationModule class :
+2. In the `ApplicationModule` class, install the following Guice module:
 ```java
 install(new GuiceFileModule());
 ```
 
-Usage
------
+3. Implements the required interfaces
 
-### Core
 As mentioned before, the core cannot work on its own. You must provide implementation for interfaces :
-- FileMetadataService
-- FileStorageService
+- `FileMetadataService`
+- `FileStorageService`
 
-Then you must reference these implementations in the ApplicationModule of your project
+Then you must reference these implementations in the `ApplicationModule` of your project
 
 ```java
 bind(FileMetadataService.class).to(MyFileMetadataService.class);
@@ -44,11 +40,11 @@ bind(FileStorageService.class).to(MyFileStorageService.class);
 Some implementations are available in this repository.
 See root project [README](../README.md) for more information on these service implementations.
 
-### FileType
+4. Create a FileType implementation
 
 Each file that goes through the core must have a type so it can be referenced.
 
-This type is personified by an enum that must implements `FileType` interface :
+This type is materialized by an enum that must implements `FileType` interface :
 ```java
 public enum MyProjectFileType implements FileType {
     LANDSCAPES,
@@ -57,7 +53,7 @@ public enum MyProjectFileType implements FileType {
 }
 ```
 
-### Scheduler
+5. Schedule the file cleaning
 
 The plume file core library provides a schedule job that will clean unreferenced files.
 Unreferenced files are files which are found when searching for a unique name, but have no reference in the metadata.
@@ -94,3 +90,34 @@ file.cleaning-hour = "03:00"
 ```
 
 If you need to create your own job to clean other data before, just call `fileService::deleteUnreferenced` in you job.
+
+Usage
+-----
+
+### Uploading files
+
+```java
+String fileUniqueName = fileService.add(MyProjectFileType.LANDSCAPES, fileInputStream, "grand_canyon_2020.png", "png", "image/png");
+```
+If you do not have all these information, `FileNameUtils` can help you guess the extension and the mime type from the file name. 
+Then just call :
+```java
+String fileUniqueName = fileService.add(MyProjectFileType.LANDSCAPES, fileInputStream, "grand_canyon_2020.png");
+```
+
+### Fetching files
+
+You can either retrieve the file itself or only its information by its unique name :
+```java
+Optional<InputStream> file = fileService.fetchData("c70f9b94-30e2-4e10-b84d-b964ef972067");
+Optional<FileMetadata> fileMetadata = fileService.fetchMetadata("c70f9b94-30e2-4e10-b84d-b964ef972067");
+```
+
+### Deleting files
+
+The library does not implement file deletion by the unique name to avoid metadata de-synchronization.
+
+However, the `deleteUnreferenced` method will delete all the files that are not referenced in the metadata.
+If the reference to the file is deleted, then the file will be deleted with this method.
+
+This way, the file metadata drives the file deletion and not the other way around
