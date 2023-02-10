@@ -21,6 +21,12 @@ public class FileUploadValidators {
         Objects.requireNonNull(fileMetadata.getMimeType());
     }
 
+    /**
+     * Compares the file name length (with the extension part) with a given maximum length
+     * @param formDataBodyPart the form data received from Jersey
+     * @param fileNameMaxSize the maximum file name length authorized
+     * @throws WsException if the file name length is bigger than the maximum authorized
+     */
     public static void verifyFileNameLength(FormDataBodyPart formDataBodyPart, long fileNameMaxSize) {
         String fileName = formDataBodyPart.getContentDisposition().getFileName();
         Objects.requireNonNull(fileName);
@@ -29,6 +35,13 @@ public class FileUploadValidators {
         }
     }
 
+    /**
+     * Compares the file size in bytes with a given maximum size
+     * @implNote 1 000 000 bytes = 1 000 000 octets = 1MB ~= 8Mb ~= 0,95Mio
+     * @param formDataBodyPart the form data received from Jersey
+     * @param fileMaxSizeInBytes the maximum file length in bytes authorized
+     * @throws WsException if the file size in bytes is bigger than the maximum authorized
+     */
     public static void verifyFileSize(FormDataBodyPart formDataBodyPart, long fileMaxSizeInBytes) {
         // 1 000 000 bytes = 1 000 000 octets = 1MB ~= 8Mb ~= 0,95Mio
         long fileSize = formDataBodyPart.getFormDataContentDisposition().getSize();
@@ -37,6 +50,12 @@ public class FileUploadValidators {
         }
     }
 
+    /**
+     * Compares the file extension with a given authorized extensions Set
+     * @param formDataBodyPart the form data received from Jersey
+     * @param authorizedExtension the authorized extensions
+     * @throws WsException if the file extension is not in the authorized extensions
+     */
     public static void verifyFileExtension(FormDataBodyPart formDataBodyPart, Set<String> authorizedExtension) {
         String fileExtension = FileNameUtils.getExtensionFromFilename(
             formDataBodyPart.getContentDisposition().getFileName()
@@ -49,10 +68,14 @@ public class FileUploadValidators {
         }
     }
 
+    /**
+     * Compares the file mime type with a given authorized mime types Set
+     * @param formDataBodyPart the form data received from Jersey
+     * @param authorizedMimeTypes the authorized mime types
+     * @throws WsException if the file mime type is not in the authorized mime types
+     */
     public static void verifyFileMediaType(FormDataBodyPart formDataBodyPart, Set<String> authorizedMimeTypes) {
-        String fileMimeType = FileNameUtils.getExtensionFromFilename(
-            formDataBodyPart.getMediaType().toString()
-        );
+        String fileMimeType = formDataBodyPart.getMediaType().toString();
         if (StringUtils.isEmpty(fileMimeType)) {
             throw new NullPointerException();
         }

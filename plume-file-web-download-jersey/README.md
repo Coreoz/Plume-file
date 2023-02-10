@@ -30,8 +30,11 @@ install(new GuiceFileCacheDownloadModule());
 ```
 for serving files with the `FileCacheServiceGuava` cache service.
 
-Configure the file WS
----------------------
+Configuration
+-------------
+
+### Configure the file WS
+
 You can override these values in your configuration file :
 ```
 // configures the "Cache-Control" max-age header
@@ -45,8 +48,7 @@ file.uid.length = 36
 ```
 The default values are shown.
 
-Configure the file cache
-------------------------
+### Configure the file cache
 
 ```
 // configures the expiration of the java data cache
@@ -63,8 +65,7 @@ file.cache.metadata.max-elements = 10000
 ```
 The default values are shown.
 
-Configure your own cache
-------------------------
+### Create your own cache
 
 This module can be used with your own implementation of the `FileCacheService` interface.
 

@@ -4,13 +4,12 @@ Plume File Web Upload Jersey
 A [Plume File](../) module to help upload file with Jersey, using Form Data Part.
 
 TODO speak about Validators included that should be used
-
 TODO reference OWASP file upload
 TODO speak about anti virus
 TODO speak about how dangerous it is to allow file upload from users
 
-Installation
-------------
+Setup
+-----
 
 1. Install Maven dependency:
 ```xml
@@ -19,8 +18,12 @@ Installation
   <artifactId>plume-file-web-upload-jersey</artifactId>
 </dependency>
 ```
-2. Create the webservice file that will use the newly imported class
-3. Create your webservice endpoint that will upload your file, using the FormData :
+2. Register the MultiPart Feature on your `JerseyConfigProvider`:
+```java
+config.register(MultiPartFeature.class);
+```
+3. Create the webservice file that will use the newly imported class
+4. Create your webservice endpoint that will upload your file, using the FormData :
 ```java
 @POST
 @Operation(description = "Upload a file")
