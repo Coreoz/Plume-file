@@ -1,13 +1,7 @@
 Plume File Core
 ===============
 
-Plume file core is at the center of the Plume File architecture as it is where all the common logic is implemented.
-The core exposes the 2 interfaces to be implemented to match any usages.
-
-Glossary
---------
-
-- File unique identifier is the 36 chars long UID that identifies a file 
+Plume file core is the main composant of [Plume File](../).
 
 Setup
 -----
@@ -24,29 +18,18 @@ Setup
 install(new GuiceFileModule());
 ```
 
-3. Implements the required interfaces
+3. Add the required storage modules
+One metadata storage module and one data storage module must be configured. See the main documentation to view the [available storage modules](.../#plume-file-modules). 
 
-As mentioned before, the core cannot work on its own. You must provide implementation for interfaces :
-- `FileMetadataService`
-- `FileStorageService`
-
-Then you must reference these implementations in the `ApplicationModule` of your project
-
-```java
-bind(FileMetadataService.class).to(MyFileMetadataService.class);
-bind(FileStorageService.class).to(MyFileStorageService.class);
-```
-
-Some implementations are available in this repository.
-See root project [README](../README.md) for more information on these service implementations.
+Custom storage systems can be configured. See [Custom storage implementation](#custom-storage-implementation).
 
 4. Create a FileType implementation
 
-Each file that goes through the core must have a type so it can be referenced.
+Each file must be associated to a `FileType` to ease file management.
 
-This type is materialized by an enum that must implements `FileType` interface :
+This type is materialized by an enum that must implements `FileType` interface. For example:
 ```java
-public enum MyProjectFileType implements FileType {
+public enum ProjectFileType implements FileType {
     LANDSCAPES,
     PROFILE_PICTURES,
     ;
@@ -55,33 +38,14 @@ public enum MyProjectFileType implements FileType {
 
 5. Schedule the file cleaning
 
-The plume file core library provides a schedule job that will clean unreferenced files.
-Unreferenced files are files which are found when searching for a unique name, but have no reference in the metadata.
-These files should be cleaned to free space.
+The plume file core module provides a schedule job that will clean unreferenced files.
+Unreferenced files are files that are awaiting deletion. This is specified in the file metadata module used.
 
-However, it is not mandatory.
+Scheduling unreferenced files is important to make sure deleted files (data and metadata) are correctly removed.
 
-In order to schedule it, execute in your scheduled jobs class :
+In order to schedule it, execute in your `WebApplication` entry point:
 ```java
-@Singleton
-public class ScheduledJobs {
-
-    private final Scheduler scheduler;
-    private final MyService service1;
-
-    @Inject
-    public ScheduledJobs(Scheduler scheduler, MyService service1, FileScheduledTasks fileScheduledTasks) {
-        this.scheduler = scheduler;
-        this.service1 = service1;
-
-        fileScheduledTasks.scheduleJobs();
-    }
-
-    public void scheduleJobs() {
-        // add your own scheduled jobs here
-    }
-
-}
+injector.getInstance(FileScheduledTasks.class).scheduleJobs();
 ```
 
 The cleaning hour is configurable. The default value is :
@@ -99,8 +63,7 @@ Usage
 ```java
 String fileUniqueName = fileService.add(MyProjectFileType.LANDSCAPES, fileInputStream, "grand_canyon_2020.png", "png", "image/png");
 ```
-If you do not have all these information, `FileNameUtils` can help you guess the extension and the mime type from the file name. 
-Then just call :
+If you do not have all these information, the file service will guess it for you:
 ```java
 String fileUniqueName = fileService.add(MyProjectFileType.LANDSCAPES, fileInputStream, "grand_canyon_2020.png");
 ```
@@ -114,10 +77,26 @@ Optional<FileMetadata> fileMetadata = fileService.fetchMetadata("c70f9b94-30e2-4
 ```
 
 ### Deleting files
-
 The library does not implement file deletion by the unique name to avoid metadata de-synchronization.
 
 However, the `deleteUnreferenced` method will delete all the files that are not referenced in the metadata.
 If the reference to the file is deleted, then the file will be deleted with this method.
 
 This way, the file metadata drives the file deletion and not the other way around
+
+Custom storage implementation
+-----------------------------
+As mentioned in the [main documentation](../), the core module needs implementation for the interfaces:
+- `FileMetadataService`
+- `FileStorageService`
+
+To create use a custom storage implementation:
+- It is generally best to use the provided [metadata database module](.../plume-file-metadata-database)
+- Then the custom data storage will be configured by implementing `FileStorageService`.
+
+Then you must reference these implementations in the `ApplicationModule` of your project
+
+```java
+bind(FileMetadataService.class).to(MyFileMetadataService.class); // Do not write this line if the standard metadata database module is used
+bind(FileStorageService.class).to(MyFileStorageService.class);
+```
