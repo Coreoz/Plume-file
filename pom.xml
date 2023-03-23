@@ -31,6 +31,12 @@
 			<organization>Coreoz</organization>
 			<organizationUrl>https://coreoz.com/</organizationUrl>
 		</developer>
+		<developer>
+			<name>Lucas Amiaud</name>
+			<email>lamiaud@coreoz.com</email>
+			<organization>Coreoz</organization>
+			<organizationUrl>https://coreoz.com/</organizationUrl>
+		</developer>
 	</developers>
 
 	<scm>
