@@ -28,6 +28,8 @@ public class FileNameUtils {
 		}
 	}
 
+	// TODO à renommer en parseFileNameExtension
+	// TODO pourquoi ne pas renvoyer null s'il n'y a pas d'extension ? Je me dis que sémantiquement ça serait plus clair
 	public static String getExtensionFromFilename(String fileName) {
 		if (fileName == null) {
 			return "";

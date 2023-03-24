@@ -21,6 +21,7 @@ install(new GuiceFileDownloadModule());
 for serving files without a cache
 
 3. Declare the FileWs in the `JerseyConfigProvider`
+TODO Autant mettre juste config.resource(FileWs.class) non ? 
 ```java
 config.packages("com.coreoz.plume.file.webservices");
 ```

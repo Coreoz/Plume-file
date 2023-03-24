@@ -40,6 +40,7 @@ public class FileWs {
 
 		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
 		this.keepOriginalNameOnDownload = config.keepOriginalNameOnDownload();
+		// TODO pourquoi passer par de la configuration pour définir la taille ? Elle sera toujours la même
 		this.fileUidLength = config.fileUidLength();
 	}
 
@@ -50,6 +51,7 @@ public class FileWs {
 		@Parameter(required = true) @PathParam("fileUniqueName") String fileUniqueName,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
+		// TODO peut être ajouter une vérification sur le fait que fileUniqueName ne doit pas être null ?
 		String fileExtension = FileNameUtils.getExtensionFromFilename(fileUniqueName);
 		String fileUid = fileUniqueName.substring(0, fileUniqueName.length() - fileExtension.length() - 1);
 		if (fileUid.length() != fileUidLength) {

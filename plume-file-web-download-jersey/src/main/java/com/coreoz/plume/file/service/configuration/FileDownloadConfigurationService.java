@@ -32,6 +32,7 @@ public class FileDownloadConfigurationService {
         return config.getDuration("file.cache.metadata.expires-after-access-duration");
     }
 
+    // TODO peut être renommer en fileDataCacheMaximumSizeInBytes ?
     public long fileDataCacheMaximumSize() {
         return config.getBytes("file.cache.data.max-cache-size");
     }
