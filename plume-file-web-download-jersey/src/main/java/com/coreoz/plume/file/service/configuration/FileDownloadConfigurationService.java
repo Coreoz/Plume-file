@@ -45,6 +45,7 @@ public class FileDownloadConfigurationService {
         return config.getBoolean("file.keep-original-name-on-download");
     }
 
+    // TODO cette longueur est fixe et ne devrait pas être configurable
     public int fileUidLength() {
         return config.getInt("file.uid.length");
     }

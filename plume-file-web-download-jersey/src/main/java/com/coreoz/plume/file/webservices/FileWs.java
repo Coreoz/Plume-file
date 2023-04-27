@@ -85,6 +85,8 @@ public class FileWs {
 								"public, max-age=" + maxAgeCacheInSeconds
 							);
 						}
+						// TODO en fait je me dis que plutôt que d'avoir un paramètre de conf qui oblige tous les fichiers à être téléchargés, ça serait surement plus souple d'avoir un query param optionnel que le front pourrait ajouter pour permettre d'ajouter ce header ou pas non ? Par exemple https://wedownload.coreoz.com/api/files/abcd.jpg?attachment=true
+						// TODO j'ai l'impression que ça serait d'un côté plus souple et de l'autre que ça n'ajouterait pas de problème de sécurité
 						if (keepOriginalNameOnDownload && fileMetadata.getFileOriginalName() != null) {
 							response
 								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.getFileOriginalName() + "\"");

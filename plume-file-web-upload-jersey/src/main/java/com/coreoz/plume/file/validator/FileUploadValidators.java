@@ -60,6 +60,8 @@ public class FileUploadValidators {
         String fileExtension = FileNameUtils.getExtensionFromFilename(
             formDataBodyPart.getContentDisposition().getFileName()
         );
+        // TODO c'est hyper violant et ça ne sera pas affiché à l'utilisateur :O
+        // TODO tu veux pas juste mettre : throw new WsException(WsError.REQUEST_INVALID, "Empty file extension not supported");
         if (StringUtils.isEmpty(fileExtension)) {
             throw new NullPointerException();
         }
@@ -76,6 +78,8 @@ public class FileUploadValidators {
      */
     public static void verifyFileMediaType(FormDataBodyPart formDataBodyPart, Set<String> authorizedMimeTypes) {
         String fileMimeType = formDataBodyPart.getMediaType().toString();
+        // TODO c'est hyper violant et ça ne sera pas affiché à l'utilisateur :O
+        // TODO tu veux pas juste mettre : throw new WsException(WsError.REQUEST_INVALID, "Unrecognized mime type");
         if (StringUtils.isEmpty(fileMimeType)) {
             throw new NullPointerException();
         }
@@ -83,4 +87,6 @@ public class FileUploadValidators {
             throw new WsException(WsError.REQUEST_INVALID, "File mime type not supported");
         }
     }
+
+    // TODO on pourrait ajouter verifyFileImage qui utiliserait le mime type pour vérifier si fileMimeType.startsWith("image/");
 }

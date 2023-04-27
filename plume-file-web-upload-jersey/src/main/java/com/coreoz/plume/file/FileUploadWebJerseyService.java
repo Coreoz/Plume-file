@@ -27,7 +27,7 @@ public class FileUploadWebJerseyService {
         InputStream fileData,
         FormDataBodyPart formDataBodyPart
     ) {
-        logger.trace("uploading file with type {}", fileType);
+        logger.trace("Uploading file with type: {}", fileType);
         FileUploadMetadata fileMetadata = FileUploadMetadata.of(
             formDataBodyPart.getContentDisposition().getFileName(),
             formDataBodyPart.getMediaType().toString(),
