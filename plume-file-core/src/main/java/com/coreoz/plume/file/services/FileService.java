@@ -57,8 +57,8 @@ public class FileService {
      *
      * @param fileType        the type of the file {@link FileType}
      * @param fileInputStream the file data stream, that will be closed automatically in this method
-     * @param originalName    the original name of the file. This won't be the name under the one the file will be saved
-     * @param fileExtension   the file extension
+     * @param originalName    the optional (nullable) original name of the file. This won't be the name under the one the file will be saved
+     * @param fileExtension   the optional (nullable) file extension
      * @param mimeType        the mime type
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      * @throws UncheckedIOException in case the file could not be saved
@@ -69,6 +69,7 @@ public class FileService {
         InputStream fileInputStream,
         String originalName,
         String fileExtension,
+        // TODO pourquoi le mimeType est obligatoire ?
         String mimeType
     ) throws UncheckedIOException {
         Objects.requireNonNull(fileType);

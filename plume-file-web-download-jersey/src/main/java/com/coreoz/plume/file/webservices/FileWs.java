@@ -61,6 +61,8 @@ public class FileWs {
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
 			.flatMap(fileMetadata -> {
+				// TODO ça fonctionne bien si fileMetadata.getFileExtension() == null ?
+				// TODO peut être ajouter un petit TU pour ça !
 				if (!fileMetadata.getFileExtension().equals(fileExtension)) {
 					return Optional.of(Response.status(Status.NOT_FOUND).build());
 				}
@@ -87,6 +89,7 @@ public class FileWs {
 						}
 						// TODO en fait je me dis que plutôt que d'avoir un paramètre de conf qui oblige tous les fichiers à être téléchargés, ça serait surement plus souple d'avoir un query param optionnel que le front pourrait ajouter pour permettre d'ajouter ce header ou pas non ? Par exemple https://wedownload.coreoz.com/api/files/abcd.jpg?attachment=true
 						// TODO j'ai l'impression que ça serait d'un côté plus souple et de l'autre que ça n'ajouterait pas de problème de sécurité
+						// TODO Si fileMetadata.getFileOriginalName() c'est pas forcément un problème, on pourrait mettre le nom de fichier autogénéré
 						if (keepOriginalNameOnDownload && fileMetadata.getFileOriginalName() != null) {
 							response
 								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.getFileOriginalName() + "\"");

@@ -37,6 +37,7 @@ public class FileUploadWebJerseyService {
         return this.fileService.add(
             fileType,
             fileData,
+            // TODO à modifier en FileNames.clean(fileMetadata.getOriginalName())
             fileMetadata.getOriginalName(),
             fileMetadata.getMimeType()
         );

@@ -8,6 +8,16 @@ TODO reference OWASP file upload
 TODO speak about anti virus
 TODO speak about how dangerous it is to allow file upload from users
 
+TODO ça me semble obligatoire de lister les choses à prendre en considération avant de permettre un upload de fichier :
+- List allowed extensions. Only allow safe and critical extensions for business functionality
+- Ensure that input validation is applied before validating the extensions.
+- Set a filename length limit. Restrict the allowed characters if possible
+- Set a file size limit
+- Only allow authorized users to upload files
+- Run the file through an antivirus or a sandbox if available to validate that it doesn't contain malicious data
+- Ensure that any libraries used are securely configured and kept up to date
+- Protect the file upload from CSRF attacks
+
 Setup
 -----
 

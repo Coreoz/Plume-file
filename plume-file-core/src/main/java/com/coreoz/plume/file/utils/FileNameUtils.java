@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+// TODO à renommer en FileNames ?
 public class FileNameUtils {
 
 	private FileNameUtils() {
 		// empty constructor
 	}
+
+	// TODO fournir une méthode pour nettoyer le nom du fichier non ?
 
 	/**
 	 * Find the corresponding mime type for the file name.
