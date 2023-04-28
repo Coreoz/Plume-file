@@ -21,9 +21,8 @@ install(new GuiceFileDownloadModule());
 for serving files without a cache
 
 3. Declare the FileWs in the `JerseyConfigProvider`
-TODO Autant mettre juste config.resource(FileWs.class) non ? 
 ```java
-config.packages("com.coreoz.plume.file.webservices");
+config.resource(FileWs.class);
 ```
 
 ```java
@@ -40,12 +39,6 @@ You can override these values in your configuration file :
 ```
 // configures the "Cache-Control" max-age header
 file.cache.http.max-age = "365 days"
-
-// returns the file with its upload name if set to true, with the generated unique name if set to false
-file.keep-original-name-on-download = "false"
-
-// if a file identifier given through the webservice is not equals to this lenght, 404 is returned 
-file.uid.length = 36
 ```
 The default values are shown.
 

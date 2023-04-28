@@ -7,20 +7,26 @@ import org.junit.Test;
 public class FileNameUtilsTest {
 
 	@Test
+	public void test_clean_from_string_with_accents_should_return_without_accents() {
+		assertThat(FileNames.clean("éçàyt.jpg"))
+			.isEqualTo("ecayt.jpg");
+	}
+
+	@Test
 	public void test_get_extension_from_jpg_should_return_jpg() {
-		assertThat(FileNameUtils.getExtensionFromFilename("toto.jpg"))
+		assertThat(FileNames.parseFileNameExtension("toto.jpg"))
 			.isEqualTo("jpg");
 	}
 
 	@Test
 	public void test_get_extension_from_no_extension_should_return_empty() {
-		assertThat(FileNameUtils.getExtensionFromFilename("toto"))
+		assertThat(FileNames.parseFileNameExtension("toto"))
 			.isEmpty();
 	}
 
 	@Test
 	public void test_clean_extension_from_jpg_should_return_jpg() {
-		assertThat(FileNameUtils.cleanExtensionName(".jpg"))
+		assertThat(FileNames.cleanExtensionName(".jpg"))
 			.isEqualTo("jpg");
 	}
 

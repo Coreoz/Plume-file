@@ -5,6 +5,9 @@ import com.typesafe.config.ConfigFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.Duration;
 
 @Singleton
@@ -32,8 +35,7 @@ public class FileDownloadConfigurationService {
         return config.getDuration("file.cache.metadata.expires-after-access-duration");
     }
 
-    // TODO peut être renommer en fileDataCacheMaximumSizeInBytes ?
-    public long fileDataCacheMaximumSize() {
+    public long fileDataCacheMaximumSizeInBytes() {
         return config.getBytes("file.cache.data.max-cache-size");
     }
 
@@ -41,12 +43,31 @@ public class FileDownloadConfigurationService {
         return config.getLong("file.cache.metadata.max-elements");
     }
 
-    public boolean keepOriginalNameOnDownload() {
-        return config.getBoolean("file.keep-original-name-on-download");
+    /**
+     * File URL base path used in {@link com.coreoz.plume.file.service.url.FileDownloadUrlService}
+     * The URL should not be padded by a '/'
+     * @return the base path
+     */
+    public String fileUrlBasePath() {
+        String basePath = config.getString("file.url.base-path");
+        if (!isValidURL(basePath)) {
+            throw new RuntimeException("Wrong input for file.url.base-path. Should be a valid URL.");
+        }
+        if (basePath.endsWith("/")) {
+            return basePath.substring(0, basePath.length() - 1);
+        }
+        return basePath;
     }
 
-    // TODO cette longueur est fixe et ne devrait pas être configurable
-    public int fileUidLength() {
-        return config.getInt("file.uid.length");
+    private boolean isValidURL(String url) {
+        if (url == null) {
+            return false;
+        }
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
+            return false;
+        }
     }
 }

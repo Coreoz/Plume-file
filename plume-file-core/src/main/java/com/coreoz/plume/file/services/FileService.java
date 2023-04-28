@@ -24,7 +24,7 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
-import com.coreoz.plume.file.utils.FileNameUtils;
+import com.coreoz.plume.file.utils.FileNames;
 
 import lombok.SneakyThrows;
 
@@ -59,7 +59,7 @@ public class FileService {
      * @param fileInputStream the file data stream, that will be closed automatically in this method
      * @param originalName    the optional (nullable) original name of the file. This won't be the name under the one the file will be saved
      * @param fileExtension   the optional (nullable) file extension
-     * @param mimeType        the mime type
+     * @param mimeType        the optional (nullable) mime type
      * @return the unique file name of the file. This will be the name under the one the file will be saved
      * @throws UncheckedIOException in case the file could not be saved
      */
@@ -69,19 +69,18 @@ public class FileService {
         InputStream fileInputStream,
         String originalName,
         String fileExtension,
-        // TODO pourquoi le mimeType est obligatoire ?
         String mimeType
     ) throws UncheckedIOException {
         Objects.requireNonNull(fileType);
         Objects.requireNonNull(fileInputStream);
 
-        String fileCleanExtension = FileNameUtils.cleanExtensionName(fileExtension);
-        String fileUniqueName = UUID.randomUUID() + (fileCleanExtension.isEmpty() ? "" : "." + fileCleanExtension);
+        String fileCleanExtension = FileNames.cleanExtensionName(fileExtension);
+        String fileUniqueName = UUID.randomUUID() + Optional.ofNullable(fileCleanExtension).map(extension -> "." + extension).orElse("");
         this.fileMetadataService.add(
             fileUniqueName,
             originalName,
             fileType.name(),
-            fileExtension,
+            fileCleanExtension,
             mimeType
         );
         DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, MessageDigest.getInstance(checksumAlgorithm));
@@ -112,7 +111,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) throws UncheckedIOException {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), mimeType);
+        return add(fileType, fileData, fileName, FileNames.parseFileNameExtension(fileName), mimeType);
     }
 
     /**
@@ -120,7 +119,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) throws UncheckedIOException {
-        return add(fileType, fileData, fileName, FileNameUtils.getExtensionFromFilename(fileName), FileNameUtils.guessMimeType(fileName));
+        return add(fileType, fileData, fileName, FileNames.parseFileNameExtension(fileName), FileNames.guessMimeType(fileName));
     }
 
     // file data

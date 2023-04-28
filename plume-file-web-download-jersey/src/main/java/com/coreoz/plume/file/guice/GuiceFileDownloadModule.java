@@ -1,7 +1,7 @@
 package com.coreoz.plume.file.guice;
 
-import com.coreoz.plume.file.service.FileDownloadService;
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
+import com.coreoz.plume.file.service.FileDownloadService;
 import com.google.inject.AbstractModule;
 
 public class GuiceFileDownloadModule extends AbstractModule {

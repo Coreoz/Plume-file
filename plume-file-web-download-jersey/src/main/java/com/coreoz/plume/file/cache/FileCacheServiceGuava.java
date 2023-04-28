@@ -25,7 +25,7 @@ public class FileCacheServiceGuava implements FileCacheService {
     public FileCacheServiceGuava(FileService fileService, FileDownloadConfigurationService configurationService) {
         this.fileDataCache = CacheBuilder.newBuilder()
             .expireAfterAccess(configurationService.fileDataCacheExpiresAfterAccessDuration())
-            .maximumWeight(configurationService.fileDataCacheMaximumSize())
+            .maximumWeight(configurationService.fileDataCacheMaximumSizeInBytes())
             .weigher((String key, Optional<byte[]> fileData) -> fileData
                 .map(data -> data.length)
                 // Orphan keys handling, this case will almost never happen because the metadata will be fetched first

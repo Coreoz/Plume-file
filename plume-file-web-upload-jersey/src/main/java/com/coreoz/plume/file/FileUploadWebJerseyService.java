@@ -3,6 +3,7 @@ package com.coreoz.plume.file;
 import com.coreoz.plume.file.data.FileUploadMetadata;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.filetype.FileType;
+import com.coreoz.plume.file.utils.FileNames;
 import com.coreoz.plume.file.validator.FileUploadValidators;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.slf4j.Logger;
@@ -37,8 +38,7 @@ public class FileUploadWebJerseyService {
         return this.fileService.add(
             fileType,
             fileData,
-            // TODO à modifier en FileNames.clean(fileMetadata.getOriginalName())
-            fileMetadata.getOriginalName(),
+            FileNames.clean(fileMetadata.getOriginalName()),
             fileMetadata.getMimeType()
         );
     }

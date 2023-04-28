@@ -4,7 +4,7 @@ CREATE TABLE `PLM_FILE`
 (
     `unique_name`        VARCHAR(255)   NOT NULL,
     `file_type`          VARCHAR(255)   NOT NULL,
-    `mime_type`          VARCHAR(255)   NOT NULL,
+    `mime_type`          VARCHAR(255)   NULL,
     `file_size`          DECIMAL(19, 0) NULL,
     `file_original_name` VARCHAR(255)   NULL,
     `file_extension`     VARCHAR(5)     NULL,

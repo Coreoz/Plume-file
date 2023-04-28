@@ -44,10 +44,9 @@ public Response upload(
 ) {
     Validators.checkRequired("fileMetadata", fileMetadata);
     Validators.checkRequired("file", fileData);
-    // TODO ça serait cool ici de montrer comment utiliser quelques validateurs. Par exemple :
-    // FileUploadValidators.verifyFileNameLength(fileMetadata, 255);
-    // FileUploadValidators.verifyFileSize(fileMetadata, 2_000_000);
-    // FileUploadValidators.verifyFileExtension(fileMetadata, Set.of("docx", "pdf"));
+    FileUploadValidators.verifyFileNameLength(fileMetadata, 255);
+    FileUploadValidators.verifyFileSize(fileMetadata, 2_000_000);
+    FileUploadValidators.verifyFileExtension(fileMetadata, Set.of("docx", "pdf"));
     return Response.ok(
         this.fileUploadWebJerseyService.add(
             MyProjectFileType.ENUM,

@@ -13,6 +13,7 @@ import java.util.Set;
 public class FileUploadValidatorsTest {
 
     private FormDataBodyPart xmlBodyPart;
+    private FormDataBodyPart untypedBodyPart;
 
     @Before
     public void createBodyParts() {
@@ -23,6 +24,14 @@ public class FileUploadValidatorsTest {
 
         this.xmlBodyPart = new FormDataBodyPart(MediaType.TEXT_XML_TYPE);
         this.xmlBodyPart.setFormDataContentDisposition(xmlFormData);
+
+        FormDataContentDisposition untypedFormData = FormDataContentDisposition.name("testUntyped")
+            .fileName("File Name")
+            .size(1000)
+            .build();
+
+        this.untypedBodyPart = new FormDataBodyPart();
+        this.untypedBodyPart.setFormDataContentDisposition(untypedFormData);
     }
 
     @Test
@@ -33,6 +42,21 @@ public class FileUploadValidatorsTest {
     @Test(expected = WsException.class)
     public void validate_not_accepted_extension_should_fail() {
         FileUploadValidators.verifyFileExtension(this.xmlBodyPart, Set.of("xlsx"));
+    }
+
+    @Test(expected = WsException.class)
+    public void validate_untyped_extension_should_fail() {
+        FileUploadValidators.verifyFileExtension(this.untypedBodyPart, Set.of("xlsx"));
+    }
+
+    @Test(expected = WsException.class)
+    public void validate_xml_with_image_should_fail() {
+        FileUploadValidators.verifyFileImage(this.xmlBodyPart);
+    }
+
+    @Test(expected = WsException.class)
+    public void validate_untyped_with_image_should_fail() {
+        FileUploadValidators.verifyFileImage(this.untypedBodyPart);
     }
 
     @Test

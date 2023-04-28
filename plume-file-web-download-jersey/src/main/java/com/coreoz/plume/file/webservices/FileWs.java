@@ -2,7 +2,7 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.utils.FileNameUtils;
+import com.coreoz.plume.file.utils.FileNames;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +14,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -25,11 +26,10 @@ import java.util.Optional;
 @Singleton
 @PublicApi
 public class FileWs {
+    private static final int FILE_UID_LENGTH = 36;
 
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
-	private final boolean keepOriginalNameOnDownload;
-	private final int fileUidLength;
 
 	@Inject
 	public FileWs(
@@ -39,9 +39,6 @@ public class FileWs {
 		this.fileDownloadService = fileDownloadService;
 
 		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
-		this.keepOriginalNameOnDownload = config.keepOriginalNameOnDownload();
-		// TODO pourquoi passer par de la configuration pour définir la taille ? Elle sera toujours la même
-		this.fileUidLength = config.fileUidLength();
 	}
 
 	@GET
@@ -49,21 +46,28 @@ public class FileWs {
 	@Operation(description = "Serve a file")
 	public Response fetch(
 		@Parameter(required = true) @PathParam("fileUniqueName") String fileUniqueName,
+		@QueryParam("attachment") Boolean attachment,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		// TODO peut être ajouter une vérification sur le fait que fileUniqueName ne doit pas être null ?
-		String fileExtension = FileNameUtils.getExtensionFromFilename(fileUniqueName);
-		String fileUid = fileUniqueName.substring(0, fileUniqueName.length() - fileExtension.length() - 1);
-		if (fileUid.length() != fileUidLength) {
+		// fileUniqueName cannot be null as it it required by jersey PathParam
+		Optional<String> fileExtension = Optional.ofNullable(FileNames.parseFileNameExtension(fileUniqueName));
+		String fileUid = fileUniqueName.substring(
+			0,
+			fileUniqueName.length() - fileExtension.map(String::length).orElse(0) - 1
+		);
+		if (fileUid.length() != FILE_UID_LENGTH) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
 			.flatMap(fileMetadata -> {
-				// TODO ça fonctionne bien si fileMetadata.getFileExtension() == null ?
 				// TODO peut être ajouter un petit TU pour ça !
-				if (!fileMetadata.getFileExtension().equals(fileExtension)) {
+				boolean extensionsAreNull = fileExtension.isEmpty() && fileMetadata.getFileExtension() == null;
+				boolean extensionsAreSame = fileExtension
+					.map(extension -> extension.equals(fileMetadata.getFileExtension()))
+					.orElse(false);
+				if (!extensionsAreNull && !extensionsAreSame) {
 					return Optional.of(Response.status(Status.NOT_FOUND).build());
 				}
 				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.getChecksum())) {
@@ -87,13 +91,12 @@ public class FileWs {
 								"public, max-age=" + maxAgeCacheInSeconds
 							);
 						}
-						// TODO en fait je me dis que plutôt que d'avoir un paramètre de conf qui oblige tous les fichiers à être téléchargés, ça serait surement plus souple d'avoir un query param optionnel que le front pourrait ajouter pour permettre d'ajouter ce header ou pas non ? Par exemple https://wedownload.coreoz.com/api/files/abcd.jpg?attachment=true
-						// TODO j'ai l'impression que ça serait d'un côté plus souple et de l'autre que ça n'ajouterait pas de problème de sécurité
-						// TODO Si fileMetadata.getFileOriginalName() c'est pas forcément un problème, on pourrait mettre le nom de fichier autogénéré
-						if (keepOriginalNameOnDownload && fileMetadata.getFileOriginalName() != null) {
-							response
-								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileMetadata.getFileOriginalName() + "\"");
-						}
+						if (attachment != null && attachment) {
+                            String attachmentFilename = Optional.ofNullable(fileMetadata.getFileOriginalName())
+                                .orElse(fileMetadata.getUniqueName());
+                            response
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentFilename + "\"");
+                        }
 						return response.build();
 					});
 			})
