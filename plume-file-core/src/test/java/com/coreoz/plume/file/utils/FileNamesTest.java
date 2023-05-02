@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class FileNameUtilsTest {
+public class FileNamesTest {
 
 	@Test
 	public void test_clean_from_string_with_accents_should_return_without_accents() {

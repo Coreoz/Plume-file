@@ -75,7 +75,7 @@ public class FileService {
         Objects.requireNonNull(fileInputStream);
 
         String fileCleanExtension = FileNames.cleanExtensionName(fileExtension);
-        String fileUniqueName = UUID.randomUUID() + Optional.ofNullable(fileCleanExtension).map(extension -> "." + extension).orElse("");
+        String fileUniqueName = UUID.randomUUID() + ((fileCleanExtension == null || fileCleanExtension.isEmpty()) ? "" : "." + fileCleanExtension);;
         this.fileMetadataService.add(
             fileUniqueName,
             originalName,

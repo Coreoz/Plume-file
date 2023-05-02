@@ -1,22 +1,7 @@
 Plume File Web Upload Jersey
-==============================
+============================
 
 A [Plume File](../) module to help upload file with Jersey, using Form Data Part.
-
-TODO speak about Validators included that should be used
-TODO reference OWASP file upload
-TODO speak about anti virus
-TODO speak about how dangerous it is to allow file upload from users
-
-TODO ça me semble obligatoire de lister les choses à prendre en considération avant de permettre un upload de fichier :
-- List allowed extensions. Only allow safe and critical extensions for business functionality
-- Ensure that input validation is applied before validating the extensions.
-- Set a filename length limit. Restrict the allowed characters if possible
-- Set a file size limit
-- Only allow authorized users to upload files
-- Run the file through an antivirus or a sandbox if available to validate that it doesn't contain malicious data
-- Ensure that any libraries used are securely configured and kept up to date
-- Protect the file upload from CSRF attacks
 
 Setup
 -----
@@ -57,3 +42,29 @@ public Response upload(
     .build();
 }
 ```
+
+Before using the library
+------------------------
+
+Before uploading a file with Plume File Web Upload Jersey,
+you must be very careful with the consequences of allowing upload on your application.
+
+Here is the recommendations from [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html) 
+for you to be aware of the security of your application.
+
+### What is in the library
+
+The library helps you implement some of them with the FileUploadValidators:
+- Checks the maximum file size
+- Checks the file extension from the HTTP headers
+- Checks the media type from the HTTP headers
+
+These validators should be used to helps you verify that the incoming file is what your application expected.
+
+### What you should implement for your application
+
+- Even if the library gives you helpers, you should implement them on your upload Web Service
+- This library does not implement the user authentication, but your application should not authorize upload from non-authenticated users, 
+this can be very dangerous as mentioned in the OWASP documentation
+- This library does not implement an antivirus, but your application should run the incoming file through an antivirus or a Sandbox, 
+as mentioned in the OWASP documentation

@@ -19,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import java.util.Objects;
 import java.util.Optional;
 
 @Path("/files")
@@ -49,11 +50,11 @@ public class FileWs {
 		@QueryParam("attachment") Boolean attachment,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
-		// fileUniqueName cannot be null as it it required by jersey PathParam
-		Optional<String> fileExtension = Optional.ofNullable(FileNames.parseFileNameExtension(fileUniqueName));
+		// fileUniqueName cannot be null as it is required by jersey PathParam
+		String fileExtension = FileNames.parseFileNameExtension(fileUniqueName);
 		String fileUid = fileUniqueName.substring(
 			0,
-			fileUniqueName.length() - fileExtension.map(String::length).orElse(0) - 1
+			fileUniqueName.length() - (fileExtension != null ? fileExtension.length() : 0) - 1
 		);
 		if (fileUid.length() != FILE_UID_LENGTH) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -62,12 +63,11 @@ public class FileWs {
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
 			.flatMap(fileMetadata -> {
-				// TODO peut être ajouter un petit TU pour ça !
-				boolean extensionsAreNull = fileExtension.isEmpty() && fileMetadata.getFileExtension() == null;
-				boolean extensionsAreSame = fileExtension
-					.map(extension -> extension.equals(fileMetadata.getFileExtension()))
-					.orElse(false);
-				if (!extensionsAreNull && !extensionsAreSame) {
+				// if both are null, returns true
+				// if both are same, returns true
+				// else returns false
+				boolean extensionsAreSame = Objects.equals(fileExtension, fileMetadata.getFileExtension());
+				if (!extensionsAreSame) {
 					return Optional.of(Response.status(Status.NOT_FOUND).build());
 				}
 				if (ifNoneMatchHeader != null && ifNoneMatchHeader.equals(fileMetadata.getChecksum())) {
