@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -47,7 +48,7 @@ public class FileWs {
 	@Operation(description = "Serve a file")
 	public Response fetch(
 		@Parameter(required = true) @PathParam("fileUniqueName") String fileUniqueName,
-		@QueryParam("attachment") Boolean attachment,
+		@DefaultValue("false") @QueryParam("attachment") boolean attachment,
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		// fileUniqueName cannot be null as it is required by jersey PathParam
@@ -91,7 +92,7 @@ public class FileWs {
 								"public, max-age=" + maxAgeCacheInSeconds
 							);
 						}
-						if (attachment != null && attachment) {
+						if (attachment) {
                             String attachmentFilename = Optional.ofNullable(fileMetadata.getFileOriginalName())
                                 .orElse(fileMetadata.getUniqueName());
                             response
