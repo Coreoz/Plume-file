@@ -64,7 +64,7 @@ public class QFileMetadataQuerydsl extends com.querydsl.sql.RelationalPathBase<F
         addMetadata(mimeType, ColumnMetadata.named("mime_type").withIndex(3).ofType(Types.VARCHAR).withSize(255).notNull());
         addMetadata(fileSize, ColumnMetadata.named("file_size").withIndex(4).ofType(Types.DECIMAL).withSize(19).notNull());
         addMetadata(fileOriginalName, ColumnMetadata.named("file_original_name").withIndex(5).ofType(Types.VARCHAR).withSize(255).notNull());
-        addMetadata(fileExtension, ColumnMetadata.named("file_extension").withIndex(6).ofType(Types.VARCHAR).withSize(5).notNull());
+        addMetadata(fileExtension, ColumnMetadata.named("file_extension").withIndex(6).ofType(Types.VARCHAR).withSize(10).notNull());
         addMetadata(creationDate, ColumnMetadata.named("creation_date").withIndex(7).ofType(Types.TIMESTAMP).withSize(19).notNull());
         addMetadata(checksum, ColumnMetadata.named("checksum").withIndex(8).ofType(Types.VARCHAR).withSize(255).notNull());
     }

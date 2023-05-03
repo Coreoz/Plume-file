@@ -13,6 +13,18 @@ public class FileNamesTest {
 	}
 
 	@Test
+	public void test_has_accents_with_accents_words_should_return_true() {
+		assertThat(FileNames.extensionNameHasAccents("file.jépèèègèhhL"))
+			.isTrue();
+	}
+
+	@Test
+	public void test_has_accents_with_no_accents_words_should_return_false() {
+		assertThat(FileNames.extensionNameHasAccents("file.jpg"))
+			.isFalse();
+	}
+
+	@Test
 	public void test_get_extension_from_jpg_should_return_jpg() {
 		assertThat(FileNames.parseFileNameExtension("toto.jpg"))
 			.isEqualTo("jpg");
@@ -21,7 +33,7 @@ public class FileNamesTest {
 	@Test
 	public void test_get_extension_from_no_extension_should_return_empty() {
 		assertThat(FileNames.parseFileNameExtension("toto"))
-			.isEmpty();
+			.isNull();
 	}
 
 	@Test

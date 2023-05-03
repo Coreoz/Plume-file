@@ -43,12 +43,11 @@ final class StringUtils {
      *
      * @param input String to be stripped
      * @return input text with diacritics removed
-     *
      * @since 3.0
      */
     // See also Lucene's ASCIIFoldingFilter (Lucene 2.9) that replaces accented characters by their unaccented equivalent (and uncommitted bug fix: https://issues.apache.org/jira/browse/LUCENE-1343?focusedCommentId=12858907&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_12858907).
     static String stripAccents(final String input) {
-        if(input == null) {
+        if (input == null) {
             return null;
         }
         final Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");//$NON-NLS-1$
@@ -56,6 +55,14 @@ final class StringUtils {
         convertRemainingAccentCharacters(decomposed);
         // Note that this doesn't correctly remove ligatures...
         return pattern.matcher(decomposed).replaceAll(EMPTY);
+    }
+
+    static boolean hasAccents(String str) {
+        String strippedString = stripAccents(str);
+        if (strippedString == null) {
+            return false;
+        }
+        return !strippedString.equals(str);
     }
 
     private static void convertRemainingAccentCharacters(StringBuilder decomposed) {

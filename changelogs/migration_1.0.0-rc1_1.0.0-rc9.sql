@@ -11,7 +11,7 @@ CREATE TABLE `PLM_FILE_TRANSITION`
     `mime_type`          VARCHAR(255)   NULL,
     `file_size`          DECIMAL(19, 0) NULL,
     `file_original_name` VARCHAR(255)   NULL,
-    `file_extension`     VARCHAR(5)     NULL,
+    `file_extension`     VARCHAR(10)    NULL,
     `checksum`           VARCHAR(255)   NULL,
     `creation_date`      TIMESTAMP      NOT NULL,
     PRIMARY KEY (`unique_name`)
@@ -60,7 +60,7 @@ SELECT PLM_FILE_UID.unique_name,
        SHA2(CONCAT(id, uid, coalesce(filename, '-'), file_type), 256),
        CURRENT_TIMESTAMP()
 from plm_file
-    inner join PLM_FILE_UID on PLM_FILE_UID.file_id = plm_file.id;
+         inner join PLM_FILE_UID on PLM_FILE_UID.file_id = plm_file.id;
 
 # Inserting in the previously created transition table every file data that were in the database
 INSERT INTO PLM_FILE_DATA_TRANSITION (unique_name, data)

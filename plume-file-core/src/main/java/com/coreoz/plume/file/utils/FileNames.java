@@ -52,6 +52,10 @@ public class FileNames {
         }
     }
 
+    public static boolean extensionNameHasAccents(String fileExtension) {
+        return StringUtils.hasAccents(fileExtension);
+    }
+
     @Nullable
     public static String parseFileNameExtension(String fileName) {
         if (fileName == null) {

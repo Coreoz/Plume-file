@@ -6,14 +6,14 @@ DROP TABLE IF EXISTS `PLM_FILE_DATA_TRANSITION`;
 # create a transition table for the metadata that will be the primary table later
 CREATE TABLE `PLM_FILE_TRANSITION`
 (
-    `unique_name`        VARCHAR(255) NOT NULL,
-    `file_type`          VARCHAR(255) NOT NULL,
-    `mime_type`          VARCHAR(255) NULL,
+    `unique_name`        VARCHAR(255)   NOT NULL,
+    `file_type`          VARCHAR(255)   NOT NULL,
+    `mime_type`          VARCHAR(255)   NULL,
     `file_size`          DECIMAL(19, 0) NULL,
-    `file_original_name` VARCHAR(255) NULL,
-    `file_extension`     VARCHAR(5) NULL,
-    `checksum`           VARCHAR(255) NULL,
-    `creation_date`      TIMESTAMP    NOT NULL,
+    `file_original_name` VARCHAR(255)   NULL,
+    `file_extension`     VARCHAR(10)    NULL,
+    `checksum`           VARCHAR(255)   NULL,
+    `creation_date`      TIMESTAMP      NOT NULL,
     PRIMARY KEY (`unique_name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;

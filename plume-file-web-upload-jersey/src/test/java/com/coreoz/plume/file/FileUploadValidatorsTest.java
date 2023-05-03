@@ -49,6 +49,11 @@ public class FileUploadValidatorsTest {
         FileUploadValidators.verifyFileExtension(this.untypedBodyPart, Set.of("xlsx"));
     }
 
+    @Test
+    public void validate_accepted_extension_format_should_not_fail() {
+        FileUploadValidators.verifyFileExtensionFormat(this.xmlBodyPart, 10);
+    }
+
     @Test(expected = WsException.class)
     public void validate_xml_with_image_should_fail() {
         FileUploadValidators.verifyFileImage(this.xmlBodyPart);

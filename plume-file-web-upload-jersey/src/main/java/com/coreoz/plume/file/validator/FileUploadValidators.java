@@ -69,6 +69,28 @@ public class FileUploadValidators {
     }
 
     /**
+     * Checks if the file extension :
+     * - Contains accents
+     * - Is longer than a given length
+     * @param formDataBodyPart the form data received from Jersey
+     * @param maxExtensionLength the max extension length auhtorized
+     */
+    public static void verifyFileExtensionFormat(FormDataBodyPart formDataBodyPart, Integer maxExtensionLength) {
+        String fileExtension = FileNames.parseFileNameExtension(
+            formDataBodyPart.getContentDisposition().getFileName()
+        );
+        if (StringUtils.isEmpty(fileExtension)) {
+            throw new WsException(WsError.REQUEST_INVALID, "Empty file extension not supported");
+        }
+        if (fileExtension.length() > maxExtensionLength) {
+            throw new WsException(WsError.REQUEST_INVALID, "File extension too long");
+        }
+        if (FileNames.extensionNameHasAccents(fileExtension)) {
+            throw new WsException(WsError.REQUEST_INVALID, "Accents and diacritics in file extension are not supported");
+        }
+    }
+
+    /**
      * Compares the file mime type with a given authorized mime types Set
      * @param formDataBodyPart the form data received from Jersey
      * @param authorizedMimeTypes the authorized mime types
