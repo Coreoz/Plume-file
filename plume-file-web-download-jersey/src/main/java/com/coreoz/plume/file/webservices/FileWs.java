@@ -80,7 +80,9 @@ public class FileWs {
 						ResponseBuilder response = Response.ok(fileData);
 
 						// Adding checksum in etag to enable client basic caching
-						response.header(HttpHeaders.ETAG, fileMetadata.getChecksum());
+						if (fileMetadata.getChecksum() != null) {
+							response.header(HttpHeaders.ETAG, fileMetadata.getChecksum());
+						}
 
 						if (fileMetadata.getMimeType() != null) {
 							response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.getMimeType());
