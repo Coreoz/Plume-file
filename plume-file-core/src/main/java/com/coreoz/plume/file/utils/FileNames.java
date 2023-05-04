@@ -57,24 +57,20 @@ public class FileNames {
     /**
      * Find the corresponding mime type for the file name.
      *
-     * @param filename the file name
+     * @param fileName the file name
      * @return the mime type guessed, null if no one is found
      */
     @Nullable
-    public static String guessMimeType(String filename) {
-        if (filename == null) {
+    public static String guessMimeType(String fileName) {
+        if (fileName == null) {
             return null;
         }
 
         try {
-            return Files.probeContentType(Paths.get(filename));
+            return Files.probeContentType(Paths.get(fileName));
         } catch (IOException e) {
             return null;
         }
-    }
-
-    public static boolean extensionNameHasAccents(String fileExtension) {
-        return StringUtils.hasAccents(fileExtension);
     }
 
     @Nullable

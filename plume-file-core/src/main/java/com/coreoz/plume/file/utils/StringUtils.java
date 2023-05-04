@@ -58,14 +58,6 @@ final class StringUtils {
         return stripAccentPattern.matcher(decomposed).replaceAll(EMPTY);
     }
 
-    static boolean hasAccents(String str) {
-        String strippedString = stripAccents(str);
-        if (strippedString == null) {
-            return false;
-        }
-        return !strippedString.equals(str);
-    }
-
     private static void convertRemainingAccentCharacters(StringBuilder decomposed) {
         for (int i = 0; i < decomposed.length(); i++) {
             if (decomposed.charAt(i) == '\u0141') {
