@@ -31,7 +31,8 @@ public class FileUploadValidatorTest {
             .fileNameNotEmpty()
             .fileNameMaxDefaultLength()
             .fileExtensionNotEmpty()
-            .fileExtensionMaxDefaultLength();
+            .fileExtensionMaxDefaultLength()
+            .finish();
     }
 
     @Test
@@ -42,7 +43,8 @@ public class FileUploadValidatorTest {
             .fileNameAllowEmpty()
             .fileNameMaxDefaultLength()
             .fileExtensionAllowEmpty()
-            .fileExtensionMaxDefaultLength();
+            .fileExtensionMaxDefaultLength()
+            .finish();
     }
 
     @Test
@@ -76,13 +78,13 @@ public class FileUploadValidatorTest {
     }
 
     @Test
-    public void mediaType__xml_for_xml_should_pass() {
-        makeValidator("test.xml", 0).mediaTypes(Set.of("text/xml"));
+    public void mimeTypes__xml_for_xml_should_pass() {
+        makeValidator("test.xml", 0).mimeTypes(Set.of("text/xml"));
     }
 
     @Test(expected = WsException.class)
-    public void mediaType__xml_for_json_should_fail() {
-        makeValidator("test.xml", 0).mediaTypes(Set.of("application/json"));
+    public void mimeTypes__xml_for_json_should_fail() {
+        makeValidator("test.xml", 0).mimeTypes(Set.of("application/json"));
     }
 
     @Test

@@ -23,26 +23,24 @@ config.register(MultiPartFeature.class);
 ```java
 @POST
 @Operation(description = "Upload a file")
-public Response upload(
+public void upload(
     @FormDataParam("file") FormDataBodyPart fileMetadata,
     @FormDataParam("file") InputStream fileData
 ) {
     Validators.checkRequired("file", fileData);
-    FileUploadValidator
+    FileUploadMetadata fileUploadMetadata = FileUploadValidator
         .from(fileMetadata)
         .fileMaxSize(2_000_000)
         .fileNameNotEmpty()
         .fileNameMaxDefaultLength()
         .fileExtensionNotEmpty()
-        .fileExtension(Set.of("docx", "pdf"));
-    return Response.ok(
-        this.fileUploadWebJerseyService.add(
-            MyProjectFileType.ENUM,
-            fileData,
-            fileMetadata
-        )
-    )
-    .build();
+        .fileExtensions(Set.of("docx", "pdf"))
+        .finish();
+    return this.fileUploadWebJerseyService.add(
+        MyProjectFileType.ENUM,
+        fileData,
+        fileUploadMetadata
+    );
 }
 ```
 
@@ -65,7 +63,7 @@ These validators should be used to helps you verify that the incoming files are 
 
 ### What should be checked before implementing each upload
 
-Always using `FileUploadValidator` should help you verify many aspects of file uploading. On top of that, these elements should also be taken in consideration when implementing a file upload: 
+Using `FileUploadValidator` should help you verify many aspects of file uploading. On top of that, these elements should also be taken in consideration when implementing a file upload: 
 - Only allow authorized users to upload files
 - Run the files through an antivirus or a sandbox if available to validate that it doesn't contain malicious data
 - Ensure that Jersey and Plume files libraries are securely configured and up to date

@@ -9,46 +9,46 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 
 import java.util.Set;
 
-
-
 /**
  * Validate files data with a fluent API.<br>
  * <br>
  * Usage: the first method {@code FileUploadSizeValidator.from(uploadBodyPart)} must be called, then the proposed fluent methods
- * must be called one after another until the fluent API ends. For exemple:
+ * must be called one after another until the {@code finish()} call. For exemple:
  * <pre>
  * {@code
- * FileUploadValidator
+ * FileUploadData fileUploadMetadata = FileUploadValidator
  *   .from(fileMetadata)
  *   .fileMaxSize(2_000_000)
  *   .fileNameNotEmpty()
  *   .fileNameMaxDefaultLength()
  *   .fileExtensionNotEmpty()
- *   .fileExtension(Set.of("docx", "pdf"));
+ *   .fileExtension(Set.of("docx", "pdf"))
+ *   .finish();
  * }
  * </pre>
  */
 public class FileUploadValidator implements FileUploadSizeValidator, FileUploadEmptyNameValidator,
     FileUploadNameLengthValidator, FileUploadGeneralExtensionAndTypeValidator,
-    FileUploadExtensionValidator, FileUploadTypeValidator {
-    private final String fileName;
-    private final String fileExtension;
-    private final String mediaType;
-    private final long fileSize;
+    FileUploadExtensionValidator, FileUploadTypeValidator, FileUploadFinisher {
 
-    private FileUploadValidator(FormDataBodyPart formDataBodyPart) {
-        this.fileName = formDataBodyPart.getContentDisposition().getFileName();
-        this.fileExtension = FileNames.parseFileNameExtension(this.fileName);
-        this.mediaType = FileNames.guessMimeType(this.fileName);
-        this.fileSize = formDataBodyPart.getFormDataContentDisposition().getSize();
+    private final FileUploadMetadata data;
+
+    private FileUploadValidator(FormDataBodyPart fileMetadata) {
+        String fileName = fileMetadata.getContentDisposition().getFileName();
+        this.data = new FileUploadMetadata(
+            fileName,
+            FileNames.parseFileNameExtension(fileName),
+            FileNames.guessMimeType(fileName),
+            fileMetadata.getFormDataContentDisposition().getSize()
+        );
     }
 
     /**
      * Starts a new validation process using Jersey FormDataBodyPart
      */
-    public static FileUploadSizeValidator from(FormDataBodyPart formDataBodyPart) {
-        Validators.checkRequired(formDataBodyPart);
-        return new FileUploadValidator(formDataBodyPart);
+    public static FileUploadSizeValidator from(FormDataBodyPart fileMetadata) {
+        Validators.checkRequired(fileMetadata);
+        return new FileUploadValidator(fileMetadata);
     }
 
     /**
@@ -58,7 +58,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @throws WsException if the file size in bytes is bigger than the maximum authorized
      */
     public FileUploadValidator fileMaxSize(long fileMaxSizeInBytes) {
-        if (fileSize > fileMaxSizeInBytes) {
+        if (data.getFileSize() > fileMaxSizeInBytes) {
             throw new WsException(WsError.REQUEST_INVALID, "File length is too big");
         }
         return this;
@@ -71,7 +71,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * </ul>
      */
     public FileUploadValidator fileNameNotEmpty() {
-        if (Strings.isNullOrEmpty(fileName)) {
+        if (Strings.isNullOrEmpty(data.getFileName())) {
             throw new WsException(WsError.REQUEST_INVALID, "File name cannot be empty");
         }
         return this;
@@ -83,7 +83,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @throws WsException if the file name length is longer than the limit
      */
     public FileUploadValidator fileNameMaxLength(long fileNameMaxLength) {
-        if (fileName != null && fileName.length() > fileNameMaxLength) {
+        if (data.getFileName() != null && data.getFileName().length() > fileNameMaxLength) {
             throw new WsException(WsError.REQUEST_INVALID, "File name is too long");
         }
         return this;
@@ -99,14 +99,14 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
     }
 
     public FileUploadValidator fileExtensionNotEmpty() {
-        if (Strings.isNullOrEmpty(fileExtension)) {
+        if (Strings.isNullOrEmpty(data.getFileExtension())) {
             throw new WsException(WsError.REQUEST_INVALID, "File extension cannot be empty");
         }
         return this;
     }
 
     public FileUploadValidator fileTypeNotEmpty() {
-        if (Strings.isNullOrEmpty(mediaType)) {
+        if (Strings.isNullOrEmpty(data.getMimeType())) {
             throw new WsException(WsError.REQUEST_INVALID, "Unrecognized mime type");
         }
         return this;
@@ -117,10 +117,11 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @param fileExtensionMaxLength the maximum file extension length authorized
      * @throws WsException if the file extension length is longer than the limit
      */
-    public void fileExtensionMaxLength(long fileExtensionMaxLength) {
-        if (fileExtension != null && fileExtension.length() > fileExtensionMaxLength) {
+    public FileUploadValidator fileExtensionMaxLength(long fileExtensionMaxLength) {
+        if (data.getFileExtension() != null && data.getFileExtension().length() > fileExtensionMaxLength) {
             throw new WsException(WsError.REQUEST_INVALID, "File extension is too long");
         }
+        return this;
     }
 
     /**
@@ -128,8 +129,8 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @throws WsException if the file extension length is longer than the limit
      */
     @Override
-    public void fileExtensionMaxDefaultLength() {
-        fileExtensionMaxLength(10);
+    public FileUploadValidator fileExtensionMaxDefaultLength() {
+        return fileExtensionMaxLength(10);
     }
 
     /**
@@ -137,10 +138,11 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @param authorizedExtension the authorized extensions
      * @throws WsException if the file extension is not in the authorized extensions
      */
-    public void fileExtensions(Set<String> authorizedExtension) {
-        if (fileExtension != null && !authorizedExtension.contains(fileExtension)) {
+    public FileUploadValidator fileExtensions(Set<String> authorizedExtension) {
+        if (data.getFileExtension() != null && !authorizedExtension.contains(data.getFileExtension())) {
             throw new WsException(WsError.REQUEST_INVALID, "File extension is not supported");
         }
+        return this;
     }
 
     /**
@@ -148,20 +150,27 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
      * @param authorizedMimeTypes the authorized mime types
      * @throws WsException if the file mime type is not in the authorized mime types
      */
-    public void mediaTypes(Set<String> authorizedMimeTypes) {
-        if (mediaType != null && !authorizedMimeTypes.contains(mediaType)) {
+    public FileUploadValidator mimeTypes(Set<String> authorizedMimeTypes) {
+        if (data.getMimeType() != null && !authorizedMimeTypes.contains(data.getMimeType())) {
             throw new WsException(WsError.REQUEST_INVALID, "File mime type not supported");
         }
+        return this;
     }
 
     /**
      * Verify that a file is an image
      * @throws WsException if the file mime type is not recognized as an image
      */
-    public void fileImage() {
+    public FileUploadValidator fileImage() {
         fileTypeNotEmpty();
-        if (!mediaType.startsWith("image/")) {
+        if (!data.getMimeType().startsWith("image/")) {
             throw new WsException(WsError.REQUEST_INVALID, "File type is not an image");
         }
+        return this;
+    }
+
+    @Override
+    public FileUploadMetadata finish() {
+        return data;
     }
 }

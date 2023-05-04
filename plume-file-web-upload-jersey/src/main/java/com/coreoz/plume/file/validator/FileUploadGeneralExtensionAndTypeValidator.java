@@ -15,5 +15,5 @@ public interface FileUploadGeneralExtensionAndTypeValidator {
      * Verify that a file is an image
      * @throws WsException if the file mime type is not recognized as an image
      */
-    void fileImage();
+    FileUploadFinisher fileImage();
 }

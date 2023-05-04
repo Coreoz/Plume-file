@@ -3,7 +3,7 @@ package com.coreoz.plume.file;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.utils.FileNames;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import com.coreoz.plume.file.validator.FileUploadMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +24,14 @@ public class FileUploadWebJerseyService {
     public String add(
         FileType fileType,
         InputStream fileData,
-        FormDataBodyPart formDataBodyPart
+        FileUploadMetadata fileMetadata
     ) {
         logger.trace("Uploading file with type: {}", fileType);
         return this.fileService.add(
             fileType,
             fileData,
-            FileNames.cleanFileName(formDataBodyPart.getContentDisposition().getFileName()),
-            formDataBodyPart.getMediaType().toString()
+            FileNames.cleanFileName(fileMetadata.getFileName()),
+            fileMetadata.getMimeType()
         );
     }
 }

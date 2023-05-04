@@ -10,5 +10,5 @@ public interface FileUploadTypeValidator {
      * @param authorizedMimeTypes the authorized mime types
      * @throws WsException if the file mime type is not in the authorized mime types
      */
-    void mediaTypes(Set<String> authorizedMimeTypes);
+    FileUploadFinisher mimeTypes(Set<String> authorizedMimeTypes);
 }
