@@ -9,8 +9,24 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 
 import java.util.Set;
 
+
+
 /**
- * Validate files data with a fluent API
+ * Validate files data with a fluent API.<br>
+ * <br>
+ * Usage: the first method {@code FileUploadSizeValidator.from(uploadBodyPart)} must be called, then the proposed fluent methods
+ * must be called one after another until the fluent API ends. For exemple:
+ * <pre>
+ * {@code
+ * FileUploadValidator
+ *   .from(fileMetadata)
+ *   .fileMaxSize(2_000_000)
+ *   .fileNameNotEmpty()
+ *   .fileNameMaxDefaultLength()
+ *   .fileExtensionNotEmpty()
+ *   .fileExtension(Set.of("docx", "pdf"));
+ * }
+ * </pre>
  */
 public class FileUploadValidator implements FileUploadSizeValidator, FileUploadEmptyNameValidator,
     FileUploadNameLengthValidator, FileUploadGeneralExtensionAndTypeValidator,
