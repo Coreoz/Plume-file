@@ -1,11 +1,9 @@
 package com.coreoz.plume.file;
 
-import com.coreoz.plume.file.data.FileUploadMetadata;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.utils.FileNames;
-import com.coreoz.plume.file.validator.FileUploadValidators;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import com.coreoz.plume.file.validator.FileUploadMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,19 +24,13 @@ public class FileUploadWebJerseyService {
     public String add(
         FileType fileType,
         InputStream fileData,
-        FormDataBodyPart formDataBodyPart
+        FileUploadMetadata fileMetadata
     ) {
         logger.trace("Uploading file with type: {}", fileType);
-        FileUploadMetadata fileMetadata = FileUploadMetadata.of(
-            formDataBodyPart.getContentDisposition().getFileName(),
-            formDataBodyPart.getMediaType().toString(),
-            formDataBodyPart.getFormDataContentDisposition().getSize()
-        );
-        FileUploadValidators.verifyRequiredMetadata(fileMetadata);
         return this.fileService.add(
             fileType,
             fileData,
-            FileNames.clean(fileMetadata.getOriginalName()),
+            FileNames.cleanFileName(fileMetadata.getFileName()),
             fileMetadata.getMimeType()
         );
     }

@@ -1,21 +1,5 @@
 package com.coreoz.plume.file;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import com.carlosbecker.guice.GuiceModules;
 import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.services.FileService;
@@ -24,11 +8,26 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
+import com.coreoz.plume.file.validator.FileUploadMetadata;
+import com.coreoz.plume.file.validator.FileUploadValidator;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Optional;
 
 @RunWith(GuiceTestRunner.class)
 @GuiceModules(FileUploadTestModule.class)
 public class FileUploadWebJerseyServiceTest {
-
     @Inject
     FileConfigurationService fileConfigurationService;
     FileUploadWebJerseyService fileUploadWebJerseyService;
@@ -40,6 +39,10 @@ public class FileUploadWebJerseyServiceTest {
         this.fileUploadWebJerseyService = new FileUploadWebJerseyService(
             new FileService(fileMetadataService, fileStorageService, fileConfigurationService)
         );
+    }
+
+    private FileUploadMetadata makeMetadata(FormDataBodyPart formDataBodyPart) {
+        return ((FileUploadValidator) FileUploadValidator.from(formDataBodyPart)).finish();
     }
 
     @Test
@@ -55,7 +58,7 @@ public class FileUploadWebJerseyServiceTest {
         String uid = this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
             new ByteArrayInputStream(new byte[127]),
-            formDataBodyPart
+            makeMetadata(formDataBodyPart)
         );
 
         Assert.assertNotNull(uid);
@@ -74,7 +77,7 @@ public class FileUploadWebJerseyServiceTest {
         this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
             new ByteArrayInputStream(new byte[127]),
-            formDataBodyPart
+            makeMetadata(formDataBodyPart)
         );
     }
 
@@ -85,7 +88,7 @@ public class FileUploadWebJerseyServiceTest {
         this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
             null,
-            formDataBodyPart
+            makeMetadata(formDataBodyPart)
         );
     }
 
@@ -96,7 +99,7 @@ public class FileUploadWebJerseyServiceTest {
         this.fileUploadWebJerseyService.add(
             null,
             new ByteArrayInputStream(new byte[127]),
-            formDataBodyPart
+            makeMetadata(formDataBodyPart)
         );
     }
 

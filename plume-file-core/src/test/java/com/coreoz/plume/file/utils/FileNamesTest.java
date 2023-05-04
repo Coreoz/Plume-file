@@ -8,20 +8,8 @@ public class FileNamesTest {
 
 	@Test
 	public void test_clean_from_string_with_accents_should_return_without_accents() {
-		assertThat(FileNames.clean("éçàyt.jpg"))
+		assertThat(FileNames.cleanFileName("éçàyt.jpg"))
 			.isEqualTo("ecayt.jpg");
-	}
-
-	@Test
-	public void test_has_accents_with_accents_words_should_return_true() {
-		assertThat(FileNames.extensionNameHasAccents("file.jépèèègèhhL"))
-			.isTrue();
-	}
-
-	@Test
-	public void test_has_accents_with_no_accents_words_should_return_false() {
-		assertThat(FileNames.extensionNameHasAccents("file.jpg"))
-			.isFalse();
 	}
 
 	@Test
@@ -42,4 +30,9 @@ public class FileNamesTest {
 			.isEqualTo("jpg");
 	}
 
+	@Test
+	public void cleanExtensionName__verify_that_non_basic_chars_are_removed() {
+		assertThat(FileNames.cleanExtensionName(" éi+$.	\np"))
+			.isEqualTo("ip");
+	}
 }
