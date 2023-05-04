@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
  */
 final class StringUtils {
 
+    private static final Pattern stripAccentPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");//$NON-NLS-1$
+
     private static final String EMPTY = "";
 
     /**
@@ -50,11 +52,10 @@ final class StringUtils {
         if (input == null) {
             return null;
         }
-        final Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");//$NON-NLS-1$
         final StringBuilder decomposed = new StringBuilder(Normalizer.normalize(input, Normalizer.Form.NFD));
         convertRemainingAccentCharacters(decomposed);
         // Note that this doesn't correctly remove ligatures...
-        return pattern.matcher(decomposed).replaceAll(EMPTY);
+        return stripAccentPattern.matcher(decomposed).replaceAll(EMPTY);
     }
 
     static boolean hasAccents(String str) {

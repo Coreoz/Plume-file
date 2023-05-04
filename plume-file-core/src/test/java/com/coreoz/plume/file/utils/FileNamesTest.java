@@ -8,7 +8,7 @@ public class FileNamesTest {
 
 	@Test
 	public void test_clean_from_string_with_accents_should_return_without_accents() {
-		assertThat(FileNames.clean("éçàyt.jpg"))
+		assertThat(FileNames.cleanFileName("éçàyt.jpg"))
 			.isEqualTo("ecayt.jpg");
 	}
 
@@ -40,6 +40,12 @@ public class FileNamesTest {
 	public void test_clean_extension_from_jpg_should_return_jpg() {
 		assertThat(FileNames.cleanExtensionName(".jpg"))
 			.isEqualTo("jpg");
+	}
+
+	@Test
+	public void cleanExtensionName__verify_that_non_basic_chars_are_removed() {
+		assertThat(FileNames.cleanExtensionName(" éi+$.	\np"))
+			.isEqualTo("ip");
 	}
 
 }
