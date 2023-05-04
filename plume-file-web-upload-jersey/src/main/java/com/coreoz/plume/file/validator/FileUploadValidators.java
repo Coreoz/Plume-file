@@ -1,6 +1,5 @@
 package com.coreoz.plume.file.validator;
 
-import com.coreoz.plume.file.data.FileUploadMetadata;
 import com.coreoz.plume.file.utils.FileNames;
 import com.coreoz.plume.jersey.errors.WsError;
 import com.coreoz.plume.jersey.errors.WsException;
@@ -14,11 +13,6 @@ public class FileUploadValidators {
 
     private FileUploadValidators() {
         // empty constructor to hide the implicit one
-    }
-
-    public static void verifyRequiredMetadata(FileUploadMetadata fileMetadata) {
-        Objects.requireNonNull(fileMetadata);
-        Objects.requireNonNull(fileMetadata.getMimeType());
     }
 
     /**
