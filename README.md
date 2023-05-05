@@ -16,12 +16,6 @@ Some necessary file storage choices has been taken for this library:
 To categorize file, each file is associated with a `FileType`. This consists of a user defined `enum` with values like `LANDSCAPES` or `PROFILE_PICTURE`.
 This category is especially used by the [plume-file-metadata-database](plume-file-metadata-database) to provide a convenient way to delete files.
 
-TODO:
-- ajouter un dossier `changelogs` et y mettre les scripts SQL de migration
-- Dans la release sur Github faire référence à tout ça et les grandes étapes à suivre pour faire la migration : changer les dépendances du pom.xml etc.
-- Dans le fichier principal README.md référencer la release dans une partie "migrating from v1 or v2 to v3"
-- Dans le dossier "changelogs", avoir un fichier README.md qui référénce la release pour utiliser les scripts de migration
-
 Getting started
 ---------------
 The main composant is the module [plume-file-core](plume-file-core) which exposes file storage interfaces, `FileMetadataService` and `FileStorageService` that must be implemented. So to use the main entry point `FileService`:
@@ -64,3 +58,7 @@ Those modules provide API connectors to serve and upload files.
 - [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file through a Jersey
   MultiPart object
 
+Migrating from v1 or v2 to v3
+_____________________________
+
+Follow our migration guides in the releases on the documentation to keep your projects up-to-date.
