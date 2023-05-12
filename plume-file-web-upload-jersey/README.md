@@ -1,7 +1,7 @@
 Plume File Web Upload Jersey
 ============================
 
-A [Plume File](../) module to help upload file with Jersey, using Form Data Part.
+A [Plume File](../) module to help upload file with Jersey, using `multipart/form-data`.
 
 Setup
 -----
@@ -18,8 +18,8 @@ Setup
 ```java
 config.register(MultiPartFeature.class);
 ```
-3. Create the webservice file that will use the newly imported class
-4. Create your webservice endpoint that will upload your file, using the FormData:
+3. Create the webservice file with the injected dependency `FileMimeTypeDetector` (it comes from Plume file Core)
+4. Create the webservice endpoint to upload a file (using `multipart/form-data`):
 ```java
 @POST
 @Operation(description = "Upload a file")
@@ -27,20 +27,15 @@ public void upload(
     @FormDataParam("file") FormDataBodyPart fileMetadata,
     @FormDataParam("file") InputStream fileData
 ) {
-    Validators.checkRequired("file", fileData);
-    FileUploadMetadata fileUploadMetadata = FileUploadValidator
-        .from(fileMetadata)
+    FileUploadData fileUploadData = FileUploadValidator
+        .from(fileMetadata, fileData, fileMimeTypeDetector)
         .fileMaxSize(2_000_000)
         .fileNameNotEmpty()
         .fileNameMaxDefaultLength()
         .fileExtensionNotEmpty()
         .fileExtensions(Set.of("docx", "pdf"))
         .finish();
-    return this.fileUploadWebJerseyService.add(
-        MyProjectFileType.ENUM,
-        fileData,
-        fileUploadMetadata
-    );
+    return this.fileUploadWebJerseyService.add(MyProjectFileType.ENUM, fileUploadData);
 }
 ```
 
