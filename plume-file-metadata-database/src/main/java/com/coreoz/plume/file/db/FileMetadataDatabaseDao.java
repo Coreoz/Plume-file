@@ -75,6 +75,7 @@ public class FileMetadataDatabaseDao {
                 QFileMetadataQuerydsl.fileMetadata.uniqueName.notIn(
                     SQLExpressions.select(fileTypeDatabase.getJoinColumn())
                         .from(fileTypeDatabase.getFileEntity())
+                        .where(fileTypeDatabase.getJoinColumn().isNotNull())
                 ).and(
                     QFileMetadataQuerydsl.fileMetadata.fileType.eq(fileTypeDatabase.name())
                 )
@@ -84,6 +85,14 @@ public class FileMetadataDatabaseDao {
             .select(QFileMetadataQuerydsl.fileMetadata.uniqueName)
             .from(QFileMetadataQuerydsl.fileMetadata)
             .where(conditions.stream().reduce(BooleanExpression::or).orElse(Expressions.asBoolean(true)))
+            .fetch();
+    }
+
+    public List<String> findFilesForDeletedTypes(List<String> deletedFileTypes) {
+        return this.transactionManager.selectQuery()
+            .select(QFileMetadataQuerydsl.fileMetadata.uniqueName)
+            .from(QFileMetadataQuerydsl.fileMetadata)
+            .where(QFileMetadataQuerydsl.fileMetadata.fileType.in(deletedFileTypes))
             .fetch();
     }
 

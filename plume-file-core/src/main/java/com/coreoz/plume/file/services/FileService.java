@@ -143,12 +143,29 @@ public class FileService {
      */
     public void deleteUnreferenced() throws UncheckedIOException {
         List<String> fileUniqueNamesToDelete = fileMetadataService.findUnreferencedFiles();
-        try {
-        	fileStorageService.deleteAll(fileUniqueNamesToDelete);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-        fileMetadataService.deleteAll(fileUniqueNamesToDelete);
+        this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
         logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
+    }
+
+    /**
+     * Delete files from types that longer exists in the {@link FileType} enum and can't be linked to stored files
+     * This method must be use with caution and punctually, as it can lead to errors
+     *
+     * @throws UncheckedIOException is a file could not be deleted.
+     * It is possible to retry if the deletion failed.
+     */
+    public void deleteFilesForDeletedTypes(List<String> deletedFileTypes) throws UncheckedIOException {
+        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesForDeletedTypes(deletedFileTypes);
+        this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
+        logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
+    }
+
+    private void deleteFilesByUniqueName(List<String> fileUniqueNamesToDelete) {
+        try {
+            fileStorageService.deleteAll(fileUniqueNamesToDelete);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        fileMetadataService.deleteAll(fileUniqueNamesToDelete);
     }
 }
