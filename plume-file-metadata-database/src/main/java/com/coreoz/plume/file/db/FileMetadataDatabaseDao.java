@@ -88,11 +88,17 @@ public class FileMetadataDatabaseDao {
             .fetch();
     }
 
-    public List<String> findFilesForDeletedTypes(List<String> deletedFileTypes) {
+    public List<String> findFilesHavingUnusedTypes(Collection<FileTypeDatabase> remainingFileTypes) {
+        List<BooleanExpression> conditions = new ArrayList<>();
+        for (FileTypeDatabase fileTypeDatabase : remainingFileTypes) {
+            conditions.add(
+                QFileMetadataQuerydsl.fileMetadata.fileType.ne(fileTypeDatabase.name())
+            );
+        }
         return this.transactionManager.selectQuery()
             .select(QFileMetadataQuerydsl.fileMetadata.uniqueName)
             .from(QFileMetadataQuerydsl.fileMetadata)
-            .where(QFileMetadataQuerydsl.fileMetadata.fileType.in(deletedFileTypes))
+            .where(conditions.stream().reduce(BooleanExpression::and).orElse(Expressions.asBoolean(true)))
             .fetch();
     }
 

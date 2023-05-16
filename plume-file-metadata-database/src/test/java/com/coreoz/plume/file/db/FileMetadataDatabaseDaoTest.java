@@ -62,6 +62,13 @@ public class FileMetadataDatabaseDaoTest {
         Assert.assertFalse(unreferencedFiles.isEmpty());
     }
 
+    @Test
+    public void find_files_having_unused_known_type_should_return_1() {
+        List<String> unreferencedFiles = fileMetadataDao.findFilesHavingUnusedTypes(List.of(TestFileType.TEST));
+
+        Assert.assertEquals(1, unreferencedFiles.size());
+    }
+
     private enum TestFileType implements FileTypeDatabase {
         TEST;
 

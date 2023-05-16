@@ -151,11 +151,11 @@ public class FileService {
      * Delete files from types that longer exists in the {@link FileType} enum and can't be linked to stored files
      * This method must be use with caution and punctually, as it can lead to errors
      *
-     * @throws UncheckedIOException is a file could not be deleted.
+     * @throws UncheckedIOException is a file could not be deleted. This may happen if the file is still referenced.
      * It is possible to retry if the deletion failed.
      */
-    public void deleteFilesForDeletedTypes(List<String> deletedFileTypes) throws UncheckedIOException {
-        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesForDeletedTypes(deletedFileTypes);
+    public void deleteFilesForDeletedTypes() throws UncheckedIOException {
+        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesForDeletedTypes();
         this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
         logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
     }

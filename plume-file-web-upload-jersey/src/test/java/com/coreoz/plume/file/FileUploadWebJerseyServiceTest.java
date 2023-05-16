@@ -126,7 +126,7 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
-        public List<String> findFilesForDeletedTypes(List<String> deletedFileTypes) {
+        public List<String> findFilesForDeletedTypes() {
             return null;
         }
 
