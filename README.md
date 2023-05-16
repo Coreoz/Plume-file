@@ -58,7 +58,38 @@ Those modules provide API connectors to serve and upload files.
 - [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file through a Jersey
   MultiPart object
 
-Migrating from v1 or v2 to v3
-_____________________________
+Configuration and default values
+--------------------------------
+**[plume-file-core](plume-file-core)**
+```hocon
+# The time of day at which the cleaning task is scheduled
+file.cleaning-hour = "03:00"
+# The algorithm used for checksum file calculation
+file.checksum-algorithm = "SHA-256"
+```
 
-Follow our migration guides in the releases on the documentation to keep your projects up-to-date.
+**[plume-file-storage-system](plume-file-storage-system)**
+```hocon
+# The directory in which the files are stored locally
+file.storage.local-path = "plume-file-data/"
+```
+
+**[plume-file-web-download-jersey](plume-file-web-download-jersey)**
+```hocon
+# The Cache-Control response header value for max-age, it represents the time files will be stored in cache on browsers
+file.cache.http.max-age = "365 days"
+# Internal server file content configuration: the duration after which a file will be removed from the cache
+file.cache.data.expires-after-access-duration = "1 day"
+# Internal server file content configuration: the maximum size of the cache
+file.cache.data.max-cache-size = "64 MB"
+# Internal server file metadata configuration: the duration after which metadata will be removed from the cache
+file.cache.metadata.expires-after-access-duration = "1 day"
+# Internal server file metadata configuration: the maximum number of metadata elements stored in the cache
+file.cache.metadata.max-elements = 10000
+# The base file URL used by FileUrlService.url(). If the config value application.base-url is defined, this can be replaced by file.url.base-path = ${application.base-url}"/api/files"
+file.url.base-path = "/api/files"
+```
+
+Migrating from v1 or v2 to v3
+-----------------------------
+Follow our migration guides in the [v3 release](https://github.com/Coreoz/Plume-file/releases/tag/3.0.0) to keep your projects up-to-date.
