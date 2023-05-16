@@ -15,6 +15,8 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
+import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +37,19 @@ public class FileService {
 
     private final FileMetadataService fileMetadataService;
     private final FileStorageService fileStorageService;
+    private final FileMimeTypeDetector fileMimeTypeDetector;
     private final String checksumAlgorithm;
 
     @Inject
     public FileService(
         FileMetadataService fileMetadataService,
         FileStorageService fileStorageService,
+        FileMimeTypeDetector fileMimeTypeDetector,
         FileConfigurationService fileConfigurationService
     ) throws NoSuchAlgorithmException {
         this.fileMetadataService = fileMetadataService;
         this.fileStorageService = fileStorageService;
+        this.fileMimeTypeDetector = fileMimeTypeDetector;
         this.checksumAlgorithm = fileConfigurationService.checksumAlgorithm();
         // verify on startup that the checksumAlgorithm is available
         MessageDigest.getInstance(checksumAlgorithm);
@@ -119,7 +124,19 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) throws UncheckedIOException {
-        return add(fileType, fileData, fileName, FileNames.parseFileNameExtension(fileName), FileNames.guessMimeType(fileName));
+        try {
+            PeekingInputStream filePeekingStream = new PeekingInputStream(fileData);
+            String mimeType = fileMimeTypeDetector.guessMimeType(fileName, filePeekingStream);
+            return add(
+                fileType,
+                filePeekingStream.peekedStream(),
+                fileName,
+                FileNames.parseFileNameExtension(fileName),
+                mimeType
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     // file data

@@ -46,6 +46,13 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Provide mime type detection, when upgrading the value PeekingInputStream.BUFFER_SIZE should be updated -->
+		<dependency>
+			<groupId>org.overviewproject</groupId>
+			<artifactId>mime-types</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
