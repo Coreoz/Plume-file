@@ -64,8 +64,9 @@ public class FileMetadataDatabaseDaoTest {
 
     @Test
     public void find_files_having_unused_known_type_should_return_1() {
-        List<String> unreferencedFiles = fileMetadataDao.findFilesHavingUnusedTypes(List.of(TestFileType.TEST));
+        List<String> unreferencedFiles = fileMetadataDao.findFilesHavingDeletedTypes(List.of(TestFileType.TEST));
 
+        // see file V1__file_setup.sql, there is only one file with the type TEST_DELETED
         Assert.assertEquals(1, unreferencedFiles.size());
     }
 
