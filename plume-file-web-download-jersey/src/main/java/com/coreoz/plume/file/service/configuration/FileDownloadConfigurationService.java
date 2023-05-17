@@ -5,9 +5,6 @@ import com.typesafe.config.ConfigFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.Duration;
 
 @Singleton
@@ -50,24 +47,9 @@ public class FileDownloadConfigurationService {
      */
     public String fileUrlBasePath() {
         String basePath = config.getString("file.url.base-path");
-        if (!isValidURL(basePath)) {
-            throw new RuntimeException("Wrong input for file.url.base-path. Should be a valid URL.");
-        }
         if (basePath.endsWith("/")) {
             return basePath.substring(0, basePath.length() - 1);
         }
         return basePath;
-    }
-
-    private boolean isValidURL(String url) {
-        if (url == null) {
-            return false;
-        }
-        try {
-            new URL(url).toURI();
-            return true;
-        } catch (MalformedURLException | URISyntaxException e) {
-            return false;
-        }
     }
 }
