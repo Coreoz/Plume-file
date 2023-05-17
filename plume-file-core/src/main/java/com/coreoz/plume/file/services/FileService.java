@@ -148,10 +148,10 @@ public class FileService {
     }
 
     /**
-     * Delete files from types that longer exists in the {@link FileType} enum and can't be linked to stored files
-     * This method must be use with caution and punctually, as it can lead to errors
+     * Delete files having a type that longer exists in the {@link FileType} enum and can't be linked to stored files.
+     * This method should be used punctually only when a file type is deleted. Else unwanted files could be deleted in a shared metadata database environment.
      *
-     * @throws UncheckedIOException is a file could not be deleted. This may happen if the file is still referenced.
+     * @throws UncheckedIOException if a file could not be deleted. This may happen if the file storage service cannot delete the file.
      * It is possible to retry if the deletion failed.
      */
     public void deleteFilesForDeletedTypes() throws UncheckedIOException {
