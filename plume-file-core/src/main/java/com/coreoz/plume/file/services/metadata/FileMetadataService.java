@@ -11,5 +11,6 @@ public interface FileMetadataService {
 	void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksum);
 	Optional<FileMetadata> fetch(String fileUniqueName);
 	List<String> findUnreferencedFiles();
+	List<String> findFilesHavingDeletedTypes();
 	void deleteAll(List<String> fileUniqueNamesDeleted);
 }

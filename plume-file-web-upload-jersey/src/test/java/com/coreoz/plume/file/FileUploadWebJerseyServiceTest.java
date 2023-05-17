@@ -90,6 +90,11 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
+        public List<String> findFilesHavingDeletedTypes() {
+            return null;
+        }
+
+        @Override
         public void deleteAll(List<String> fileUniqueNamesDeleted) {
             // empty method
         }
