@@ -88,7 +88,7 @@ public class FileMetadataDatabaseDao {
             .fetch();
     }
 
-    public List<String> findFilesHavingUnusedTypes(Collection<FileTypeDatabase> remainingFileTypes) {
+    public List<String> findFilesHavingDeletedTypes(Collection<FileTypeDatabase> remainingFileTypes) {
         List<BooleanExpression> conditions = new ArrayList<>();
         for (FileTypeDatabase fileTypeDatabase : remainingFileTypes) {
             conditions.add(

@@ -46,8 +46,8 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
-    public List<String> findFilesForDeletedTypes() {
-        return this.fileMetadataDao.findFilesHavingUnusedTypes(this.fileTypes);
+    public List<String> findFilesHavingDeletedTypes() {
+        return this.fileMetadataDao.findFilesHavingDeletedTypes(this.fileTypes);
     }
 
     @Override

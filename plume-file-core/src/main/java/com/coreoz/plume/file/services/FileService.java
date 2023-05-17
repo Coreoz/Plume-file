@@ -155,9 +155,9 @@ public class FileService {
      * It is possible to retry if the deletion failed.
      */
     public void deleteFilesForDeletedTypes() throws UncheckedIOException {
-        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesForDeletedTypes();
+        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesHavingDeletedTypes();
         this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
-        logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
+        logger.debug("{} files having deleted types have been deleted", fileUniqueNamesToDelete.size());
     }
 
     private void deleteFilesByUniqueName(List<String> fileUniqueNamesToDelete) {
