@@ -1,12 +1,19 @@
 package com.coreoz.plume.file.validator;
 
+import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
+import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
 import com.coreoz.plume.file.utils.FileNames;
 import com.coreoz.plume.jersey.errors.Validators;
 import com.coreoz.plume.jersey.errors.WsError;
 import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -16,8 +23,9 @@ import java.util.Set;
  * must be called one after another until the {@code finish()} call. For exemple:
  * <pre>
  * {@code
- * FileUploadData fileUploadMetadata = FileUploadValidator
- *   .from(fileMetadata)
+ * // The instance of fileMimeTypeDetector should be obtained by dependency injection from Plume file Core
+ * FileUploadData fileUploadData = FileUploadValidator
+ *   .from(fileMetadata, fileData, fileMimeTypeDetector)
  *   .fileMaxSize(2_000_000)
  *   .fileNameNotEmpty()
  *   .fileNameMaxDefaultLength()
@@ -30,25 +38,38 @@ import java.util.Set;
 public class FileUploadValidator implements FileUploadSizeValidator, FileUploadEmptyNameValidator,
     FileUploadNameLengthValidator, FileUploadGeneralExtensionAndTypeValidator,
     FileUploadExtensionValidator, FileUploadTypeValidator, FileUploadFinisher {
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadValidator.class);
 
-    private final FileUploadMetadata data;
+    private final FileUploadData data;
 
-    private FileUploadValidator(FormDataBodyPart fileMetadata) {
-        String fileName = fileMetadata.getContentDisposition().getFileName();
-        this.data = new FileUploadMetadata(
-            fileName,
-            FileNames.parseFileNameExtension(fileName),
-            FileNames.guessMimeType(fileName),
-            fileMetadata.getFormDataContentDisposition().getSize()
-        );
+    private FileUploadValidator(FormDataBodyPart fileMetadata, InputStream fileData,
+                                FileMimeTypeDetector fileMimeTypeDetector) {
+        try {
+            String fileName = fileMetadata.getContentDisposition().getFileName();
+            PeekingInputStream filePeekingStream = new PeekingInputStream(fileData);
+            String mimeType = fileMimeTypeDetector.guessMimeType(fileName, filePeekingStream);
+            this.data = new FileUploadData(
+                filePeekingStream.peekedStream(),
+                fileName,
+                FileNames.parseFileNameExtension(fileName),
+                mimeType,
+                fileMetadata.getFormDataContentDisposition().getSize()
+            );
+        } catch (IOException e) {
+            logger.warn("Could not extract mime type", e);
+            throw new WsException(WsError.REQUEST_INVALID, "Could not read file data");
+        }
     }
 
     /**
-     * Starts a new validation process using Jersey FormDataBodyPart
+     * Starts a new validation process using Jersey fields FormDataBodyPart and InputStream
      */
-    public static FileUploadSizeValidator from(FormDataBodyPart fileMetadata) {
+    public static FileUploadSizeValidator from(FormDataBodyPart fileMetadata, InputStream fileData,
+                                               FileMimeTypeDetector fileMimeTypeDetector) {
+        Validators.checkRequired(fileData);
         Validators.checkRequired(fileMetadata);
-        return new FileUploadValidator(fileMetadata);
+        Objects.requireNonNull(fileMimeTypeDetector, "The instance of fileMimeTypeDetector should be obtained by dependency injection from Plume file Core");
+        return new FileUploadValidator(fileMetadata, fileData, fileMimeTypeDetector);
     }
 
     /**
@@ -146,7 +167,10 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
     }
 
     /**
-     * Compares the file mime type with a given authorized mime types Set
+     * Compares the file mime type with a given authorized mime types Set<br>
+     * <br>
+     * <strong>Warning: be careful with mime types verification, many alias exists, and it is difficult to get them all.
+     * For example, for xml, you can get "text/xml" or "application/xml"</strong>
      * @param authorizedMimeTypes the authorized mime types
      * @throws WsException if the file mime type is not in the authorized mime types
      */
@@ -170,7 +194,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
     }
 
     @Override
-    public FileUploadMetadata finish() {
+    public FileUploadData finish() {
         return data;
     }
 }

@@ -93,6 +93,11 @@ public class FileMetadataDatabaseServiceTest {
         }
 
         @Override
+        public List<String> findFilesHavingDeletedTypes(Collection<FileTypeDatabase> remainingFileTypes) {
+            return new ArrayList<>();
+        }
+
+        @Override
         public long deleteFilesMetadata(List<String> fileUniqueNames) {
             return 0;
         }

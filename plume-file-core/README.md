@@ -84,6 +84,9 @@ If the reference to the file is deleted, then the file will be deleted with this
 
 This way, the file metadata drives the file deletion and not the other way around
 
+If some file types were lost along the way, the `deleteFilesForDeletedTypes` method will delete all 
+the files which type is no longer in the `FileType` enum. This method will only delete the files with no known `FileType` and with no reference in the database.
+
 Custom storage implementation
 -----------------------------
 As mentioned in the [main documentation](../), the core module needs implementation for the interfaces:

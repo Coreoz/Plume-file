@@ -2,7 +2,7 @@
 
 DROP TABLE IF EXISTS `PLM_FILE_TRANSITION`;
 
-# create a transition table for the metadata that will be the primary table later
+# Step 1 - create a transition table for the metadata that will be the primary table later
 CREATE TABLE `PLM_FILE_TRANSITION`
 (
     `unique_name`        VARCHAR(255)   NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `PLM_FILE_TRANSITION`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# Inserting in the previously created metadata transition table every file metadata that were in the database
+# Step 2 - Inserting in the previously created metadata transition table every file metadata that were in the database
 # check on what name your file was stored as it will be the one searched on the disk
 # this name must be reported in the unique_name column in the select below
 INSERT INTO PLM_FILE_TRANSITION (unique_name,
@@ -39,7 +39,9 @@ SELECT uid, # change here
        CURRENT_TIMESTAMP()
 from plm_file;
 
-# renaming transition tables into primary tables and archiving old plm file table
+# Step 3 - use the PLM_FILE_TRANSITION table to update the current table referenced with the correct UUID
+
+# Step 4 - renaming transition tables into primary tables and archiving old plm file table
 ALTER TABLE PLM_FILE RENAME PLM_FILE_HISTORY;
 ALTER TABLE PLM_FILE_TRANSITION RENAME PLM_FILE;
 ALTER TABLE PLM_FILE_DISK RENAME PLM_FILE_DISK_HISTORY;

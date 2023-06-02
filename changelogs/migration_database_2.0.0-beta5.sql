@@ -3,7 +3,7 @@
 DROP TABLE IF EXISTS `PLM_FILE_TRANSITION`;
 DROP TABLE IF EXISTS `PLM_FILE_DATA_TRANSITION`;
 
-# create a transition table for the metadata that will be the primary table later
+# Step 1 - creates a transition table for the metadata that will be the primary table later
 CREATE TABLE `PLM_FILE_TRANSITION`
 (
     `unique_name`        VARCHAR(255)   NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `PLM_FILE_TRANSITION`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# create a transition table that will be the primary table later
+# Step 2 - creates a transition table that will be the primary table later
 CREATE TABLE `PLM_FILE_DATA_TRANSITION`
 (
     `unique_name` VARCHAR(255) NOT NULL PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE `PLM_FILE_DATA_TRANSITION`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# Inserting in the previously created metadata transition table every file that were in the database
+# Step 3 - Inserting in the previously created metadata transition table every file that were in the database
 INSERT INTO PLM_FILE_TRANSITION (unique_name,
                                  file_type,
                                  mime_type,
@@ -47,13 +47,15 @@ SELECT uid,
        CURRENT_TIMESTAMP()
 from plm_file;
 
-# Inserting in the previously created transition table every file data that were in the database
+# Step 4 - Inserting in the previously created transition table every file data that were in the database
 INSERT INTO PLM_FILE_DATA_TRANSITION (unique_name, data)
 select uid, plm_file_data.data
 from plm_file
          inner join plm_file_data on plm_file_data.id_file = plm_file.id;
 
-# renaming transition tables into primary tables and archiving old plm file table
+# Step 5 - use the plm_uid table to update the current table referenced with the correct UUID
+
+# Step 6 - archiving old plm file table and renaming transition tables into primary tables
 ALTER TABLE PLM_FILE RENAME PLM_FILE_HISTORY;
 ALTER TABLE PLM_FILE_TRANSITION RENAME PLM_FILE;
 ALTER TABLE PLM_FILE_DATA RENAME PLM_FILE_DATA_HISTORY;

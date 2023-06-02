@@ -15,6 +15,8 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
+import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +37,19 @@ public class FileService {
 
     private final FileMetadataService fileMetadataService;
     private final FileStorageService fileStorageService;
+    private final FileMimeTypeDetector fileMimeTypeDetector;
     private final String checksumAlgorithm;
 
     @Inject
     public FileService(
         FileMetadataService fileMetadataService,
         FileStorageService fileStorageService,
+        FileMimeTypeDetector fileMimeTypeDetector,
         FileConfigurationService fileConfigurationService
     ) throws NoSuchAlgorithmException {
         this.fileMetadataService = fileMetadataService;
         this.fileStorageService = fileStorageService;
+        this.fileMimeTypeDetector = fileMimeTypeDetector;
         this.checksumAlgorithm = fileConfigurationService.checksumAlgorithm();
         // verify on startup that the checksumAlgorithm is available
         MessageDigest.getInstance(checksumAlgorithm);
@@ -119,7 +124,19 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName) throws UncheckedIOException {
-        return add(fileType, fileData, fileName, FileNames.parseFileNameExtension(fileName), FileNames.guessMimeType(fileName));
+        try {
+            PeekingInputStream filePeekingStream = new PeekingInputStream(fileData);
+            String mimeType = fileMimeTypeDetector.guessMimeType(fileName, filePeekingStream);
+            return add(
+                fileType,
+                filePeekingStream.peekedStream(),
+                fileName,
+                FileNames.parseFileNameExtension(fileName),
+                mimeType
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     // file data
@@ -143,12 +160,29 @@ public class FileService {
      */
     public void deleteUnreferenced() throws UncheckedIOException {
         List<String> fileUniqueNamesToDelete = fileMetadataService.findUnreferencedFiles();
-        try {
-        	fileStorageService.deleteAll(fileUniqueNamesToDelete);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-        fileMetadataService.deleteAll(fileUniqueNamesToDelete);
+        this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
         logger.debug("{} unreferenced files deleted", fileUniqueNamesToDelete.size());
+    }
+
+    /**
+     * Delete files having a type that longer exists in the {@link FileType} enum and can't be linked to stored files.
+     * This method should be used punctually only when a file type is deleted. Else unwanted files could be deleted in a shared metadata database environment.
+     *
+     * @throws UncheckedIOException if a file could not be deleted. This may happen if the file storage service cannot delete the file.
+     * It is possible to retry if the deletion failed.
+     */
+    public void deleteFilesForDeletedTypes() throws UncheckedIOException {
+        List<String> fileUniqueNamesToDelete = fileMetadataService.findFilesHavingDeletedTypes();
+        this.deleteFilesByUniqueName(fileUniqueNamesToDelete);
+        logger.debug("{} files having deleted types have been deleted", fileUniqueNamesToDelete.size());
+    }
+
+    private void deleteFilesByUniqueName(List<String> fileUniqueNamesToDelete) {
+        try {
+            fileStorageService.deleteAll(fileUniqueNamesToDelete);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        fileMetadataService.deleteAll(fileUniqueNamesToDelete);
     }
 }

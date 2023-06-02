@@ -1,11 +1,14 @@
 package com.coreoz.plume.file;
 
+import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
+import com.coreoz.plume.file.validator.FileUploadSizeValidator;
 import com.coreoz.plume.file.validator.FileUploadValidator;
 import com.coreoz.plume.jersey.errors.WsException;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.Set;
 
 public class FileUploadValidatorTest {
@@ -20,13 +23,20 @@ public class FileUploadValidatorTest {
     }
 
     private FileUploadValidator makeValidator(String fileName, long size) {
-        return (FileUploadValidator) FileUploadValidator.from(makeBodyPart(fileName, size));
+        return (FileUploadValidator) makeClassicValidator(fileName, size);
+    }
+
+    private FileUploadSizeValidator makeClassicValidator(String fileName, long size) {
+        return FileUploadValidator.from(
+            makeBodyPart(fileName, size),
+            InputStream.nullInputStream(),
+            new MimeTypesDetector()
+        );
     }
 
     @Test
     public void from__verify_general_workflow_without_errors() {
-        FileUploadValidator
-            .from(makeBodyPart("test.txt", 100))
+        makeClassicValidator("test.txt", 100)
             .fileMaxSize(100)
             .fileNameNotEmpty()
             .fileNameMaxDefaultLength()
@@ -37,8 +47,7 @@ public class FileUploadValidatorTest {
 
     @Test
     public void from__verify_permissive_workflow_without_errors() {
-        FileUploadValidator
-            .from(makeBodyPart(null, 100))
+        makeClassicValidator(null, 100)
             .fileMaxSize(100)
             .fileNameAllowEmpty()
             .fileNameMaxDefaultLength()
@@ -79,7 +88,12 @@ public class FileUploadValidatorTest {
 
     @Test
     public void mimeTypes__xml_for_xml_should_pass() {
-        makeValidator("test.xml", 0).mimeTypes(Set.of("text/xml"));
+        makeValidator("test.xml", 0).mimeTypes(Set.of("application/xml"));
+    }
+
+    @Test
+    public void mimeTypes__csv_for_csv_should_pass() {
+        makeValidator("test.csv", 0).mimeTypes(Set.of("text/csv"));
     }
 
     @Test(expected = WsException.class)

@@ -7,8 +7,9 @@ import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
+import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
 import com.coreoz.plume.file.services.storage.FileStorageService;
-import com.coreoz.plume.file.validator.FileUploadMetadata;
+import com.coreoz.plume.file.validator.FileUploadData;
 import com.coreoz.plume.file.validator.FileUploadValidator;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -19,7 +20,6 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -31,18 +31,22 @@ public class FileUploadWebJerseyServiceTest {
     @Inject
     FileConfigurationService fileConfigurationService;
     FileUploadWebJerseyService fileUploadWebJerseyService;
+    MimeTypesDetector mimeTypesDetector;
 
     @Before
     public void before_test() throws NoSuchAlgorithmException {
         FileMetadataService fileMetadataService = new FileMetadataServiceTest();
         FileStorageService fileStorageService = new FileStorageServiceTest();
+        this.mimeTypesDetector = new MimeTypesDetector();
         this.fileUploadWebJerseyService = new FileUploadWebJerseyService(
-            new FileService(fileMetadataService, fileStorageService, fileConfigurationService)
+            new FileService(fileMetadataService, fileStorageService, mimeTypesDetector, fileConfigurationService)
         );
     }
 
-    private FileUploadMetadata makeMetadata(FormDataBodyPart formDataBodyPart) {
-        return ((FileUploadValidator) FileUploadValidator.from(formDataBodyPart)).finish();
+    private FileUploadData makeUploadData(FormDataBodyPart formDataBodyPart) {
+        return ((FileUploadValidator) FileUploadValidator
+            .from(formDataBodyPart, InputStream.nullInputStream(), mimeTypesDetector))
+            .finish();
     }
 
     @Test
@@ -57,50 +61,10 @@ public class FileUploadWebJerseyServiceTest {
 
         String uid = this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
-            new ByteArrayInputStream(new byte[127]),
-            makeMetadata(formDataBodyPart)
+            makeUploadData(formDataBodyPart)
         );
 
         Assert.assertNotNull(uid);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_mime_type_should_fail() {
-        FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
-        FormDataContentDisposition formDataContentDisposition = FormDataContentDisposition.name("test")
-            .fileName("File Name")
-            .size(12)
-            .build();
-        formDataBodyPart.setFormDataContentDisposition(formDataContentDisposition);
-        formDataBodyPart.setMediaType(null);
-
-        this.fileUploadWebJerseyService.add(
-            TestFileType.TEST,
-            new ByteArrayInputStream(new byte[127]),
-            makeMetadata(formDataBodyPart)
-        );
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_should_fail() {
-        FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
-
-        this.fileUploadWebJerseyService.add(
-            TestFileType.TEST,
-            null,
-            makeMetadata(formDataBodyPart)
-        );
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void add_file_with_no_file_type_should_fail() {
-        FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
-
-        this.fileUploadWebJerseyService.add(
-            null,
-            new ByteArrayInputStream(new byte[127]),
-            makeMetadata(formDataBodyPart)
-        );
     }
 
     private static class FileMetadataServiceTest implements FileMetadataService {
@@ -126,6 +90,11 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
+        public List<String> findFilesHavingDeletedTypes() {
+            return null;
+        }
+
+        @Override
         public void deleteAll(List<String> fileUniqueNamesDeleted) {
             // empty method
         }
@@ -147,6 +116,6 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     private enum TestFileType implements FileType {
-        TEST;
+        TEST
     }
 }

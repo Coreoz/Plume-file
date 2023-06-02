@@ -3,7 +3,7 @@
 DROP TABLE IF EXISTS `PLM_FILE_DATA_TRANSITION`;
 DROP TABLE IF EXISTS `PLM_FILE_TRANSITION`;
 
-# create a transition table for the metadata that will be the primary table later
+# Step 1 - creates a transition table for the metadata that will be the primary table later
 CREATE TABLE `PLM_FILE_TRANSITION`
 (
     `unique_name`        VARCHAR(255)   NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `PLM_FILE_TRANSITION`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# create a transition table that will be the primary table later
+# Step 2 - creates a transition table that will be the primary table later
 CREATE TABLE `PLM_FILE_DATA_TRANSITION`
 (
     `unique_name` VARCHAR(255) NOT NULL PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE `PLM_FILE_DATA_TRANSITION`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# this temporary table will be used to create an UUID for every plm_file.id as there were none
+# Step 3 - creates a temporary table tha will be used to create an UUID for every plm_file.id as there were none
 CREATE TABLE `PLM_FILE_UID`
 (
     `unique_name` VARCHAR(255) NOT NULL PRIMARY KEY,
@@ -35,12 +35,12 @@ CREATE TABLE `PLM_FILE_UID`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# creating UUIDs for every plm_file.id
+# Step 4 - creating UUIDs for every plm_file.id
 INSERT INTO PLM_FILE_UID (unique_name, file_id)
 SELECT uuid(), id
 from plm_file;
 
-# Inserting in the previously created metadata transition table every file that were in the database
+# Step 5 - Inserting in the previously created metadata transition table every file that were in the database
 INSERT INTO PLM_FILE_TRANSITION (unique_name,
                                  file_type,
                                  mime_type,
@@ -62,13 +62,15 @@ SELECT PLM_FILE_UID.unique_name,
 from plm_file
          inner join PLM_FILE_UID on PLM_FILE_UID.file_id = plm_file.id;
 
-# Inserting in the previously created transition table every file data that were in the database
+# Step 6 - Inserting in the previously created transition table every file data that were in the database
 INSERT INTO PLM_FILE_DATA_TRANSITION (unique_name, data)
 select plm_file_uid.unique_name, plm_file.data
 from plm_file
          inner join plm_file_uid on plm_file.id = plm_file_uid.file_id;
 
-# renaming transition tables into primary tables
+# Step 7 - use the plm_uid table to update the current table referenced with the correct UUID
+
+# Step 8 - rename transition tables into primary tables
 ALTER TABLE PLM_FILE_DATA_TRANSITION RENAME PLM_FILE_DATA;
 # archiving old plm file table
 ALTER TABLE PLM_FILE RENAME PLM_FILE_HISTORY;
