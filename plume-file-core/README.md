@@ -19,7 +19,7 @@ install(new GuiceFileModule());
 ```
 
 3. Add the required storage modules
-One metadata storage module and one data storage module must be configured. See the main documentation to view the [available storage modules](.../#plume-file-modules). 
+One metadata storage module and one data storage module must be configured. See the main documentation to view the [available storage modules](../README.md/#plume-file-modules). 
 
 Custom storage systems can be configured. See [Custom storage implementation](#custom-storage-implementation).
 

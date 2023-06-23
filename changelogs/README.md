@@ -1,7 +1,7 @@
 Plume File SQL migration guide
 ==============================
 
-These migration guide does not delete old Plume File tables. They will be found under *table_name*_history.
+This migration guide does not delete old Plume File tables. They will be found under *table_name*_history.
 
 #### Migrating v1.0.0-rc1 ~ v1.0.0-rc9
 
