@@ -4,7 +4,7 @@
 
 	<groupId>com.coreoz</groupId>
 	<artifactId>plume-file-parent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Plume File Parent</name>
@@ -13,7 +13,7 @@
 
 	<organization>
 		<name>Coreoz</name>
-		<url>http://coreoz.com/</url>
+		<url>https://coreoz.com/</url>
 	</organization>
 
 	<licenses>
@@ -29,7 +29,13 @@
 			<name>Aurélien Manteaux</name>
 			<email>amanteaux@coreoz.com</email>
 			<organization>Coreoz</organization>
-			<organizationUrl>http://coreoz.com/</organizationUrl>
+			<organizationUrl>https://coreoz.com/</organizationUrl>
+		</developer>
+		<developer>
+			<name>Lucas Amiaud</name>
+			<email>lamiaud@coreoz.com</email>
+			<organization>Coreoz</organization>
+			<organizationUrl>https://coreoz.com/</organizationUrl>
 		</developer>
 	</developers>
 
@@ -63,16 +69,21 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<javadoc.java-version>8</javadoc.java-version>
 		<additionalparam>-Xdoclint:none</additionalparam>
 
-		<plume-framework-dependencies.version>1.0.0</plume-framework-dependencies.version>
+		<plume-framework-dependencies.version>4.1.0</plume-framework-dependencies.version>
 	</properties>
 
 	<modules>
 		<module>plume-file-core</module>
-		<module>plume-file-gallery</module>
+		<module>plume-file-web-download-jersey</module>
+		<module>plume-file-web-upload-jersey</module>
+		<module>plume-file-storage-database</module>
+		<module>plume-file-storage-system</module>
+		<module>plume-file-metadata-database</module>
 	</modules>
 
 	<profiles>
@@ -107,6 +118,7 @@
 						</executions>
 						<configuration>
 							<stylesheet>java</stylesheet>
+							<source>${javadoc.java-version}</source>
 						</configuration>
 					</plugin>
 					<plugin>

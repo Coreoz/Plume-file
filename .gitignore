@@ -5,3 +5,5 @@
 /.project
 /.README.md.html
 /bin/
+/.idea
+*.iml

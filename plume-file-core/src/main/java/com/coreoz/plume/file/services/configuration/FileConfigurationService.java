@@ -1,7 +1,5 @@
 package com.coreoz.plume.file.services.configuration;
 
-import java.time.Duration;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -22,20 +20,12 @@ public class FileConfigurationService {
 		);
 	}
 
-	public String apiBasePath() {
-		return config.getString("application.api-base-path");
-	}
-
-	public String fileWsPath() {
-		return config.getString("file.ws-path");
-	}
-
-	public Duration fileMaxAgeCache() {
-		return config.getDuration("file.max-age-cache");
-	}
-
 	public String cleaningHour() {
 		return config.getString("file.cleaning-hour");
+	}
+	
+	public String checksumAlgorithm() {
+		return config.getString("file.checksum-algorithm");
 	}
 
 }

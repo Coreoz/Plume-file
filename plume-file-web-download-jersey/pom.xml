@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.coreoz</groupId>
+		<artifactId>plume-file-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>plume-file-web-download-jersey</artifactId>
+	<packaging>jar</packaging>
+	<name>Plume File Web Download Jersey</name>
+	<description>A Plume File toolkit to serve stored files with Jersey</description>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.conf</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-conf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-web-jersey</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-jaxrs2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-framework-dependencies</artifactId>
+				<version>${plume-framework-dependencies.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
+
