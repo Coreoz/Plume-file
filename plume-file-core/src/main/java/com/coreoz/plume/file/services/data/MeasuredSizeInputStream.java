@@ -20,7 +20,7 @@ public class MeasuredSizeInputStream extends InputStream {
     public int read() throws IOException {
         int read = baseInputStream.read();
         if (read != -1) {
-            inputStreamTotalSize += 1;
+            inputStreamTotalSize += read;
         }
         return read;
     }
