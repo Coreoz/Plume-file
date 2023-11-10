@@ -34,6 +34,13 @@ public class MeasuredSizeInputStream extends FilterInputStream {
         return read;
     }
 
+    @Override
+    public long skip(long n) throws IOException {
+        long result = this.in.skip(n);
+        this.inputStreamTotalSize += result;
+        return result;
+    }
+
     /**
      * Returns the number of bytes that has been read
      */

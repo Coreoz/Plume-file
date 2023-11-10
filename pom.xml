@@ -74,7 +74,7 @@
 		<javadoc.java-version>8</javadoc.java-version>
 		<additionalparam>-Xdoclint:none</additionalparam>
 
-		<plume-framework-dependencies.version>4.1.0</plume-framework-dependencies.version>
+		<plume-framework-dependencies.version>4.2.3</plume-framework-dependencies.version>
 	</properties>
 
 	<modules>
