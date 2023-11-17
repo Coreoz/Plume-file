@@ -1,9 +1,10 @@
 Plume File
 ==========
-Plume File is a modular Java library based on [Plume Framework](https://github.com/Coreoz/Plume).
-It provides several modules to easily handle files in a project from storage to download.
+Plume File is a modular Java library that provides several modules to easily handle files in a project from storage to download. Its goal is to provide great performance with a great Java API: it can handle files of several gigabytes with a JVM that has an `Xmx` of only `128Mo`.
 
-Looking for a demo? Check out the file service implementation on [Plume Demo project](https://github.com/Coreoz/Plume-showcase).
+Plume File that has some small dependencies on the [Plume Framework](https://github.com/Coreoz/Plume), especially to the conf and scheduler modules.
+
+Looking for a demo? Check out the file service implementation on the [Plume Demo project](https://github.com/Coreoz/Plume-showcase).
 
 Architecture
 ------------
