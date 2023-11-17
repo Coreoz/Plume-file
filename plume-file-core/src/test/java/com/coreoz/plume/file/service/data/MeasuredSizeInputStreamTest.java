@@ -25,6 +25,6 @@ public class MeasuredSizeInputStreamTest {
             new ByteArrayInputStream(new byte[0])
         );
         measuredSizeInputStream.readAllBytes();
-        assertThat(measuredSizeInputStream.getInputStreamTotalSize()).isEqualTo(0);
+        assertThat(measuredSizeInputStream.getInputStreamTotalSize()).isZero();
     }
 }

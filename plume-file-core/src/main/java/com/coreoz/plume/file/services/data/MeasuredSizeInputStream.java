@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.services.data;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -7,20 +8,19 @@ import java.io.InputStream;
  * An input stream wrapper that exposes a method to know
  * the number of bytes that has been read in the stream.
  */
-public class MeasuredSizeInputStream extends InputStream {
-    private final InputStream baseInputStream;
+public class MeasuredSizeInputStream extends FilterInputStream {
     private long inputStreamTotalSize;
 
     public MeasuredSizeInputStream(InputStream baseInputStream) {
-        this.baseInputStream = baseInputStream;
+        super(baseInputStream);
         this.inputStreamTotalSize = 0;
     }
 
     @Override
     public int read() throws IOException {
-        int read = baseInputStream.read();
+        int read = super.in.read();
         if (read != -1) {
-            inputStreamTotalSize += read;
+            inputStreamTotalSize += 1;
         }
         return read;
     }
@@ -34,16 +34,17 @@ public class MeasuredSizeInputStream extends InputStream {
         return read;
     }
 
+    @Override
+    public long skip(long n) throws IOException {
+        long result = this.in.skip(n);
+        this.inputStreamTotalSize += result;
+        return result;
+    }
+
     /**
      * Returns the number of bytes that has been read
      */
     public long getInputStreamTotalSize() {
         return inputStreamTotalSize;
     }
-
-	@Override
-	public void close() throws IOException {
-		baseInputStream.close();
-		super.close();
-	}
 }
