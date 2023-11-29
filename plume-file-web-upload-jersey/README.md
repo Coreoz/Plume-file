@@ -34,6 +34,7 @@ public void upload(
         .fileNameMaxDefaultLength()
         .fileExtensionNotEmpty()
         .fileExtensions(Set.of("docx", "pdf"))
+        .sanitizeFileName()
         .finish();
     return this.fileUploadWebJerseyService.add(MyProjectFileType.ENUM, fileUploadData);
 }

@@ -33,7 +33,7 @@ import java.util.function.UnaryOperator;
  *   .fileNameMaxDefaultLength()
  *   .fileExtensionNotEmpty()
  *   .fileExtension(Set.of("docx", "pdf"))
- *   .sanitizeOriginalFileName()
+ *   .sanitizeFileName()
  *   .finish();
  * }
  * </pre>
@@ -196,11 +196,18 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
         return this;
     }
 
-    public FileUploadDataBuilder sanitizeOriginalFileName() {
-        return this.mapOriginalFileName(FileNameCleaning::cleanFileName);
+    /**
+     * Remove all weird characters while trying to ensure the sanitize file name is close to the original one.
+     * @see FileNameCleaning#cleanFileName(String)
+     */
+    public FileUploadDataBuilder sanitizeFileName() {
+        return this.changeFileName(FileNameCleaning::cleanFileName);
     }
 
-    public FileUploadDataBuilder mapOriginalFileName(UnaryOperator<String> fileNameMapper) {
+    /**
+     * Customize how to change the file name.
+     */
+    public FileUploadDataBuilder changeFileName(UnaryOperator<String> fileNameMapper) {
         this.data = new FileUploadData(
             this.data.getFileData(),
             fileNameMapper.apply(this.data.getFileName()),
@@ -211,18 +218,16 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
         return this;
     }
 
+    /**
+     * Keep the file name exactly how it was sent without any transformation.
+     */
     @Override
-    public FileUploadDataBuilder keepOriginalFilename() {
+    public FileUploadDataBuilder keepOriginalFileName() {
         return this;
     }
 
     @Override
     public FileUploadData finish() {
-        return this.data;
-    }
-
-    @Override
-    public FileUploadData buildFile() {
         return this.data;
     }
 }
