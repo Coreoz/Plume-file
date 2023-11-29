@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.validator;
 
+import com.coreoz.plume.file.cleaning.FileNameCleaning;
 import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
 import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
 import com.coreoz.plume.file.utils.FileNames;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * Validate files data with a fluent API.<br>
@@ -31,16 +33,17 @@ import java.util.Set;
  *   .fileNameMaxDefaultLength()
  *   .fileExtensionNotEmpty()
  *   .fileExtension(Set.of("docx", "pdf"))
+ *   .sanitizeOriginalFileName()
  *   .finish();
  * }
  * </pre>
  */
 public class FileUploadValidator implements FileUploadSizeValidator, FileUploadEmptyNameValidator,
     FileUploadNameLengthValidator, FileUploadGeneralExtensionAndTypeValidator,
-    FileUploadExtensionValidator, FileUploadTypeValidator, FileUploadFinisher {
+    FileUploadExtensionValidator, FileUploadTypeValidator, FileUploadFinisher, FileUploadDataBuilder {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadValidator.class);
 
-    private final FileUploadData data;
+    private FileUploadData data;
 
     private FileUploadValidator(FormDataBodyPart fileMetadata, InputStream fileData,
                                 FileMimeTypeDetector fileMimeTypeDetector) {
@@ -193,8 +196,33 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
         return this;
     }
 
+    public FileUploadDataBuilder sanitizeOriginalFileName() {
+        return this.mapOriginalFileName(FileNameCleaning::cleanFileName);
+    }
+
+    public FileUploadDataBuilder mapOriginalFileName(UnaryOperator<String> fileNameMapper) {
+        this.data = new FileUploadData(
+            this.data.getFileData(),
+            fileNameMapper.apply(this.data.getFileName()),
+            this.data.getFileExtension(),
+            this.data.getMimeType(),
+            this.data.getFileSize()
+        );
+        return this;
+    }
+
+    @Override
+    public FileUploadDataBuilder keepOriginalFilename() {
+        return this;
+    }
+
     @Override
     public FileUploadData finish() {
-        return data;
+        return this.data;
+    }
+
+    @Override
+    public FileUploadData buildFile() {
+        return this.data;
     }
 }
