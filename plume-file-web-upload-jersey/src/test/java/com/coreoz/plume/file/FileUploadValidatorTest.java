@@ -4,6 +4,7 @@ import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
 import com.coreoz.plume.file.validator.FileUploadSizeValidator;
 import com.coreoz.plume.file.validator.FileUploadValidator;
 import com.coreoz.plume.jersey.errors.WsException;
+import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Test;
@@ -42,6 +43,7 @@ public class FileUploadValidatorTest {
             .fileNameMaxDefaultLength()
             .fileExtensionNotEmpty()
             .fileExtensionMaxDefaultLength()
+            .keepOriginalFileName()
             .finish();
     }
 
@@ -53,6 +55,7 @@ public class FileUploadValidatorTest {
             .fileNameMaxDefaultLength()
             .fileExtensionAllowEmpty()
             .fileExtensionMaxDefaultLength()
+            .sanitizeFileName()
             .finish();
     }
 
@@ -119,5 +122,35 @@ public class FileUploadValidatorTest {
     @Test(expected = WsException.class)
     public void fileNameMaxLength__over_length_size_should_fail() {
         makeValidator("abcdefgh", 0).fileNameMaxLength(7);
+    }
+
+    @Test
+    public void sanitizeOriginalFileName__should_return_accents_string_without_accents() {
+        String fileName = makeValidator("éçàyt.jpg", 0)
+            .sanitizeFileName()
+            .finish()
+            .getFileName();
+
+        Assertions.assertThat(fileName).isEqualTo("ecayt.jpg");
+    }
+
+    @Test
+    public void keepOriginalFileName__should_keep_original_name() {
+        String fileName = makeValidator("éçàyt.jpg", 0)
+            .keepOriginalFileName()
+            .finish()
+            .getFileName();
+
+        Assertions.assertThat(fileName).isEqualTo("éçàyt.jpg");
+    }
+
+    @Test
+    public void mapOriginalFileName__should_transform_original_name() {
+        String fileName = makeValidator("éçàyt.jpg", 0)
+            .changeFileName(filename -> "test_" + filename)
+            .finish()
+            .getFileName();
+
+        Assertions.assertThat(fileName).isEqualTo("test_éçàyt.jpg");
     }
 }

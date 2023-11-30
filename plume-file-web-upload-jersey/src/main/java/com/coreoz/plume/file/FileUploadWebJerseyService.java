@@ -1,6 +1,5 @@
 package com.coreoz.plume.file;
 
-import com.coreoz.plume.file.cleaning.FileNameCleaning;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.validator.FileUploadData;
@@ -24,7 +23,7 @@ public class FileUploadWebJerseyService {
         return this.fileService.add(
             fileType,
             fileUploadData.getFileData(),
-            FileNameCleaning.cleanFileName(fileUploadData.getFileName()),
+            fileUploadData.getFileName(),
             fileUploadData.getMimeType()
         );
     }

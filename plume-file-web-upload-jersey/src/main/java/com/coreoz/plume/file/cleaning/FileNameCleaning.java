@@ -13,10 +13,10 @@ public class FileNameCleaning {
 
     /**
      * Remove all weird characters while trying to ensure
-     * the sanitize file name is close to the original one:
-     * - Useless spaces are trimmed
-     * - Accents are stripped, spaces are replaced by -,
-     * - Upper case chars are converted to lower case.
+     * the sanitize file name is close to the original one:<br>
+     * - Useless spaces are trimmed<br>
+     * - Accents are stripped, spaces are replaced by -,<br>
+     * - Upper case chars are converted to lower case.<br>
      *
      * @param fileName the file name, e.g. <code>dog.jpg</code>
      * @return the clean file name, null if the filename is null
