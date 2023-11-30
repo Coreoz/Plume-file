@@ -43,8 +43,8 @@ public class FileUploadValidatorTest {
             .fileNameMaxDefaultLength()
             .fileExtensionNotEmpty()
             .fileExtensionMaxDefaultLength()
-            .keepOriginalFilename()
-            .buildFile();
+            .keepOriginalFileName()
+            .finish();
     }
 
     @Test
@@ -55,8 +55,8 @@ public class FileUploadValidatorTest {
             .fileNameMaxDefaultLength()
             .fileExtensionAllowEmpty()
             .fileExtensionMaxDefaultLength()
-            .sanitizeOriginalFileName()
-            .buildFile();
+            .sanitizeFileName()
+            .finish();
     }
 
     @Test
@@ -127,8 +127,8 @@ public class FileUploadValidatorTest {
     @Test
     public void sanitizeOriginalFileName__should_return_accents_string_without_accents() {
         String fileName = makeValidator("éçàyt.jpg", 0)
-            .sanitizeOriginalFileName()
-            .buildFile()
+            .sanitizeFileName()
+            .finish()
             .getFileName();
 
         Assertions.assertThat(fileName).isEqualTo("ecayt.jpg");
@@ -137,8 +137,8 @@ public class FileUploadValidatorTest {
     @Test
     public void keepOriginalFileName__should_keep_original_name() {
         String fileName = makeValidator("éçàyt.jpg", 0)
-            .keepOriginalFilename()
-            .buildFile()
+            .keepOriginalFileName()
+            .finish()
             .getFileName();
 
         Assertions.assertThat(fileName).isEqualTo("éçàyt.jpg");
@@ -147,8 +147,8 @@ public class FileUploadValidatorTest {
     @Test
     public void mapOriginalFileName__should_transform_original_name() {
         String fileName = makeValidator("éçàyt.jpg", 0)
-            .mapOriginalFileName(filename -> "test_" + filename)
-            .buildFile()
+            .changeFileName(filename -> "test_" + filename)
+            .finish()
             .getFileName();
 
         Assertions.assertThat(fileName).isEqualTo("test_éçàyt.jpg");

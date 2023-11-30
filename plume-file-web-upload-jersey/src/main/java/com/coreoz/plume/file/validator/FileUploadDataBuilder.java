@@ -4,5 +4,5 @@ public interface FileUploadDataBuilder {
     /**
      * Returns the metadata associated to the validated file upload.
      */
-    FileUploadData buildFile();
+    FileUploadData finish();
 }
