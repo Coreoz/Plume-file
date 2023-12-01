@@ -19,8 +19,10 @@ Setup
 Uploading with Multipart
 ------------------------
 
-The fastest way to upload a file with [] is to use the Jersey Multipart API.
+Using the Jersey Multipart API is the easiest way to upload a file.
 This API allows you to get the file InputStream directly from the webservice parameters, by reading the multipart content.
+
+This method preferably used for small files (< 100Mo).
 
 1. Add the Jersey Multipart to your dependencies if not already in your project
 ```xml
@@ -64,7 +66,7 @@ public void upload(
 With Jersey Multipart API, you can implement file uploading really quickly as the library preprocesses the multipart request 
 to make it very accessible through parameters.
 
-However, this request preprocessing means that the request is read before you can access it. 
+However, this request preprocessing means that the request is read before you can access it, and put in temp files on your OS.
 When uploading large files (> 1Go), this can be a performance issue.
 
 Uploading with Apache FileUpload
@@ -76,9 +78,9 @@ This will allow you to read the incoming Multipart request as you wish, getting 
 1. Add the Apache Commons FileUpload to your dependencies if not already in your project
 ```xml
 <dependency>
-  <groupId>org.glassfish.jersey.media</groupId>
-  <artifactId>jersey-media-multipart</artifactId>
-  <version>3.1.3</version>
+  <groupId>commons-fileupload</groupId>
+  <artifactId>commons-fileupload</artifactId>
+  <version>1.5</version>
 </dependency>
 ```
 2. Create the webservice endpoint to upload a file (using `multipart/form-data`):
