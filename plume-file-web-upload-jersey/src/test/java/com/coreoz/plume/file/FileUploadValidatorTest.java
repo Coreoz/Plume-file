@@ -5,23 +5,12 @@ import com.coreoz.plume.file.validator.FileUploadSizeValidator;
 import com.coreoz.plume.file.validator.FileUploadValidator;
 import com.coreoz.plume.jersey.errors.WsException;
 import org.assertj.core.api.Assertions;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.Set;
 
 public class FileUploadValidatorTest {
-    private FormDataBodyPart makeBodyPart(String fileName, long size) {
-        FormDataContentDisposition contentDisposition = FormDataContentDisposition.name("dummy unused name")
-            .fileName(fileName)
-            .size(size)
-            .build();
-        FormDataBodyPart bodyPart = new FormDataBodyPart();
-        bodyPart.setFormDataContentDisposition(contentDisposition);
-        return bodyPart;
-    }
 
     private FileUploadValidator makeValidator(String fileName, long size) {
         return (FileUploadValidator) makeClassicValidator(fileName, size);
@@ -29,7 +18,8 @@ public class FileUploadValidatorTest {
 
     private FileUploadSizeValidator makeClassicValidator(String fileName, long size) {
         return FileUploadValidator.from(
-            makeBodyPart(fileName, size),
+            fileName,
+            size,
             InputStream.nullInputStream(),
             new MimeTypesDetector()
         );

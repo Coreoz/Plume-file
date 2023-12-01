@@ -14,21 +14,42 @@ Setup
   <artifactId>plume-file-web-upload-jersey</artifactId>
 </dependency>
 ```
+2. Create the webservice file with the injected dependency `FileMimeTypeDetector` (it comes from Plume file Core)
+
+Uploading with Multipart
+------------------------
+
+The fastest way to upload a file with [] is to use the Jersey Multipart API.
+This API allows you to get the file InputStream directly from the webservice parameters, by reading the multipart content.
+
+1. Add the Jersey Multipart to your dependencies if not already in your project
+```xml
+<dependency>
+  <groupId>org.glassfish.jersey.media</groupId>
+  <artifactId>jersey-media-multipart</artifactId>
+  <version>3.1.3</version>
+</dependency>
+```
 2. Register the MultiPart Feature on your `JerseyConfigProvider`:
 ```java
 config.register(MultiPartFeature.class);
 ```
-3. Create the webservice file with the injected dependency `FileMimeTypeDetector` (it comes from Plume file Core)
-4. Create the webservice endpoint to upload a file (using `multipart/form-data`):
+3. Create the webservice endpoint to upload a file (using `multipart/form-data`):
 ```java
 @POST
 @Operation(description = "Upload a file")
 public void upload(
     @FormDataParam("file") FormDataBodyPart fileMetadata,
-    @FormDataParam("file") InputStream fileData
+    @FormDataParam("file") InputStream fileData,
+    @FormDataParam("part-2") String part2 // an other part of your multipart request
 ) {
     FileUploadData fileUploadData = FileUploadValidator
-        .from(fileMetadata, fileData, fileMimeTypeDetector)
+        .from(
+            fileMetadata.getContentDisposition().getFileName(),
+            fileMetadata.getFormDataContentDisposition().getSize(),
+            fileData,
+            fileMimeTypeDetector
+        )
         .fileMaxSize(2_000_000)
         .fileNameNotEmpty()
         .fileNameMaxDefaultLength()
@@ -39,6 +60,66 @@ public void upload(
     return this.fileUploadWebJerseyService.add(MyProjectFileType.ENUM, fileUploadData);
 }
 ```
+
+With Jersey Multipart API, you can implement file uploading really quickly as the library preprocesses the multipart request 
+to make it very accessible through parameters.
+
+However, this request preprocessing means that the request is read before you can access it. 
+When uploading large files (> 1Go), this can be a performance issue.
+
+Uploading with Apache FileUpload
+--------------------------------
+
+The Apache [FileUpload](https://commons.apache.org/proper/commons-fileupload/) package ...
+This will allow you to read the incoming Multipart request as you wish, getting rid of the file preprocessing.
+
+1. Add the Apache Commons FileUpload to your dependencies if not already in your project
+```xml
+<dependency>
+  <groupId>org.glassfish.jersey.media</groupId>
+  <artifactId>jersey-media-multipart</artifactId>
+  <version>3.1.3</version>
+</dependency>
+```
+2. Create the webservice endpoint to upload a file (using `multipart/form-data`):
+```java
+@POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(description = "Upload a file")
+    @SneakyThrows
+    public String upload(
+        @Context ContainerRequestContext request,
+        @HeaderParam(HttpHeaders.CONTENT_LENGTH) long size
+    ) {
+        // handle the multipart object contained in the ContainerRequestContext ... 
+    }
+```
+2. Create a FileItemIterator from the ContainerRequestContext
+```java
+FileUpload fileUpload = new FileUpload();
+FileItemIterator fileIterator = fileUpload.getItemIterator(new RequestContext() {
+    // create you own request context
+})
+```
+3. Read the multipart object with the iterator
+```java
+while (iterator.hasNext()) {
+    FileItemStream item = iterator.next();
+    String name = item.getFieldName();
+    if ("file".equals(name)) {
+        // handle the file input stream
+    } else if ("string-part-2".equals(name)) {
+        String part2 = Streams.asString(item.openStream());
+    } else if ("instant-part-3".equals(name)) {
+        Instant part3 = Instant.parse(Streams.asString(item.openStream()));
+    } else {
+        logger.debug("File field {} with file name {} detected.", name, item.getName());
+    }
+}
+```
+
+The real advantage of this solution is to be free to handle the multipart.
+When uploading large files (> 1 Go), this make a real difference on upload time, as the stream can be read only once.
 
 Before using the library
 ------------------------
