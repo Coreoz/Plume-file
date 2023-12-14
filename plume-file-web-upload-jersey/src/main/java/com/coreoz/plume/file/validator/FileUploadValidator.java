@@ -46,7 +46,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
 
     private FileUploadValidator(
         String fileName,
-        long displayedFileSize,
+        long fileSize,
         InputStream fileData,
         FileMimeTypeDetector fileMimeTypeDetector
     ) {
@@ -58,7 +58,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
                 fileName,
                 FileNames.parseFileNameExtension(fileName),
                 mimeType,
-                displayedFileSize
+                fileSize
             );
         } catch (IOException e) {
             logger.warn("Could not extract mime type", e);
@@ -68,16 +68,23 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
 
     /**
      * Starts a new validation process using Jersey fields FormDataBodyPart and InputStream
+     * @param fileName the file name
+     * @param fileSize the file size in bytes
+     *                 it's usually the value of the Header Content-Length,
+     *                 considering that the rest of the MultiPart body is insignificant
+     * @param fileData the file InputStream
+     * @param fileMimeTypeDetector the mime type detector {@link FileMimeTypeDetector}
+     * @return a {@link FileUploadSizeValidator} builder
      */
     public static FileUploadSizeValidator from(
         String fileName,
-        long displayedFileSize,
+        long fileSize,
         InputStream fileData,
         FileMimeTypeDetector fileMimeTypeDetector
     ) {
         Validators.checkRequired(fileData);
         Objects.requireNonNull(fileMimeTypeDetector, "The instance of fileMimeTypeDetector should be obtained by dependency injection from Plume file Core");
-        return new FileUploadValidator(fileName, displayedFileSize, fileData, fileMimeTypeDetector);
+        return new FileUploadValidator(fileName, fileSize, fileData, fileMimeTypeDetector);
     }
 
     /**

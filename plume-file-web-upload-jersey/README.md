@@ -15,16 +15,21 @@ Setup
 </dependency>
 ```
 2. Create the webservice file with the injected dependency `FileMimeTypeDetector` (it comes from Plume file Core)
+3. Choose your upload option between:
+   - [Jersey Multipart](#uploading-with-multipart): easier to setup, but offers lower performances
+   - [Apache FileUpload](#uploading-with-apache-fileupload): more difficult to setup, so it offers the best performance with no overhead
 
 Uploading with Multipart
 ------------------------
 
 Using the Jersey Multipart API is the easiest way to upload a file.
-This API allows you to get the file InputStream directly from the webservice parameters, by reading the multipart content.
+This API allows you to get the file `InputStream` directly from the webservice parameters, by reading the multipart content.
 
-This method preferably used for small files (< 100Mo).
+This method however has a performance drawback: it will first copy the uploaded file to a temporary file on disk, before giving access to this temporary file. 
+It is preferably used for small files (< 100Mo).
+When uploading large files (> 1Go), this can be a performance issue.
 
-1. Add the Jersey Multipart to your dependencies if not already in your project
+1. Add the Jersey Multipart to your dependencies if not already present
 ```xml
 <dependency>
   <groupId>org.glassfish.jersey.media</groupId>
@@ -43,7 +48,7 @@ config.register(MultiPartFeature.class);
 public void upload(
     @FormDataParam("file") FormDataBodyPart fileMetadata,
     @FormDataParam("file") InputStream fileData,
-    @FormDataParam("part-2") String part2 // an other part of your multipart request
+    @FormDataParam("otherValue") String otherValue // another value present in the multipart request
 ) {
     FileUploadData fileUploadData = FileUploadValidator
         .from(
@@ -66,16 +71,12 @@ public void upload(
 With Jersey Multipart API, you can implement file uploading really quickly as the library preprocesses the multipart request 
 to make it very accessible through parameters.
 
-However, this request preprocessing means that the request is read before you can access it, and put in temp files on your OS.
-When uploading large files (> 1Go), this can be a performance issue.
-
 Uploading with Apache FileUpload
 --------------------------------
 
-The Apache [FileUpload](https://commons.apache.org/proper/commons-fileupload/) package ...
-This will allow you to read the incoming Multipart request as you wish, getting rid of the file preprocessing.
+The Apache [FileUpload](https://commons.apache.org/proper/commons-fileupload/) package will allow you to read the incoming Multipart easily, without waiting for the whole MultiPart request to have been received.
 
-1. Add the Apache Commons FileUpload to your dependencies if not already in your project
+1. Add Apache Commons FileUpload to the project dependencies if not already present
 ```xml
 <dependency>
   <groupId>commons-fileupload</groupId>
@@ -85,7 +86,7 @@ This will allow you to read the incoming Multipart request as you wish, getting 
 ```
 2. Create the webservice endpoint to upload a file (using `multipart/form-data`):
 ```java
-@POST
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(description = "Upload a file")
     @SneakyThrows
@@ -99,24 +100,67 @@ This will allow you to read the incoming Multipart request as you wish, getting 
 2. Create a FileItemIterator from the ContainerRequestContext
 ```java
 FileUpload fileUpload = new FileUpload();
+upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
 FileItemIterator fileIterator = fileUpload.getItemIterator(new RequestContext() {
-    // create you own request context
+    try {
+        return upload.getItemIterator(new RequestContext() {
+            @Override
+            public String getCharacterEncoding() {
+                return StandardCharsets.UTF_8.displayName();
+            }
+
+            @Override
+            public String getContentType() {
+                return request.getMediaType().toString();
+           }
+
+            @Override
+            public int getContentLength() {
+                return request.getLength();
+            }
+
+            @Override
+            public InputStream getInputStream() {
+                return request.getEntityStream();
+            }
+        });
+    } catch (FileUploadException | IOException e) {
+        throw new RuntimeException(e);
+    }
 })
 ```
 3. Read the multipart object with the iterator
 ```java
-while (iterator.hasNext()) {
-    FileItemStream item = iterator.next();
-    String name = item.getFieldName();
-    if ("file".equals(name)) {
-        // handle the file input stream
-    } else if ("string-part-2".equals(name)) {
-        String part2 = Streams.asString(item.openStream());
-    } else if ("instant-part-3".equals(name)) {
-        Instant part3 = Instant.parse(Streams.asString(item.openStream()));
-    } else {
-        logger.debug("File field {} with file name {} detected.", name, item.getName());
+@Data
+private static class UploadStreamingData {
+    String fileUniqueName;
+    InputStream fileInputStream;
+    String password;
+    @Nullable
+    Instant expirationDate;
+};
+@SneakyThrows
+private static UploadStreamingData readMultipartStreamingData(ContainerRequestContext request) {
+    FileItemIterator iterator = JerseyStreamingFileUpload.createIterator(request); // your newly created iterator
+    UploadStreamingData uploadData = new UploadStreamingData();
+    while (iterator.hasNext()) {
+        FileItemStream item = iterator.next();
+        switch (item.getFieldName()) {
+            // file must be the last element of your HTTP Multipart request
+            case  "file" -> {
+                uploadData.setFileUniqueName(item.getName());
+                uploadData.setFileInputStream(item.openStream());
+                // Returning the value directly to leave the function
+                // Otherwise, the JerseyStreamingFileUpload iterator will read the entire input stream before
+                // returning the uploadData object
+                return uploadData;
+            }
+            case "password" -> uploadData.setPassword(Streams.asString(item.openStream()));
+            case "expirationDate" -> uploadData.setExpirationDate(Instant.parse(Streams.asString(item.openStream())));
+            default -> throw new IllegalStateException("Unexpected value: " + item.getFieldName());
+        }
     }
+    return uploadData;
 }
 ```
 
