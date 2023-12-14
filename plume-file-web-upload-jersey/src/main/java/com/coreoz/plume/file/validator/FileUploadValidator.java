@@ -8,6 +8,7 @@ import com.coreoz.plume.jersey.errors.Validators;
 import com.coreoz.plume.jersey.errors.WsError;
 import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,22 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
             logger.warn("Could not extract mime type", e);
             throw new WsException(WsError.REQUEST_INVALID, "Could not read file data");
         }
+    }
+
+    /**
+     * Starts a new validation process using Jersey fields FormDataBodyPart and InputStream.
+     * See {@link #from(String, long, InputStream, FileMimeTypeDetector)} for streaming upload
+     * not relying on Jersey.
+     */
+    public static FileUploadSizeValidator from(FormDataBodyPart fileMetadata, InputStream fileData,
+                                               FileMimeTypeDetector fileMimeTypeDetector) {
+        Validators.checkRequired(fileMetadata);
+        return from(
+            fileMetadata.getContentDisposition().getFileName(),
+            fileMetadata.getFormDataContentDisposition().getSize(),
+            fileData,
+            fileMimeTypeDetector
+        );
     }
 
     /**
