@@ -56,8 +56,7 @@ Those modules provide API connectors to serve and upload files.
 
 - [plume-file-web-download-jersey](plume-file-web-download-jersey): serve stored file through
   a Jersey based single web-service
-- [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file through a Jersey
-  MultiPart object
+- [plume-file-web-upload](plume-file-web-upload): upload file using HTTP multipart
 
 Configuration and default values
 --------------------------------
@@ -91,6 +90,6 @@ file.cache.metadata.max-elements = 10000
 file.url.base-path = "/api/files"
 ```
 
-Migrating from v1 or v2 to v3
------------------------------
-Follow our migration guides in the [v3 release](https://github.com/Coreoz/Plume-file/releases/tag/3.0.0) to keep your projects up-to-date.
+Migrating guides
+----------------
+All migration guides are available in the [Plume File Github releases](https://github.com/Coreoz/Plume-file/releases).

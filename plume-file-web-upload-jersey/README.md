@@ -16,8 +16,8 @@ Setup
 ```
 2. Create the webservice file with the injected dependency `FileMimeTypeDetector` (it comes from Plume file Core)
 3. Choose your upload option between:
-   - [Jersey Multipart](#uploading-with-multipart): easier to setup, but offers lower performances
-   - [Apache FileUpload](#uploading-with-apache-fileupload): more difficult to setup, so it offers the best performance with no overhead
+   - [Jersey Multipart](#uploading-with-multipart): easier to set up, but offers lower performance
+   - [Apache FileUpload](#uploading-with-apache-fileupload): more difficult to set up, so it offers the best performance with no overhead
 
 Uploading with Multipart
 ------------------------
@@ -29,7 +29,7 @@ This method however has a performance drawback: it will first copy the uploaded 
 It is preferably used for small files (< 100Mo).
 When uploading large files (> 1Go), this can be a performance issue.
 
-1. Add the Jersey Multipart to your dependencies if not already present
+1. Add Jersey Multipart to the project dependencies if not already present
 ```xml
 <dependency>
   <groupId>org.glassfish.jersey.media</groupId>
@@ -37,11 +37,11 @@ When uploading large files (> 1Go), this can be a performance issue.
   <version>3.1.3</version>
 </dependency>
 ```
-2. Register the MultiPart Feature on your `JerseyConfigProvider`:
+2. Register the MultiPart Feature in the `JerseyConfigProvider` class:
 ```java
 config.register(MultiPartFeature.class);
 ```
-3. Create the webservice endpoint to upload a file (using `multipart/form-data`):
+3. Create the webservice endpoint to upload a file using `multipart/form-data`:
 ```java
 @POST
 @Operation(description = "Upload a file")
@@ -52,8 +52,7 @@ public void upload(
 ) {
     FileUploadData fileUploadData = FileUploadValidator
         .from(
-            fileMetadata.getContentDisposition().getFileName(),
-            fileMetadata.getFormDataContentDisposition().getSize(),
+            fileMetadata,
             fileData,
             fileMimeTypeDetector
         )
@@ -68,13 +67,13 @@ public void upload(
 }
 ```
 
-With Jersey Multipart API, you can implement file uploading really quickly as the library preprocesses the multipart request 
-to make it very accessible through parameters.
+With Jersey Multipart API, you can implement file uploading quickly as the library preprocesses the multipart request 
+to make it easy to access.
 
 Uploading with Apache FileUpload
 --------------------------------
 
-The Apache [FileUpload](https://commons.apache.org/proper/commons-fileupload/) package will allow you to read the incoming Multipart easily, without waiting for the whole MultiPart request to have been received.
+The Apache [FileUpload Streaming](https://commons.apache.org/proper/commons-fileupload/streaming.html) package will allow you to read the incoming Multipart request, without waiting for the whole request body to have been received.
 
 1. Add Apache Commons FileUpload to the project dependencies if not already present
 ```xml
@@ -97,48 +96,31 @@ The Apache [FileUpload](https://commons.apache.org/proper/commons-fileupload/) p
         // handle the multipart object contained in the ContainerRequestContext ... 
     }
 ```
-2. Create a FileItemIterator from the ContainerRequestContext
+2. Create a `FileItemIterator` from the `ContainerRequestContext`:
 ```java
 FileUpload fileUpload = new FileUpload();
 upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
-FileItemIterator fileIterator = fileUpload.getItemIterator(new RequestContext() {
-    try {
-        return upload.getItemIterator(new RequestContext() {
-            @Override
-            public String getCharacterEncoding() {
-                return StandardCharsets.UTF_8.displayName();
-            }
-
-            @Override
-            public String getContentType() {
-                return request.getMediaType().toString();
-           }
-
-            @Override
-            public int getContentLength() {
-                return request.getLength();
-            }
-
-            @Override
-            public InputStream getInputStream() {
-                return request.getEntityStream();
-            }
-        });
-    } catch (FileUploadException | IOException e) {
-        throw new RuntimeException(e);
-    }
-})
+FileItemIterator fileIterator = fileUpload.getItemIterator(new JaxRsFileItemIterator(request));
+while (fileIterator.hasNext()) {
+  FileItemStream item = iterator.next();
+  // do the rest following https://commons.apache.org/proper/commons-fileupload/streaming.html
+}
 ```
-3. Read the multipart object with the iterator
+
+### Example of file upload using the streaming API
+In this example:
+- A file is uploaded alongside a password and an expiration date
+- The file multipart item is the **last multipart item** of the incoming requests 
+
 ```java
 @Data
-private static class UploadStreamingData {
-    String fileUniqueName;
+public class UploadStreamingData {
+    String fileName;
     InputStream fileInputStream;
     String password;
-    @Nullable
     Instant expirationDate;
-};
+}
+
 @SneakyThrows
 private static UploadStreamingData readMultipartStreamingData(ContainerRequestContext request) {
     FileItemIterator iterator = JerseyStreamingFileUpload.createIterator(request); // your newly created iterator
@@ -148,9 +130,9 @@ private static UploadStreamingData readMultipartStreamingData(ContainerRequestCo
         switch (item.getFieldName()) {
             // file must be the last element of your HTTP Multipart request
             case  "file" -> {
-                uploadData.setFileUniqueName(item.getName());
+                uploadData.setFileName(item.getName());
                 uploadData.setFileInputStream(item.openStream());
-                // Returning the value directly to leave the function
+                // Return the value directly to leave the function.
                 // Otherwise, the JerseyStreamingFileUpload iterator will read the entire input stream before
                 // returning the uploadData object
                 return uploadData;
@@ -164,32 +146,28 @@ private static UploadStreamingData readMultipartStreamingData(ContainerRequestCo
 }
 ```
 
-The real advantage of this solution is to be free to handle the multipart.
-When uploading large files (> 1 Go), this make a real difference on upload time, as the stream can be read only once.
-
 Before using the library
 ------------------------
-
-Before uploading a file with Plume File Web Upload Jersey,
-one must be very careful with the consequences of allowing upload in an application.
+Allowing file upload in an application has security implications.
+Some of these implications are handled by [Plume File Upload Jersey](#what-validations-are-performed-in-plume-file-upload-jersey).
 
 A sum up of file upload security considerations is available on [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html).
 
-### What is in the library
+### What validations are performed in Plume File Upload Jersey?
 
-The library helps you implement some of them with the FileUploadValidators. For example:
+The library helps you implement some of them with `FileUploadValidators`. For example:
 - Checks the maximum file size
 - Checks the file extension from the HTTP headers
 - Checks the media type from the HTTP headers
 
-These validators should be used to helps you verify that the incoming files are what your application expected.
+These validators should be used to help verify that the incoming files are what the application expects.
 
 ### What should be checked before implementing each upload
 
 Using `FileUploadValidator` should help you verify many aspects of file uploading. On top of that, these elements should also be taken in consideration when implementing a file upload: 
 - Only allow authorized users to upload files
 - Run the files through an antivirus or a sandbox if available to validate that it doesn't contain malicious data
-- Ensure that Jersey and Plume files libraries are securely configured and up to date
+- Ensure that Jersey and Plume files libraries are up-to-date
 - Protect the file upload from CSRF attacks. This can be mitigated mainly:
   - Using configuring correct `Content-Security-Policy` HTTP headers
   - Using an authentication token that is not stored in cookies (like in [Plume admin](https://github.com/Coreoz/Plume-admin))
