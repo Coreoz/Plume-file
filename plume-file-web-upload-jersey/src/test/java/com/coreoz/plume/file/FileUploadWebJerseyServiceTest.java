@@ -11,15 +11,12 @@ import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.validator.FileUploadData;
 import com.coreoz.plume.file.validator.FileUploadValidator;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -43,25 +40,17 @@ public class FileUploadWebJerseyServiceTest {
         );
     }
 
-    private FileUploadData makeUploadData(FormDataBodyPart formDataBodyPart) {
+    private FileUploadData makeUploadData(String fileName, long size) {
         return ((FileUploadValidator) FileUploadValidator
-            .from(formDataBodyPart, InputStream.nullInputStream(), mimeTypesDetector))
+            .from(fileName, size, InputStream.nullInputStream(), mimeTypesDetector))
             .finish();
     }
 
     @Test
     public void add_file_with_all_metadata_should_not_fail() {
-        FormDataBodyPart formDataBodyPart = new FormDataBodyPart();
-        FormDataContentDisposition formDataContentDisposition = FormDataContentDisposition.name("test")
-            .fileName("File Name")
-            .size(12)
-            .build();
-        formDataBodyPart.setFormDataContentDisposition(formDataContentDisposition);
-        formDataBodyPart.setMediaType(MediaType.TEXT_XML_TYPE);
-
         String uid = this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
-            makeUploadData(formDataBodyPart)
+            makeUploadData("File Name", 12)
         );
 
         Assert.assertNotNull(uid);

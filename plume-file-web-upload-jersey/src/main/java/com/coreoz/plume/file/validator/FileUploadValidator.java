@@ -8,7 +8,6 @@ import com.coreoz.plume.jersey.errors.Validators;
 import com.coreoz.plume.jersey.errors.WsError;
 import com.coreoz.plume.jersey.errors.WsException;
 import com.google.common.base.Strings;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +44,13 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
 
     private FileUploadData data;
 
-    private FileUploadValidator(FormDataBodyPart fileMetadata, InputStream fileData,
-                                FileMimeTypeDetector fileMimeTypeDetector) {
+    private FileUploadValidator(
+        String fileName,
+        long fileSize,
+        InputStream fileData,
+        FileMimeTypeDetector fileMimeTypeDetector
+    ) {
         try {
-            String fileName = fileMetadata.getContentDisposition().getFileName();
             PeekingInputStream filePeekingStream = new PeekingInputStream(fileData);
             String mimeType = fileMimeTypeDetector.guessMimeType(fileName, filePeekingStream);
             this.data = new FileUploadData(
@@ -56,7 +58,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
                 fileName,
                 FileNames.parseFileNameExtension(fileName),
                 mimeType,
-                fileMetadata.getFormDataContentDisposition().getSize()
+                fileSize
             );
         } catch (IOException e) {
             logger.warn("Could not extract mime type", e);
@@ -66,13 +68,23 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
 
     /**
      * Starts a new validation process using Jersey fields FormDataBodyPart and InputStream
+     * @param fileName the file name
+     * @param fileSize the file size in bytes
+     *                 it's usually the value of the Header Content-Length,
+     *                 considering that the rest of the MultiPart body is insignificant
+     * @param fileData the file InputStream
+     * @param fileMimeTypeDetector the mime type detector {@link FileMimeTypeDetector}
+     * @return a {@link FileUploadSizeValidator} builder
      */
-    public static FileUploadSizeValidator from(FormDataBodyPart fileMetadata, InputStream fileData,
-                                               FileMimeTypeDetector fileMimeTypeDetector) {
+    public static FileUploadSizeValidator from(
+        String fileName,
+        long fileSize,
+        InputStream fileData,
+        FileMimeTypeDetector fileMimeTypeDetector
+    ) {
         Validators.checkRequired(fileData);
-        Validators.checkRequired(fileMetadata);
         Objects.requireNonNull(fileMimeTypeDetector, "The instance of fileMimeTypeDetector should be obtained by dependency injection from Plume file Core");
-        return new FileUploadValidator(fileMetadata, fileData, fileMimeTypeDetector);
+        return new FileUploadValidator(fileName, fileSize, fileData, fileMimeTypeDetector);
     }
 
     /**
