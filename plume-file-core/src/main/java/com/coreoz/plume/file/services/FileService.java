@@ -26,7 +26,7 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
-import com.coreoz.plume.file.utils.FileNames;
+import com.coreoz.plume.file.utils.FileExtensionCleaning;
 
 import lombok.SneakyThrows;
 
@@ -79,7 +79,7 @@ public class FileService {
         Objects.requireNonNull(fileType);
         Objects.requireNonNull(fileInputStream);
 
-        String fileCleanExtension = FileNames.cleanExtensionName(fileExtension);
+        String fileCleanExtension = FileExtensionCleaning.cleanExtensionName(fileExtension);
         String fileUniqueName = UUID.randomUUID() + ((fileCleanExtension == null || fileCleanExtension.isEmpty()) ? "" : "." + fileCleanExtension);
         this.fileMetadataService.add(
             fileUniqueName,
@@ -116,7 +116,7 @@ public class FileService {
      * then call {@link #add(FileType, InputStream, String, String, String)}
      */
     public String add(FileType fileType, InputStream fileData, String fileName, String mimeType) throws UncheckedIOException {
-        return add(fileType, fileData, fileName, FileNames.parseFileNameExtension(fileName), mimeType);
+        return add(fileType, fileData, fileName, FileExtensionCleaning.parseFileNameExtension(fileName), mimeType);
     }
 
     /**
@@ -131,7 +131,7 @@ public class FileService {
                 fileType,
                 filePeekingStream.peekedStream(),
                 fileName,
-                FileNames.parseFileNameExtension(fileName),
+                FileExtensionCleaning.parseFileNameExtension(fileName),
                 mimeType
             );
         } catch (IOException e) {

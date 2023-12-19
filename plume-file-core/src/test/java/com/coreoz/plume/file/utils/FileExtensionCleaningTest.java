@@ -4,28 +4,28 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FileNamesTest {
+public class FileExtensionCleaningTest {
 	@Test
 	public void test_get_extension_from_jpg_should_return_jpg() {
-		assertThat(FileNames.parseFileNameExtension("toto.jpg"))
+		assertThat(FileExtensionCleaning.parseFileNameExtension("toto.jpg"))
 			.isEqualTo("jpg");
 	}
 
 	@Test
 	public void test_get_extension_from_no_extension_should_return_empty() {
-		assertThat(FileNames.parseFileNameExtension("toto"))
+		assertThat(FileExtensionCleaning.parseFileNameExtension("toto"))
 			.isNull();
 	}
 
 	@Test
 	public void test_clean_extension_from_jpg_should_return_jpg() {
-		assertThat(FileNames.cleanExtensionName(".jpg"))
+		assertThat(FileExtensionCleaning.cleanExtensionName(".jpg"))
 			.isEqualTo("jpg");
 	}
 
 	@Test
 	public void cleanExtensionName__verify_that_non_basic_chars_are_removed() {
-		assertThat(FileNames.cleanExtensionName(" éi+$.	\np"))
+		assertThat(FileExtensionCleaning.cleanExtensionName(" éi+$.	\np"))
 			.isEqualTo("ip");
 	}
 }

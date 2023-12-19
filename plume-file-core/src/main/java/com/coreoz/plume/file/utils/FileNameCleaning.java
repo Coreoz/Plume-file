@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.cleaning;
+package com.coreoz.plume.file.utils;
 
 import javax.annotation.Nullable;
 import java.text.Normalizer;
@@ -10,6 +10,10 @@ public class FileNameCleaning {
     private static final Pattern stripAccentPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");//$NON-NLS-1$
 
     private static final String EMPTY = "";
+
+    private FileNameCleaning() {
+        // empty constructor
+    }
 
     /**
      * Remove all weird characters while trying to ensure

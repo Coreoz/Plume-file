@@ -3,10 +3,10 @@ package com.coreoz.plume.file.utils;
 import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
-public class FileNames {
+public class FileExtensionCleaning {
     private static final Pattern fileExtensionExcludePattern = Pattern.compile("[^a-zA-Z0-9]");
 
-    private FileNames() {
+    private FileExtensionCleaning() {
         // empty constructor
     }
 

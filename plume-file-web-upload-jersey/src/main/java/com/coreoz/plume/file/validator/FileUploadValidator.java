@@ -1,9 +1,9 @@
 package com.coreoz.plume.file.validator;
 
-import com.coreoz.plume.file.cleaning.FileNameCleaning;
+import com.coreoz.plume.file.utils.FileNameCleaning;
 import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
 import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
-import com.coreoz.plume.file.utils.FileNames;
+import com.coreoz.plume.file.utils.FileExtensionCleaning;
 import com.coreoz.plume.jersey.errors.Validators;
 import com.coreoz.plume.jersey.errors.WsError;
 import com.coreoz.plume.jersey.errors.WsException;
@@ -57,7 +57,7 @@ public class FileUploadValidator implements FileUploadSizeValidator, FileUploadE
             this.data = new FileUploadData(
                 filePeekingStream.peekedStream(),
                 fileName,
-                FileNames.parseFileNameExtension(fileName),
+                FileExtensionCleaning.parseFileNameExtension(fileName),
                 mimeType,
                 fileSize
             );

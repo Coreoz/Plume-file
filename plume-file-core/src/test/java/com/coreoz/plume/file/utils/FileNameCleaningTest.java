@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.cleaning;
+package com.coreoz.plume.file.utils;
 
 import org.junit.Test;
 

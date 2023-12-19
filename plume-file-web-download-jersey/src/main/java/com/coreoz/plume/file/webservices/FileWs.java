@@ -2,7 +2,8 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.utils.FileNames;
+import com.coreoz.plume.file.utils.FileExtensionCleaning;
+import com.coreoz.plume.file.utils.FileNameCleaning;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +21,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -52,7 +55,7 @@ public class FileWs {
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		// fileUniqueName cannot be null as it is required by jersey PathParam
-		String fileExtension = FileNames.parseFileNameExtension(fileUniqueName);
+		String fileExtension = FileExtensionCleaning.parseFileNameExtension(fileUniqueName);
 		String fileUid = fileUniqueName.substring(
 			0,
 			fileUniqueName.length() - (fileExtension != null ? fileExtension.length() : 0) - 1
@@ -97,8 +100,15 @@ public class FileWs {
 						if (attachment) {
                             String attachmentFilename = Optional.ofNullable(fileMetadata.getFileOriginalName())
                                 .orElse(fileMetadata.getUniqueName());
+							String utf8FileName = URLEncoder.encode(attachmentFilename, StandardCharsets.UTF_8)
+								.replace("+", "%20");
+							String sanitizedFileName = FileNameCleaning.cleanFileName(attachmentFilename);
                             response
-                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentFilename + "\"");
+                                .header(
+									HttpHeaders.CONTENT_DISPOSITION,
+									"attachment; filename=\"" + sanitizedFileName
+										+ "\"; filename*=UTF-8''" + utf8FileName
+								);
                         }
 						return response.build();
 					});
