@@ -1,17 +1,12 @@
-package com.coreoz.plume.file.utils;
+package com.coreoz.plume.file.cleaning;
 
 import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
-/**
- * For removal in V4
- * Call {@link com.coreoz.plume.file.cleaning.FileExtensionCleaning} instead
- */
-@Deprecated(forRemoval = true)
-public class FileNames {
+public class FileExtensionCleaning {
     private static final Pattern fileExtensionExcludePattern = Pattern.compile("[^a-zA-Z0-9]");
 
-    private FileNames() {
+    private FileExtensionCleaning() {
         // empty constructor
     }
 

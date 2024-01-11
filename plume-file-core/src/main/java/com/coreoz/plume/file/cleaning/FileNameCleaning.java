@@ -11,6 +11,10 @@ public class FileNameCleaning {
 
     private static final String EMPTY = "";
 
+    private FileNameCleaning() {
+        // empty constructor
+    }
+
     /**
      * Remove all weird characters while trying to ensure
      * the sanitize file name is close to the original one:<br>
