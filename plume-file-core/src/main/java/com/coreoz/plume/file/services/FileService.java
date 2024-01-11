@@ -26,7 +26,7 @@ import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.coreoz.plume.file.services.storage.FileStorageService;
-import com.coreoz.plume.file.utils.FileExtensionCleaning;
+import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
 
 import lombok.SneakyThrows;
 

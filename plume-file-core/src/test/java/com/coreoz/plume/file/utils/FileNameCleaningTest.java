@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.utils;
 
+import com.coreoz.plume.file.cleaning.FileNameCleaning;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

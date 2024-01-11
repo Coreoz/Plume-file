@@ -1,4 +1,4 @@
-package com.coreoz.plume.file.utils;
+package com.coreoz.plume.file.cleaning;
 
 import javax.annotation.Nullable;
 import java.util.regex.Pattern;

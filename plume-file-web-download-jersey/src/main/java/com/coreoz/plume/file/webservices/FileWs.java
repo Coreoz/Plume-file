@@ -2,8 +2,8 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.service.FileDownloadJerseyService;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.utils.FileExtensionCleaning;
-import com.coreoz.plume.file.utils.FileNameCleaning;
+import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
+import com.coreoz.plume.file.cleaning.FileNameCleaning;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
