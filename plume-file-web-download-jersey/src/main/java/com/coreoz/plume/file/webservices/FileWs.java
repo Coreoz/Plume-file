@@ -5,6 +5,7 @@ import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationServ
 import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
 import com.coreoz.plume.file.cleaning.FileNameCleaning;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
+import com.google.common.net.UrlEscapers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +22,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -100,8 +99,7 @@ public class FileWs {
 						if (attachment) {
                             String attachmentFilename = Optional.ofNullable(fileMetadata.getFileOriginalName())
                                 .orElse(fileMetadata.getUniqueName());
-							String utf8FileName = URLEncoder.encode(attachmentFilename, StandardCharsets.UTF_8)
-								.replace("+", "%20");
+							String utf8FileName = UrlEscapers.urlFragmentEscaper().escape(attachmentFilename);
 							String sanitizedFileName = FileNameCleaning.cleanFileName(attachmentFilename);
                             response
                                 .header(
