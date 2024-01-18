@@ -1,9 +1,12 @@
+Complementary migration guides
+==============================
+This guide contains some additional information to the migrations guides when files are involved.
+
+For the complete migration guides, please refer to [Plume File Github releases](https://github.com/Coreoz/Plume-file/releases).
+
 Plume File SQL migration guide to V3
-====================================
-
+------------------------------------
 This migration guide does not delete old Plume File tables. They will be found under *table_name*_history.
-
-For the complete migration guide to V3, please refer to [Plume File Github releases](https://github.com/Coreoz/Plume-file/releases).
 
 #### Migrating v1.0.0-rc1 ~ v1.0.0-rc9
 
