@@ -1,7 +1,7 @@
 package com.coreoz.plume.file.services.configuration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -23,7 +23,7 @@ public class FileConfigurationService {
 	public String cleaningHour() {
 		return config.getString("file.cleaning-hour");
 	}
-	
+
 	public String checksumAlgorithm() {
 		return config.getString("file.checksum-algorithm");
 	}
