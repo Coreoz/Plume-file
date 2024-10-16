@@ -4,8 +4,8 @@ import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.filetype.FileType;
 import com.coreoz.plume.file.validator.FileUploadData;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class FileUploadWebJerseyService {

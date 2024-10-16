@@ -12,8 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
 import com.coreoz.plume.file.services.mimetype.PeekingInputStream;

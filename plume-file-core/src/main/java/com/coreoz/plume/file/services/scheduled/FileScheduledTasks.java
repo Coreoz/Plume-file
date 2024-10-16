@@ -5,8 +5,8 @@ import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.wisp.Scheduler;
 import com.coreoz.wisp.schedule.Schedules;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class FileScheduledTasks {

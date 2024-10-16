@@ -2,7 +2,7 @@ package com.coreoz.plume.file.streaming;
 
 import org.apache.commons.fileupload.RequestContext;
 
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
