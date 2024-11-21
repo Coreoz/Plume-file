@@ -6,18 +6,14 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import com.coreoz.plume.file.service.FileTestModule;
+import com.coreoz.test.GuiceTest;
 import jakarta.inject.Inject;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
-
-@RunWith(GuiceTestRunner.class)
-@GuiceModules(FileTestModule.class)
+@GuiceTest(FileTestModule.class)
 public class FileStorageDaoTest {
     @Inject
     private FileStorageDao fileDao;
@@ -25,13 +21,13 @@ public class FileStorageDaoTest {
     @Test
     public void fetch_existing_file_should_return_the_file() {
         Optional<InputStream> file = fileDao.fetch("846c36cc-f973-11e8-8eb2-f2801f1b9fd1");
-        Assert.assertTrue(file.isPresent());
+        Assertions.assertThat(file).isPresent();
     }
 
     @Test
     public void fetch_unknown_file_should_return_empty() {
         Optional<InputStream> file = fileDao.fetch("unknown");
-        Assert.assertFalse(file.isPresent());
+        Assertions.assertThat(file).isEmpty();
     }
 
     @Test

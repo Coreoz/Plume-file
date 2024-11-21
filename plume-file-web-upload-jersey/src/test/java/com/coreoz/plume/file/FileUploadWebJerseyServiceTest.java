@@ -1,7 +1,5 @@
 package com.coreoz.plume.file;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.filetype.FileType;
@@ -11,26 +9,25 @@ import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
 import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.validator.FileUploadData;
 import com.coreoz.plume.file.validator.FileUploadValidator;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import com.coreoz.test.GuiceTest;
 import jakarta.inject.Inject;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
-@RunWith(GuiceTestRunner.class)
-@GuiceModules(FileUploadTestModule.class)
+@GuiceTest(FileUploadTestModule.class)
 public class FileUploadWebJerseyServiceTest {
     @Inject
     FileConfigurationService fileConfigurationService;
     FileUploadWebJerseyService fileUploadWebJerseyService;
     MimeTypesDetector mimeTypesDetector;
 
-    @Before
+    @BeforeEach
     public void before_test() throws NoSuchAlgorithmException {
         FileMetadataService fileMetadataService = new FileMetadataServiceTest();
         FileStorageService fileStorageService = new FileStorageServiceTest();
@@ -53,7 +50,7 @@ public class FileUploadWebJerseyServiceTest {
             makeUploadData("File Name", 12)
         );
 
-        Assert.assertNotNull(uid);
+        Assertions.assertThat(uid).isNotNull();
     }
 
     private static class FileMetadataServiceTest implements FileMetadataService {

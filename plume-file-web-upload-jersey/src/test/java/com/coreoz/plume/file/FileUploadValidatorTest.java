@@ -5,10 +5,12 @@ import com.coreoz.plume.file.validator.FileUploadSizeValidator;
 import com.coreoz.plume.file.validator.FileUploadValidator;
 import com.coreoz.plume.jersey.errors.WsException;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileUploadValidatorTest {
 
@@ -54,9 +56,12 @@ public class FileUploadValidatorTest {
         makeValidator("test.xml", 0).fileExtensions(Set.of("xml"));
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void fileExtension__not_accepted_extension_should_fail() {
-        makeValidator("test.xml", 0).fileExtensions(Set.of("xlsx"));
+        assertThrows(
+            WsException.class,
+            () -> makeValidator("test.xml", 0).fileExtensions(Set.of("xlsx"))
+        );
     }
 
     @Test
@@ -64,14 +69,21 @@ public class FileUploadValidatorTest {
         makeValidator("test.abcdefgh", 0).fileExtensionMaxLength(8);
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void fileExtensionMaxLength__over_limit_length_should_fail() {
-        makeValidator("test.abcdefgh", 0).fileExtensionMaxLength(7);
+        assertThrows(
+            WsException.class,
+            () -> makeValidator("test.abcdefgh", 0).fileExtensionMaxLength(7)
+        );
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void fileImage__should_fail_for_xml() {
-        makeValidator("test.xml", 0).fileImage();
+        assertThrows(
+            WsException.class,
+            () -> makeValidator("test.xml", 0).fileImage()
+        );
+
     }
 
     @Test
@@ -89,9 +101,12 @@ public class FileUploadValidatorTest {
         makeValidator("test.csv", 0).mimeTypes(Set.of("text/csv"));
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void mimeTypes__xml_for_json_should_fail() {
-        makeValidator("test.xml", 0).mimeTypes(Set.of("application/json"));
+        assertThrows(
+            WsException.class,
+            () -> makeValidator("test.xml", 0).mimeTypes(Set.of("application/json"))
+        );
     }
 
     @Test
@@ -99,9 +114,12 @@ public class FileUploadValidatorTest {
         makeValidator(null, 10).fileMaxSize(10);
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void fileSize__over_limit_size_should_fail() {
-        makeValidator(null, 10).fileMaxSize(9);
+        assertThrows(
+            WsException.class,
+            () -> makeValidator(null, 10).fileMaxSize(9)
+        );
     }
 
     @Test
@@ -109,9 +127,13 @@ public class FileUploadValidatorTest {
         makeValidator("abcdefgh", 0).fileNameMaxLength(8);
     }
 
-    @Test(expected = WsException.class)
+    @Test
     public void fileNameMaxLength__over_length_size_should_fail() {
-        makeValidator("abcdefgh", 0).fileNameMaxLength(7);
+        ;
+        assertThrows(
+            WsException.class,
+            () -> makeValidator("abcdefgh", 0).fileNameMaxLength(7)
+        );
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.coreoz.plume.file.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
