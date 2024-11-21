@@ -3,8 +3,8 @@ package com.coreoz.plume.file.service.url;
 import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
 import com.coreoz.plume.file.services.url.FileUrlService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class FileDownloadUrlService implements FileUrlService {

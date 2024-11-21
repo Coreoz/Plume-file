@@ -7,13 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.coreoz.test.GuiceTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.carlosbecker.guice.GuiceModules;
-import com.carlosbecker.guice.GuiceTestRunner;
 import com.coreoz.plume.file.db.FileMetadataDatabaseDao;
 import com.coreoz.plume.file.db.beans.FileMetadataQuerydsl;
 import com.coreoz.plume.file.filetype.FileTypeDatabase;
@@ -23,12 +21,11 @@ import com.coreoz.plume.file.services.metadata.FileMetadataService;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.dsl.StringPath;
 
-@RunWith(GuiceTestRunner.class)
-@GuiceModules(FileTestModule.class)
+@GuiceTest(FileTestModule.class)
 public class FileMetadataDatabaseServiceTest {
     private FileMetadataService fileMetadataService;
 
-    @Before
+    @BeforeEach
     public void init_metadata_service() {
         this.fileMetadataService = new FileMetadataDatabaseService(this.mockDao, new TestTypeProvider());
     }
@@ -36,33 +33,33 @@ public class FileMetadataDatabaseServiceTest {
     @Test
     public void fetch_file_with_known_unique_file_name_must_return_object() {
         Optional<? extends FileMetadata> fileMetadata = this.fileMetadataService.fetch("random-uid-to-fetch");
-        Assert.assertTrue(fileMetadata.isPresent());
-        Assert.assertEquals("TEST", fileMetadata.get().getFileType());
-        Assert.assertEquals("application/pdf", fileMetadata.get().getMimeType());
+        Assertions.assertTrue(fileMetadata.isPresent());
+        Assertions.assertEquals("TEST", fileMetadata.get().getFileType());
+        Assertions.assertEquals("application/pdf", fileMetadata.get().getMimeType());
     }
 
     @Test
     public void fetch_file_with_unknown_unique_file_name_must_return_empty() {
         Optional<? extends FileMetadata> fileMetadata = this.fileMetadataService.fetch("unknown-uid-to-fetch");
-        Assert.assertFalse(fileMetadata.isPresent());
+        Assertions.assertFalse(fileMetadata.isPresent());
     }
 
     @Test
     public void upload_file_must_return_valid_id() {
         this.fileMetadataService.add("unknown-uid-to-fetch", "original_name", "TEST", "pdf", "application/pdf");
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void unreferenced_files_must_return_valid_list() {
         List<String> unreferencedFiles = this.fileMetadataService.findUnreferencedFiles();
-        Assert.assertEquals(0, unreferencedFiles.size());
+        Assertions.assertEquals(0, unreferencedFiles.size());
     }
 
     @Test
     public void unreferenced_files_must_not_fail() {
         this.fileMetadataService.deleteAll(Collections.singletonList("random-uid-to-fetch"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     private final FileMetadataDatabaseDao mockDao = new FileMetadataDatabaseDao(null) {

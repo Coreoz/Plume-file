@@ -3,7 +3,7 @@ package com.coreoz.plume.file.configuration;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class FileStorageConfigurationService {
     private final Config config;

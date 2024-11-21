@@ -2,7 +2,7 @@ package com.coreoz.plume.file.service.mimetype;
 
 import com.coreoz.plume.file.services.mimetype.MimeTypesDetector;
 import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
