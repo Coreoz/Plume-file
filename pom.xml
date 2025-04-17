@@ -72,7 +72,7 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 
-		<plume-framework-dependencies.version>5.0.0-beta1</plume-framework-dependencies.version>
+		<plume-framework-dependencies.version>5.0.0</plume-framework-dependencies.version>
 	</properties>
 
 	<modules>
