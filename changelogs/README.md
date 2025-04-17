@@ -4,6 +4,11 @@ This guide contains some additional information to the migrations guides when fi
 
 For the complete migration guides, please refer to [Plume File Github releases](https://github.com/Coreoz/Plume-file/releases).
 
+Plume File SQL migration guide to V4
+------------------------------------
+This upgrade contains the Jakarta update along with Plume 5 and Java 17.
+Follow the [Plume v5 migration guide](https://github.com/Coreoz/Plume/blob/master/docs/releases/RELEASE_v5.md) to upgrade.
+
 Plume File SQL migration guide to V3
 ------------------------------------
 This migration guide does not delete old Plume File tables. They will be found under *table_name*_history.
