@@ -46,27 +46,6 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>oss.public</id>
-			<url>https://oss.sonatype.org/content/groups/public</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -125,6 +104,15 @@
                             </tags>
                         </configuration>
 					</plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
@@ -166,11 +154,6 @@
 			<dependency>
 				<groupId>com.coreoz</groupId>
 				<artifactId>plume-file-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.coreoz</groupId>
-				<artifactId>plume-file-gallery</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
