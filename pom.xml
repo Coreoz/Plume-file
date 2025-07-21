@@ -4,7 +4,7 @@
 
 	<groupId>com.coreoz</groupId>
 	<artifactId>plume-file-parent</artifactId>
-	<version>3.1.2</version>
+	<version>3.1.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Plume File Parent</name>
@@ -43,7 +43,7 @@
 		<developerConnection>scm:git:git@github.com:Coreoz/Plume-file.git</developerConnection>
 		<connection>scm:git:git@github.com:Coreoz/Plume-file.git</connection>
 		<url>https://github.com/Coreoz/Plume-file</url>
-		<tag>3.1.2</tag>
+		<tag>fix-3x/upgrade-commons-fileupload</tag>
 	</scm>
 
 	<properties>
