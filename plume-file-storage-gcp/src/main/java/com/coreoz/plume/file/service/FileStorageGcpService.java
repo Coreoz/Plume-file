@@ -59,12 +59,10 @@ public class FileStorageGcpService implements FileStorageService {
     }
 
     @Override
-    public void deleteAll(List<String> fileUniqueNames) throws IOException {
+    public void deleteAll(List<String> fileUniqueNames) {
         for (String fileUniqueName : fileUniqueNames) {
             BlobId blobId = BlobId.of(bucketName, objectName(fileUniqueName));
-            if (!storage.delete(blobId)) {
-                throw new IOException("Failed to delete file: " + objectName(fileUniqueName));
-            }
+            storage.delete(blobId);
         }
     }
 

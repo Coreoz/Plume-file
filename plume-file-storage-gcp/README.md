@@ -1,4 +1,4 @@
-# plume-file-storage-gcp
+# Plume File Storage GCP
 
 A Google Cloud Storage backend for the [Plume File](https://github.com/Coreoz/Plume-file) module.
 
@@ -10,9 +10,7 @@ It supports storing files either at the **root of a bucket** or inside a configu
 
 ## Features
 
-* ✅ Fully compatible with the `FileStorageService` interface.
 * ✅ Configurable **base path**: store files at the bucket root or in a “folder”.
-* ✅ Supports upload, download and bulk deletion.
 * ✅ Works with **Application Default Credentials**, service account JSON key or Workload Identity.
 * ✅ Supports injection of a custom `Credentials` object via `GcpCredentialsProvider`.
 
@@ -29,11 +27,10 @@ Maven:
 <dependency>
   <groupId>com.coreoz</groupId>
   <artifactId>plume-file-storage-gcp</artifactId>
-  <version>4.x.x</version>
 </dependency>
 ```
 
-Guice module:
+In the ApplicationModule class, install the following Guice module:
 
 ```java 
 install(new GuiceFileStorageGcpModule());
@@ -61,35 +58,11 @@ install(new GuiceFileStorageGcpModule());
 
 ## Usage
 
-### 1. Upload a file
+### 1. Upload / Fetch / Delete a file
 
-```java
-try (InputStream data = new FileInputStream("local-file.jpg")) {
-    fileStorage.add("picture-123.jpg", data);
-}
-```
+See Usage of the [Plume File core module](../plume-file-core/README.md/#usage) to upload files.
 
-This creates an object in the bucket at:
-```
-gs://my-bucket/images/picture-123.jpg
-```
-
-### 2. Fetch a file
-
-```java
-Optional<InputStream> data = fileStorage.fetch("picture-123.jpg");
-data.ifPresent(stream -> {
-    // read from the InputStream
-});
-```
-
-### 3. Delete files
-
-```java
-fileStorage.deleteAll(List.of("picture-123.jpg", "old-picture.jpg"));
-```
-
-### 4. Override credentials with `GcpCredentialsProvider`
+### 2. Override credentials with `GcpCredentialsProvider`
 
 You can implement and bind your own `GcpCredentialsProvider` to provide `com.google.auth.Credentials`:
 
@@ -105,6 +78,10 @@ public class GcpCredentialsProvider implements Provider<Credentials> {
 Then bind it in your Guice module:
 
 ```java
+import com.google.auth.Credentials;
+
+// your Guice module ...
+
 bind(Credentials.class).toProvider(MyCustomGcpCredentialsProvider.class);
 ```
 
@@ -112,13 +89,10 @@ bind(Credentials.class).toProvider(MyCustomGcpCredentialsProvider.class);
 
 ## Configurations
 
-| Parameter                           | Description                                                                                                                                                                      |
-|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `file.storage.gcp.bucket-name`      | Name of the GCS bucket.                                                                                                                                                          |
-| `file.storage.gcp.project-id`       | GCP project ID.                                                                                                                                                                  |
-| `file.storage.gcp.bucket-base-path` | Optional folder/prefix inside the bucket. Use `""` for root or e.g. `"uploads/"`.                                                                                                |
-| `file.storage.gcp.credentials-path` | Optional path to the service account JSON key file for [GcpCredentialsProvider.java](src%2Fmain%2Fjava%2Fcom%2Fcoreoz%2Fplume%2Ffile%2Fcredential%2FGcpCredentialsProvider.java) |
+| Parameter                           | Description                                                                                                                                                                                         |
+|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `file.storage.gcp.bucket-name`      | Name of the GCS bucket.                                                                                                                                                                             |
+| `file.storage.gcp.project-id`       | GCP project ID.                                                                                                                                                                                     |
+| `file.storage.gcp.bucket-base-path` | Optional folder/prefix inside the bucket. Use `""` for root or e.g. `"uploads/"`.                                                                                                                   |
+| `file.storage.gcp.credentials-path` | File system path to the service account JSON key file (only required for [GcpCredentialsProvider.java](src%2Fmain%2Fjava%2Fcom%2Fcoreoz%2Fplume%2Ffile%2Fcredential%2FGcpCredentialsProvider.java)) |
 
-## License
-
-[MIT](LICENSE)

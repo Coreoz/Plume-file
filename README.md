@@ -43,6 +43,7 @@ The storage modules implements `FileStorageService`:
 
 - [plume-file-storage-database](plume-file-storage-database): store uploaded file in a database
 - [plume-file-storage-system](plume-file-storage-system): store uploaded file on a system disk
+- [plume-file-storage-gcp](plume-file-storage-gcp): store uploaded file on a GCP Cloud Storage bucket
 
 #### Metadata module
 
