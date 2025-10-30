@@ -7,9 +7,11 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.storage.StorageOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.nio.channels.Channels;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Singleton
 public class FileStorageGcpService implements FileStorageService {
 
@@ -62,7 +65,11 @@ public class FileStorageGcpService implements FileStorageService {
     public void deleteAll(List<String> fileUniqueNames) {
         for (String fileUniqueName : fileUniqueNames) {
             BlobId blobId = BlobId.of(bucketName, objectName(fileUniqueName));
-            storage.delete(blobId);
+            try {
+                storage.delete(blobId);
+            } catch (StorageException e) {
+                logger.warn("Failed to delete file: {}", fileUniqueName, e);
+            }
         }
     }
 
