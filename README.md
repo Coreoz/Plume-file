@@ -57,7 +57,7 @@ Those modules provide API connectors to serve and upload files.
 
 - [plume-file-web-download-jersey](plume-file-web-download-jersey): serve stored file through
   a Jersey based single web-service
-- [plume-file-web-upload](plume-file-web-upload): upload file using HTTP multipart
+- [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file using HTTP multipart
 
 Configuration and default values
 --------------------------------
