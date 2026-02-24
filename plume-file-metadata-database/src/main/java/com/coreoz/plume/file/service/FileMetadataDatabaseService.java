@@ -41,6 +41,11 @@ public class FileMetadataDatabaseService implements FileMetadataService {
     }
 
     @Override
+    public List<FileMetadata> fetchAll(List<String> fileUniqueNames) {
+        return fileMetadataDao.fetchAll(fileUniqueNames);
+    }
+
+    @Override
     public List<String> findUnreferencedFiles() {
         return this.fileMetadataDao.findUnreferencedFiles(this.fileTypes);
     }

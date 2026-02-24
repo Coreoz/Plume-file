@@ -17,8 +17,6 @@ import jakarta.inject.Singleton;
 
 import com.coreoz.plume.file.services.mimetype.FileMimeTypeDetector;
 import com.coreoz.plume.file.services.mimetype.PeekingInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.coreoz.plume.file.services.configuration.FileConfigurationService;
 import com.coreoz.plume.file.services.data.MeasuredSizeInputStream;
@@ -29,12 +27,11 @@ import com.coreoz.plume.file.services.storage.FileStorageService;
 import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Singleton
 public class FileService {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
-
     private final FileMetadataService fileMetadataService;
     private final FileStorageService fileStorageService;
     private final FileMimeTypeDetector fileMimeTypeDetector;
@@ -142,12 +139,19 @@ public class FileService {
     // file data
 
     public Optional<InputStream> fetchData(String fileUniqueName) {
-        return this.fileStorageService.fetch(fileUniqueName);
+        Optional<FileMetadata> fileMetadata = this.fetchMetadata(fileUniqueName);
+        if (fileMetadata.isEmpty()) {
+            return Optional.empty();
+        }
+        return this.fetchData(fileUniqueName, fileMetadata.get());
+    }
+
+    public Optional<InputStream> fetchData(String fileUniqueName, FileMetadata fileMetadata) {
+        return this.fileStorageService.fetch(fileUniqueName, fileMetadata);
     }
 
     public Optional<FileMetadata> fetchMetadata(String fileUniqueName) {
-        return fileMetadataService
-            .fetch(fileUniqueName);
+        return fileMetadataService.fetch(fileUniqueName);
     }
 
     // clean up
@@ -177,9 +181,16 @@ public class FileService {
         logger.debug("{} files having deleted types have been deleted", fileUniqueNamesToDelete.size());
     }
 
+    /**
+     * Delete files by their unique name. This will delete both the file metadata and the file in the storage.
+     * The file metadata will be deleted only if the file in the storage has been successfully deleted, to avoid having unreferenced files in the storage.
+     * @param fileUniqueNamesToDelete the list of unique file names to delete
+     */
     private void deleteFilesByUniqueName(List<String> fileUniqueNamesToDelete) {
+        // basically the metadata should be returned by findFilesHavingDeletedTypes and findUnreferencedFiles, but in order to not create breaking change if the metadata is not returned by these methods, we fetch it here before deleting the metadata
+        List<FileMetadata> filesMetadata = this.fileMetadataService.fetchAll(fileUniqueNamesToDelete);
         try {
-            fileStorageService.deleteAll(fileUniqueNamesToDelete);
+            fileStorageService.deleteFiles(filesMetadata);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

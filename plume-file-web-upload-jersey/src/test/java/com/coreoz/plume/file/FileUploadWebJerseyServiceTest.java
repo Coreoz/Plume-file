@@ -15,20 +15,21 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
 @GuiceTest(FileUploadTestModule.class)
-public class FileUploadWebJerseyServiceTest {
+class FileUploadWebJerseyServiceTest {
     @Inject
     FileConfigurationService fileConfigurationService;
     FileUploadWebJerseyService fileUploadWebJerseyService;
     MimeTypesDetector mimeTypesDetector;
 
     @BeforeEach
-    public void before_test() throws NoSuchAlgorithmException {
+    void before_test() throws NoSuchAlgorithmException {
         FileMetadataService fileMetadataService = new FileMetadataServiceTest();
         FileStorageService fileStorageService = new FileStorageServiceTest();
         this.mimeTypesDetector = new MimeTypesDetector();
@@ -44,7 +45,7 @@ public class FileUploadWebJerseyServiceTest {
     }
 
     @Test
-    public void add_file_with_all_metadata_should_not_fail() {
+    void add_file_with_all_metadata_should_not_fail() {
         String uid = this.fileUploadWebJerseyService.add(
             TestFileType.TEST,
             makeUploadData("File Name", 12)
@@ -71,6 +72,11 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
+        public List<FileMetadata> fetchAll(List<String> fileUniqueNames) {
+            return List.of();
+        }
+
+        @Override
         public List<String> findUnreferencedFiles() {
             return null;
         }
@@ -89,6 +95,12 @@ public class FileUploadWebJerseyServiceTest {
     private static class FileStorageServiceTest implements FileStorageService {
         @Override
         public void add(String fileUniqueName, InputStream fileData) {
+            // empty method
+        }
+
+        @Override
+        public void add(String fileUniqueName, InputStream fileData, FileMetadata fileMetadata) {
+            // empty method
         }
 
         @Override
@@ -97,7 +109,18 @@ public class FileUploadWebJerseyServiceTest {
         }
 
         @Override
+        public Optional<InputStream> fetch(String fileUniqueName, FileMetadata metadata) {
+            return Optional.empty();
+        }
+
+        @Override
         public void deleteAll(List<String> fileUniqueNames) {
+            // no override for test
+        }
+
+        @Override
+        public void deleteFiles(List<FileMetadata> filesToDelete) throws IOException {
+            // no override for test
         }
     }
 

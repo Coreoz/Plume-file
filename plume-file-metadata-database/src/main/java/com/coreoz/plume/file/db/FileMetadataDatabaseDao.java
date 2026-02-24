@@ -1,14 +1,5 @@
 package com.coreoz.plume.file.db;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import com.coreoz.plume.db.querydsl.transaction.TransactionManagerQuerydsl;
 import com.coreoz.plume.file.db.beans.FileMetadataQuerydsl;
 import com.coreoz.plume.file.db.beans.QFileMetadataQuerydsl;
@@ -17,6 +8,14 @@ import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLExpressions;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class FileMetadataDatabaseDao {
@@ -66,6 +65,17 @@ public class FileMetadataDatabaseDao {
                 .where(QFileMetadataQuerydsl.fileMetadata.uniqueName.eq(fileUniqueName))
                 .fetchOne()
         );
+    }
+
+    public List<FileMetadata> fetchAll(List<String> fileUniqueNames) {
+        return transactionManager.selectQuery()
+            .select(QFileMetadataQuerydsl.fileMetadata)
+            .from(QFileMetadataQuerydsl.fileMetadata)
+            .where(QFileMetadataQuerydsl.fileMetadata.uniqueName.in(fileUniqueNames))
+            .fetch()
+            .stream()
+            .map(FileMetadata.class::cast)
+            .toList();
     }
 
     public List<String> findUnreferencedFiles(Collection<FileTypeDatabase> fileTypes) {

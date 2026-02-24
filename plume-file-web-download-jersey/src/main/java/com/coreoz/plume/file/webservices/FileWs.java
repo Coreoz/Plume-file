@@ -77,7 +77,7 @@ public class FileWs {
 					return Optional.of(Response.notModified().build());
 				}
 
-				return this.fileDownloadService.fetchData(fileUniqueName)
+				return this.fileDownloadService.fetchData(fileUniqueName, fileMetadata)
 					.map(fileData -> {
 						ResponseBuilder response = Response.ok(fileData);
 
