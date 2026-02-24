@@ -19,7 +19,6 @@ It supports storing files either at the **root of a bucket** or inside a configu
 ## Installation
 
 To use this module, add the following dependency to your project.
-This will 
 
 Maven:
 
@@ -46,7 +45,7 @@ install(new GuiceFileStorageGcpModule());
     * `storage.objects.create`
     * `storage.objects.get`
     * `storage.objects.delete`
-(For example: `roles/storage.objectAdmin`)
+      (For example: `roles/storage.objectAdmin`)
 
 3. **Provide credentials** to your application:
     * Recommended: set the configuration parameter `file.storage.gcp.credentials-path` to the path of the
@@ -89,10 +88,12 @@ bind(Credentials.class).toProvider(MyCustomGcpCredentialsProvider.class);
 
 ## Configurations
 
-| Parameter                           | Description                                                                                                                                                                                         |
-|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `file.storage.gcp.bucket-name`      | Name of the GCS bucket.                                                                                                                                                                             |
-| `file.storage.gcp.project-id`       | GCP project ID.                                                                                                                                                                                     |
-| `file.storage.gcp.bucket-base-path` | Optional folder/prefix inside the bucket. Use `""` for root or e.g. `"uploads/"`.                                                                                                                   |
-| `file.storage.gcp.credentials-path` | File system path to the service account JSON key file (only required for [GcpCredentialsProvider.java](src%2Fmain%2Fjava%2Fcom%2Fcoreoz%2Fplume%2Ffile%2Fcredential%2FGcpCredentialsProvider.java)) |
+| Parameter                                       | Description                                                                                                                                                                                         |
+|-------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `file.storage.gcp.bucket-name`                  | Name of the GCS bucket.                                                                                                                                                                             |
+| `file.storage.gcp.project-id`                   | GCP project ID.                                                                                                                                                                                     |
+| `file.storage.gcp.bucket-base-path`             | Optional folder/prefix inside the bucket. Use `""` for root or e.g. `"uploads/"`.                                                                                                                   |
+| `file.storage.gcp.credentials-path`             | File system path to the service account JSON key file (only required for [GcpCredentialsProvider.java](src%2Fmain%2Fjava%2Fcom%2Fcoreoz%2Fplume%2Ffile%2Fcredential%2FGcpCredentialsProvider.java)) |
+| `file.storage.use-subdirectories`               | Whether to use subdirectories based on file type names. Default is false.                                                                                                                           |
+| `file.storage.subdirectories-file-type-mapping` | Mapping the file type names to a specific subfolder name                                                                                                                                            |
 

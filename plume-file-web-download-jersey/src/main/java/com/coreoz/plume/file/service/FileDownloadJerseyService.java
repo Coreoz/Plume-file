@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface FileDownloadJerseyService {
     Optional<FileMetadata> fetchMetadata(String fileUniqueName);
     Optional<InputStream> fetchData(String fileUniqueName);
+    Optional<InputStream> fetchData(String fileUniqueName, FileMetadata metadata);
 }

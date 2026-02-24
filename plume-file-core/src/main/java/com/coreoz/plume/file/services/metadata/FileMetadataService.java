@@ -10,6 +10,7 @@ public interface FileMetadataService {
 	void add(String fileUniqueName, String originalName, String fileType, String fileExtension, String mimeType);
 	void updateFileSizeAndChecksum(String fileUniqueName, long fileSize, String checksum);
 	Optional<FileMetadata> fetch(String fileUniqueName);
+	List<FileMetadata> fetchAll(List<String> fileUniqueNames);
 	List<String> findUnreferencedFiles();
 	List<String> findFilesHavingDeletedTypes();
 	void deleteAll(List<String> fileUniqueNamesDeleted);
