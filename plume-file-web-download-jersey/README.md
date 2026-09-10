@@ -2,7 +2,9 @@ Plume File Web Download (Jersey)
 ================================
 
 Serve files over Jersey with optional in-memory caching. 
-This module also provides a ready-to-use JAX-RS resource to expose your files via HTTP. 
+This module also provides a ready-to-use JAX-RS resource to expose your files via HTTP.
+
+> **Note:** The underlying services (`FileDownloadJerseyService`, `FileDownloadConfigurationService`, etc.) have been moved to the shared module `plume-file-web-download-jersey-common` to allow reuse across plain and signed downloads. The local versions in this module have been deprecated for removal.
 
 Part of the [Plume File](../) ecosystem.
 

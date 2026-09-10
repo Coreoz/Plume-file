@@ -28,3 +28,10 @@ This migration guide does not delete old Plume File tables. They will be found u
 - For database storage: [migration script](sql/migration_database_2.0.0-beta5.sql)
 - For disk storage: [migration script](sql/migration_disk_2.0.0-beta5.sql)
   - **Warning** The uid column must reference the file name on the disk
+
+Plume File v4.1.1
+-----------------
+Added support for temporary, cryptographically signed file download URLs with two new modules:
+- `plume-file-signed-url`: pure Java service module to generate and validate HMAC-signed file URLs.
+- `plume-file-web-signed-download-jersey`: Jersey based single web-service to serve signed temporary download URLs.
+These new modules are stateless and do not require any SQL database migrations.

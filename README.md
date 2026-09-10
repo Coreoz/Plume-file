@@ -31,6 +31,7 @@ File URL
 Some modules implement the `FileUrlService` to be able to retrieve the full URL of a file stored using Plume File.
 That is the case of:
 - [plume-file-web-download-jersey](plume-file-web-download-jersey)
+- [plume-file-signed-url](plume-file-signed-url)
 - In the future, the AWS S3 file storage module
 
 Plume file modules
@@ -57,7 +58,9 @@ Those modules provide API connectors to serve and upload files.
 
 - [plume-file-web-download-jersey](plume-file-web-download-jersey): serve stored file through
   a Jersey based single web-service
+- [plume-file-web-signed-download-jersey](plume-file-web-signed-download-jersey): serve temporary, cryptographically signed files using a Jersey based web-service. *Note: this module is designed to be a mutually exclusive replacement for plume-file-web-download-jersey to prevent bypass of signature verification.*
 - [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file using HTTP multipart
+- [plume-file-signed-url](plume-file-signed-url): pure Java service module to generate and validate HMAC-signed file URLs (does not require Jersey)
 
 Configuration and default values
 --------------------------------
@@ -89,6 +92,22 @@ file.cache.metadata.expires-after-access-duration = "1 day"
 file.cache.metadata.max-elements = 10000
 # The base file URL used by FileUrlService.url(). If the config value application.base-url is defined, this can be replaced by file.url.base-path = ${application.base-url}"/api/files"
 file.url.base-path = "/api/files"
+```
+
+**[plume-file-signed-url](plume-file-signed-url)**
+```hocon
+# Secret key for HMAC-SHA256 signature. REQUIRED, no usable default
+file.signed-url.secret-key = null
+# Default duration for which the signed URL is valid
+file.signed-url.default-validity-duration = "1 hour"
+# Base path for the signed download URLs
+file.signed-url.base-path = "/api/files"
+```
+
+**[plume-file-web-signed-download-jersey](plume-file-web-signed-download-jersey)**
+```hocon
+# The Cache-Control response header value for max-age, it represents the time files will be stored in cache on browsers
+file.cache.http.max-age = "365 days"
 ```
 
 Migrating guides
