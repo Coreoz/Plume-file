@@ -58,6 +58,9 @@ Those modules provide API connectors to serve and upload files.
 
 - [plume-file-web-download-jersey](plume-file-web-download-jersey): serve stored file through
   a Jersey based single web-service
+- [plume-file-web-download-jersey-common](plume-file-web-download-jersey-common): common module
+  that shares the download logic (services, configuration and helpers) between the plain and signed
+  download modules. It exposes no public `@Path` resource to avoid path collisions.
 - [plume-file-web-signed-download-jersey](plume-file-web-signed-download-jersey): serve temporary, cryptographically signed files using a Jersey based web-service. *Note: this module is designed to be a mutually exclusive replacement for plume-file-web-download-jersey to prevent bypass of signature verification.*
 - [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file using HTTP multipart
 - [plume-file-signed-url](plume-file-signed-url): pure Java service module to generate and validate HMAC-signed file URLs (does not require Jersey)
