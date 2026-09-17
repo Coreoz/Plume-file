@@ -4,7 +4,7 @@ Plume File Web Download (Jersey)
 Serve files over Jersey with optional in-memory caching. 
 This module also provides a ready-to-use JAX-RS resource to expose your files via HTTP.
 
-> **Note:** The underlying services (`FileDownloadJerseyService`, `FileDownloadConfigurationService`, etc.) have been moved to the shared module `plume-file-web-download-jersey-common` to allow reuse across plain and signed downloads. The local versions in this module have been deprecated for removal.
+> **Note:** The underlying services (`FileDownloadJerseyService`, `FileDownloadConfigurationService`, etc.) have been moved to the shared module `plume-file-web-download-jersey-common`. The local versions in this module have been deprecated for removal. The Guice modules below delegate the service wiring to the shared `-common` module and only add the plain-specific binding (`FileUrlService` → `FileDownloadUrlService`).
 
 Part of the [Plume File](../) ecosystem.
 
@@ -23,9 +23,9 @@ Add the Maven dependency:
 Quick start
 -----------
 
-1) Choose your caching strategy (pick ONE):
+1) Choose your caching strategy (pick ONE Guice module):
 
-- Without cache (simple passthrough)
+- Without cache (simple passthrough, no in-memory caching)
   ```java
   // In your ApplicationModule
   install(new GuiceFileDownloadModule());
@@ -36,6 +36,8 @@ Quick start
   // In your ApplicationModule
   install(new GuiceFileCacheDownloadModule());
   ```
+
+Both modules delegate the shared download wiring to `plume-file-web-download-jersey-common` and also bind `FileUrlService` to `FileDownloadUrlService` (which builds plain file URLs from `file.url.base-path`).
 
 2) Register the file download web service:
 

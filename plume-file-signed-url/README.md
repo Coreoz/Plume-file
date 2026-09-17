@@ -26,6 +26,7 @@ Quick start
 // In your ApplicationModule
 install(new GuiceSignedFileUrlModule());
 ```
+`GuiceSignedFileUrlModule` binds `FileUrlService` to `SignedFileUrlService`. Install it whenever you need to generate or validate signed file URLs — including outside of Jersey (e.g. for cloud storage). When you use [plume-file-web-signed-download-jersey](../plume-file-web-signed-download-jersey/), this module is installed automatically and must not be installed twice.
 
 2) Configure the cryptographic secret:
 

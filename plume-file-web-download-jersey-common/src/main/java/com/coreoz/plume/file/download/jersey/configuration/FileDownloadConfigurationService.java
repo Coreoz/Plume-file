@@ -1,5 +1,6 @@
 package com.coreoz.plume.file.download.jersey.configuration;
 
+import com.coreoz.plume.file.download.jersey.cache.FileCacheConfigurationService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -10,38 +11,67 @@ import java.time.Duration;
 @Singleton
 public class FileDownloadConfigurationService {
     private final Config config;
+    private final FileCacheConfigurationService cacheConfiguration;
 
     @Inject
-    public FileDownloadConfigurationService(Config config) {
+    public FileDownloadConfigurationService(Config config, FileCacheConfigurationService cacheConfiguration) {
         // the reference file is not located in src/main/resources/ to ensure
         // that it is not overridden by another config file when a "fat jar" is created.
         this.config = config.withFallback(
             ConfigFactory.parseResources(FileDownloadConfigurationService.class, "reference.conf")
         );
+        this.cacheConfiguration = cacheConfiguration;
+    }
+
+    /**
+     * Convenience constructor kept for manual instantiation (e.g. in tests).
+     * The {@link FileCacheConfigurationService} is created with the same configuration.
+     */
+    public FileDownloadConfigurationService(Config config) {
+        this(config, new FileCacheConfigurationService(config));
     }
 
     public Duration fileCacheControlMaxAge() {
         return config.getDuration("file.cache.http.max-age");
     }
 
+    /**
+     * @deprecated For removal in V5
+     * moved to {@link FileCacheConfigurationService}
+     */
+    @Deprecated(forRemoval = true)
     public Duration fileDataCacheExpiresAfterAccessDuration() {
-        return config.getDuration("file.cache.data.expires-after-access-duration");
-    }
-
-    public Duration fileMetadataCacheExpiresAfterAccessDuration() {
-        return config.getDuration("file.cache.metadata.expires-after-access-duration");
-    }
-
-    public long fileDataCacheMaximumSizeInBytes() {
-        return config.getBytes("file.cache.data.max-cache-size");
-    }
-
-    public long fileMetadataCacheMaximumSize() {
-        return config.getLong("file.cache.metadata.max-elements");
+        return this.cacheConfiguration.fileDataCacheExpiresAfterAccessDuration();
     }
 
     /**
-     * File URL base path used in {@link com.coreoz.plume.file.service.url.FileDownloadUrlService}
+     * @deprecated For removal in V5
+     * moved to {@link FileCacheConfigurationService}
+     */
+    @Deprecated(forRemoval = true)
+    public Duration fileMetadataCacheExpiresAfterAccessDuration() {
+        return this.cacheConfiguration.fileMetadataCacheExpiresAfterAccessDuration();
+    }
+
+    /**
+     * @deprecated For removal in V5
+     * moved to {@link FileCacheConfigurationService}
+     */
+    @Deprecated(forRemoval = true)
+    public long fileDataCacheMaximumSizeInBytes() {
+        return this.cacheConfiguration.fileDataCacheMaximumSizeInBytes();
+    }
+
+    /**
+     * @deprecated For removal in V5
+     * moved to {@link FileCacheConfigurationService}
+     */
+    @Deprecated(forRemoval = true)
+    public long fileMetadataCacheMaximumSize() {
+        return this.cacheConfiguration.fileMetadataCacheMaximumSize();
+    }
+
+    /**
      * The URL should not be padded by a '/'
      * @return the base path
      */

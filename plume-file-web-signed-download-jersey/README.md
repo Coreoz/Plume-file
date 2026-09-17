@@ -41,9 +41,18 @@ Quick start
 // In your ApplicationModule
 install(new GuiceSignedFileDownloadModule());
 ```
-*Note: Installing `GuiceSignedFileDownloadModule` automatically installs the dependency service module `GuiceSignedFileUrlModule`.*
+*Note: `GuiceSignedFileDownloadModule` only installs the signing service module `GuiceSignedFileUrlModule` (from `plume-file-signed-url`). It does **not** bind `FileDownloadJerseyService`, so you must explicitly choose which download implementation to install (see step 2).*
 
-2) Register the signed file download web service:
+2) Explicitly choose the file download implementation by installing one (and only one) of the shared download modules from `plume-file-web-download-jersey-common`:
+
+```java
+// In your ApplicationModule
+install(new GuiceFileDownloadModule());       // no in-memory cache
+// or
+install(new GuiceFileCacheDownloadModule());  // with in-memory cache
+```
+
+3) Register the signed file download web service:
 
 ```java
 // In your JerseyConfigProvider

@@ -2,18 +2,17 @@ package com.coreoz.plume.file.download.jersey;
 
 import com.coreoz.plume.file.download.jersey.cache.FileCacheService;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Optional;
 
+@Slf4j
 @Singleton
 public class FileCacheDownloadService implements FileDownloadJerseyService {
-    private static final Logger logger = LoggerFactory.getLogger(FileCacheDownloadService.class);
     private final FileCacheService fileCacheService;
 
     @Inject

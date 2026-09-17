@@ -1,6 +1,5 @@
 package com.coreoz.plume.file.download.jersey.cache;
 
-import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
 import com.coreoz.plume.file.services.FileService;
 import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.google.common.cache.CacheBuilder;
@@ -22,7 +21,7 @@ public class FileCacheServiceGuava implements FileCacheService {
     private final LoadingCache<String, Optional<FileMetadata>> fileMetadataCache;
 
     @Inject
-    public FileCacheServiceGuava(FileService fileService, FileDownloadConfigurationService configurationService) {
+    public FileCacheServiceGuava(FileService fileService, FileCacheConfigurationService configurationService) {
         this.fileDataCache = CacheBuilder.newBuilder()
             .expireAfterAccess(configurationService.fileDataCacheExpiresAfterAccessDuration())
             .maximumWeight(configurationService.fileDataCacheMaximumSizeInBytes())

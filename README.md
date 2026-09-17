@@ -60,10 +60,52 @@ Those modules provide API connectors to serve and upload files.
   a Jersey based single web-service
 - [plume-file-web-download-jersey-common](plume-file-web-download-jersey-common): common module
   that shares the download logic (services, configuration and helpers) between the plain and signed
-  download modules. It exposes no public `@Path` resource to avoid path collisions.
+  download modules. It exposes no public `@Path` resource to avoid path collisions and is pulled in
+  transitively by the two download modules — you normally do not declare it directly.
 - [plume-file-web-signed-download-jersey](plume-file-web-signed-download-jersey): serve temporary, cryptographically signed files using a Jersey based web-service. *Note: this module is designed to be a mutually exclusive replacement for plume-file-web-download-jersey to prevent bypass of signature verification.*
 - [plume-file-web-upload-jersey](plume-file-web-upload-jersey): upload file using HTTP multipart
 - [plume-file-signed-url](plume-file-signed-url): pure Java service module to generate and validate HMAC-signed file URLs (does not require Jersey)
+
+Serving files (download) — installation
+---------------------------------------
+Plume File offers two **mutually exclusive** ways to expose your files over HTTP.
+Install **one** of the two modules below (never both, otherwise you expose a non-signed endpoint
+next to a signed one and attackers can bypass the signature checks).
+
+### Plain (non-signed) download
+
+- Maven module: `plume-file-web-download-jersey`
+- Guice modules (pick **one** for the caching strategy):
+  - `GuiceFileDownloadModule` — no in-memory cache
+  - `GuiceFileCacheDownloadModule` — in-memory cache (Guava)
+- Register the resource: `config.resource(FileWs.class);`
+
+```java
+install(new GuiceFileDownloadModule());      // or GuiceFileCacheDownloadModule
+// ...
+config.resource(FileWs.class);
+```
+
+### Signed download
+
+- Maven module: `plume-file-web-signed-download-jersey`
+- Guice module: `GuiceSignedFileDownloadModule` — binds only the signing service
+  (`GuiceSignedFileUrlModule`); it does **not** choose a download implementation for you.
+- You must also explicitly pick the download implementation from `plume-file-web-download-jersey-common` (choose **one**):
+  - `GuiceFileDownloadModule` — no in-memory cache
+  - `GuiceFileCacheDownloadModule` — in-memory cache (Guava)
+- Register the resource: `config.resource(SignedFileWs.class);`
+
+```java
+install(new GuiceSignedFileDownloadModule());   // signing service
+install(new GuiceFileDownloadModule());         // or GuiceFileCacheDownloadModule
+// ...
+config.resource(SignedFileWs.class);
+```
+
+> In both cases the `plume-file-web-download-jersey-common` module is a transitive dependency;
+> you do not install it directly. Only add it as a direct dependency if you write a custom Guice
+> module (for example to plug your own `FileCacheService` implementation).
 
 Configuration and default values
 --------------------------------
