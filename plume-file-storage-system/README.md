@@ -16,3 +16,43 @@ Installation
 ```java
 install(new GuiceFileStorageSystemModule());
 ```
+
+Encryption
+----------
+Files stored on disk are **encrypted by default** using AES-GCM (authenticated encryption).
+
+A Base64 encoded AES key (16, 24 or 32 bytes once decoded, for AES-128/192/256) must be provided
+through the configuration, otherwise the application fails to start:
+```hocon
+file.storage.encryption.key = "base64-encoded-aes-key"
+```
+
+To store files **unencrypted**, encryption must be disabled explicitly:
+```hocon
+file.storage.encryption.disabled = true
+```
+
+Encryption is provided by the reusable [`plume-file-storage-encryption`](../plume-file-storage-encryption)
+module (AES-GCM decorator around the storage service), so it stays out of the core and out of the
+other storage connectors (database, GCP), which rely on their own at-rest encryption. This disk
+module simply wires that decorator by default.
+
+Each encrypted file starts with a small header (magic bytes + IV). Files that do not have this
+header are treated as legacy unencrypted files and are returned as-is, allowing encrypted and
+plain files to coexist when encryption is enabled on an existing storage.
+
+### Migrating an existing disk storage
+
+Upgrading an existing application to this version enables encryption **by default**, which has two
+consequences:
+
+1. **A key becomes mandatory.** If `file.storage.encryption.key` is not set, the application fails
+   to start (secure by default). Either provide a Base64 AES key or opt out explicitly with
+   `file.storage.encryption.disabled = true`.
+2. **Existing files do not need to be re-encrypted by hand.** Legacy plaintext files stay readable
+   thanks to the header detection, while every newly stored file is encrypted automatically.
+
+If you additionally want to encrypt the already stored files retroactively, rewrite each of them
+through the regular API (`fetch` then `add` under the same unique name). See the
+[`plume-file-storage-encryption`](../plume-file-storage-encryption) README for the detailed passive
+and active migration strategies.
