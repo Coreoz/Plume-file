@@ -4,10 +4,12 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import javax.annotation.Nonnull;
 import java.time.Duration;
 
 @Singleton
 public class SignedFileUrlConfigurationService {
+    private static final String CONFIG_PATH_SECRET_KEY = "file.signed-url.secret-key";
     private final Config config;
 
     @Inject
@@ -15,17 +17,16 @@ public class SignedFileUrlConfigurationService {
         this.config = config.withFallback(
             ConfigFactory.parseResources(SignedFileUrlConfigurationService.class, "reference.conf")
         );
-        String secret = secretKey();
-        if (secret == null || secret.trim().isEmpty()) {
+        if (!this.config.hasPath(CONFIG_PATH_SECRET_KEY)
+            || this.config.getIsNull(CONFIG_PATH_SECRET_KEY)
+            || this.config.getString(CONFIG_PATH_SECRET_KEY).trim().isEmpty()) {
             throw new IllegalStateException("The signed URL secret key 'file.signed-url.secret-key' must be configured.");
         }
     }
 
+    @Nonnull
     public String secretKey() {
-        if (!config.hasPath("file.signed-url.secret-key") || config.getIsNull("file.signed-url.secret-key")) {
-            return null;
-        }
-        return config.getString("file.signed-url.secret-key");
+        return config.getString(CONFIG_PATH_SECRET_KEY);
     }
 
     public Duration defaultValidityDuration() {

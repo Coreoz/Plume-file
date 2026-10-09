@@ -2,32 +2,33 @@ package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.download.jersey.FileDownloadJerseyService;
 import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.signed.SignatureValidationResult;
+import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.coreoz.plume.file.signed.SignedFileUrlService;
 import com.coreoz.plume.file.signed.SignedFileUrlSigner;
 import com.coreoz.plume.file.signed.configuration.SignedFileUrlConfigurationService;
-import com.coreoz.plume.file.services.metadata.FileMetadata;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SignedFileWsTest {
+class SignedFileWsTest {
 
     private SignedFileUrlService signedFileUrlService;
     private SignedFileWs signedFileWs;
     private TestFileDownloadJerseyService fileDownloadJerseyService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         Config urlConfig = ConfigFactory.parseString(
             "file.signed-url.secret-key = \"test-secret-key-1234567890-test-secret-key\"\n" +
             "file.signed-url.default-validity-duration = \"1 hour\"\n" +
@@ -35,7 +36,7 @@ public class SignedFileWsTest {
         );
         SignedFileUrlConfigurationService signedUrlConfigService = new SignedFileUrlConfigurationService(urlConfig);
         SignedFileUrlSigner signer = new SignedFileUrlSigner(signedUrlConfigService);
-        this.signedFileUrlService = new SignedFileUrlService(signer, signedUrlConfigService);
+        this.signedFileUrlService = new SignedFileUrlService(signer, signedUrlConfigService, Clock.systemUTC());
 
         Config wsConfig = ConfigFactory.parseString("file.cache.http.max-age = \"365 days\"");
         FileDownloadConfigurationService fileDownloadConfig = new FileDownloadConfigurationService(wsConfig);
@@ -49,7 +50,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_fail_with_403_if_query_params_are_missing() {
+    void fetch_should_fail_with_403_if_query_params_are_missing() {
         Response response = this.signedFileWs.fetch("some-file.pdf", null, null, false, null);
         assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
@@ -61,7 +62,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_fail_with_403_if_url_is_expired() {
+    void fetch_should_fail_with_403_if_url_is_expired() {
         String uniqueName = "123456789012345678901234567890123456.pdf"; // 36 chars UUID + extension
         long pastExpiresAt = Instant.now().minusSeconds(10).getEpochSecond();
         String expiredUrl = this.signedFileUrlService.url(uniqueName, Instant.ofEpochSecond(pastExpiresAt));
@@ -74,7 +75,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_fail_with_403_if_signature_is_invalid() {
+    void fetch_should_fail_with_403_if_signature_is_invalid() {
         String uniqueName = "123456789012345678901234567890123456.pdf";
         long expiresAt = Instant.now().plusSeconds(3600).getEpochSecond();
 
@@ -83,7 +84,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_succeed_and_return_file_data_with_headers_if_valid() {
+    void fetch_should_succeed_and_return_file_data_with_headers_if_valid() {
         String uniqueName = "123456789012345678901234567890123456.pdf";
         long expiresAt = Instant.now().plusSeconds(3600).getEpochSecond();
         String url = this.signedFileUrlService.url(uniqueName, Instant.ofEpochSecond(expiresAt));
@@ -105,7 +106,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_fail_with_404_if_file_not_found() {
+    void fetch_should_fail_with_404_if_file_not_found() {
         String uniqueName = "123456789012345678901234567890123456.pdf";
         long expiresAt = Instant.now().plusSeconds(3600).getEpochSecond();
         String url = this.signedFileUrlService.url(uniqueName, Instant.ofEpochSecond(expiresAt));
@@ -116,7 +117,7 @@ public class SignedFileWsTest {
     }
 
     @Test
-    public void fetch_should_fail_with_404_if_extension_mismatch() {
+    void fetch_should_fail_with_404_if_extension_mismatch() {
         String uniqueName = "123456789012345678901234567890123456.pdf";
         long expiresAt = Instant.now().plusSeconds(3600).getEpochSecond();
         String url = this.signedFileUrlService.url(uniqueName, Instant.ofEpochSecond(expiresAt));

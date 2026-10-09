@@ -1,9 +1,9 @@
 package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.download.jersey.FileDownloadJerseyService;
-import com.coreoz.plume.file.download.jersey.FileResponseService;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper.FileUniqueNameParsed;
 import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,8 +28,6 @@ import java.util.Optional;
 @Singleton
 @PublicApi
 public class FileWs {
-    private static final int FILE_UID_LENGTH = 36;
-
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
 
@@ -39,7 +37,6 @@ public class FileWs {
 		FileDownloadConfigurationService config
 	) {
 		this.fileDownloadService = fileDownloadService;
-
 		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
 	}
 
@@ -52,16 +49,11 @@ public class FileWs {
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		// fileUniqueName cannot be null as it is required by jersey PathParam
-		String fileExtension = FileExtensionCleaning.parseFileNameExtension(fileUniqueName);
-        String fileUid = fileUniqueName.substring(
-            0,
-            fileExtension != null
-                ? fileUniqueName.length() - fileExtension.length() - 1
-                : fileUniqueName.length()
-        );
-		if (fileUid.length() != FILE_UID_LENGTH) {
+		Optional<FileUniqueNameParsed> parsedFileUniqueName = FileResponseHelper.parseAndValidateFileUniqueName(fileUniqueName);
+		if (parsedFileUniqueName.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		String fileExtension = parsedFileUniqueName.get().fileExtension();
 
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
@@ -78,7 +70,7 @@ public class FileWs {
 				}
 
 				return this.fileDownloadService.fetchData(fileUniqueName)
-					.map(fileData -> FileResponseService.buildResponse(
+					.map(fileData -> FileResponseHelper.buildResponse(
 						fileMetadata,
 						fileData,
 						maxAgeCacheInSeconds,

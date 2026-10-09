@@ -4,13 +4,15 @@ import com.coreoz.plume.file.signed.configuration.SignedFileUrlConfigurationServ
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.junit.jupiter.api.Test;
+
+import java.time.Clock;
 import java.time.Instant;
-import java.util.Map;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class SignedFileUrlServiceTest {
+class SignedFileUrlServiceTest {
 
     private SignedFileUrlConfigurationService createConfig(String secretKey, String duration, String basePath) {
         StringBuilder configStr = new StringBuilder();
@@ -30,7 +32,7 @@ public class SignedFileUrlServiceTest {
     }
 
     @Test
-    public void config_should_fail_fast_if_secret_key_is_missing_or_blank() {
+    void config_should_fail_fast_if_secret_key_is_missing_or_blank() {
         assertThatThrownBy(() -> createConfig(null, "1 hour", "/api/files"))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("file.signed-url.secret-key");
@@ -45,7 +47,7 @@ public class SignedFileUrlServiceTest {
     }
 
     @Test
-    public void signer_should_be_deterministic_and_fail_on_invalid_signatures() {
+    void signer_should_be_deterministic_and_fail_on_invalid_signatures() {
         SignedFileUrlConfigurationService config = createConfig("my-super-secret-key-for-testing", "1 hour", "/api/files");
         SignedFileUrlSigner signer = new SignedFileUrlSigner(config);
 
@@ -69,16 +71,18 @@ public class SignedFileUrlServiceTest {
     }
 
     @Test
-    public void service_should_generate_and_validate_correctly() {
+    void service_should_generate_and_validate_correctly() {
         SignedFileUrlConfigurationService config = createConfig("my-super-secret-key-for-testing", "1 hour", "/api/files");
         SignedFileUrlSigner signer = new SignedFileUrlSigner(config);
-        SignedFileUrlService service = new SignedFileUrlService(signer, config);
+        Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneOffset.UTC);
+        SignedFileUrlService service = new SignedFileUrlService(signer, config, clock);
 
         String uniqueName = "photo.png";
         String url = service.url(uniqueName);
 
-        assertThat(url).startsWith("/api/files/photo.png?expiresAt=");
-        assertThat(url).contains("&signature=");
+        assertThat(url)
+            .startsWith("/api/files/photo.png?expiresAt=")
+            .contains("&signature=");
 
         // Parse query params from generated URL to validate
         String queryStr = url.substring(url.indexOf('?') + 1);
@@ -94,7 +98,7 @@ public class SignedFileUrlServiceTest {
             }
         }
 
-        assertThat(expiresAt).isGreaterThan(Instant.now().getEpochSecond());
+        assertThat(expiresAt).isGreaterThan(clock.instant().getEpochSecond());
         assertThat(signature).isNotNull();
 
         // Validate should return VALID
@@ -106,7 +110,7 @@ public class SignedFileUrlServiceTest {
         assertThat(service.validate(uniqueName, expiresAt, signature + "tampered")).isEqualTo(SignatureValidationResult.INVALID_SIGNATURE);
 
         // Expired URL
-        long pastExpiresAt = Instant.now().minusSeconds(10).getEpochSecond();
+        long pastExpiresAt = clock.instant().minusSeconds(10).getEpochSecond();
         String expiredSignature = signer.sign(uniqueName, pastExpiresAt);
         assertThat(service.validate(uniqueName, pastExpiresAt, expiredSignature)).isEqualTo(SignatureValidationResult.EXPIRED);
     }

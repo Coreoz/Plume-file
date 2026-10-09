@@ -1,16 +1,15 @@
 package com.coreoz.plume.file.webservices;
 
 import com.coreoz.plume.file.download.jersey.FileDownloadJerseyService;
-import com.coreoz.plume.file.download.jersey.FileResponseService;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper.FileUniqueNameParsed;
 import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
 import com.coreoz.plume.file.signed.SignatureValidationResult;
 import com.coreoz.plume.file.signed.SignedFileUrlService;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.DefaultValue;
@@ -22,16 +21,17 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Path("/files")
 @Tag(name = "files", description = "Serve binary resources")
 @Singleton
 @PublicApi
 public class SignedFileWs {
-    private static final int FILE_UID_LENGTH = 36;
-
 	private final FileDownloadJerseyService fileDownloadService;
 	private final SignedFileUrlService signedFileUrlService;
 	private final long maxAgeCacheInSeconds;
@@ -64,20 +64,16 @@ public class SignedFileWs {
 
 		SignatureValidationResult validationResult = this.signedFileUrlService.validate(fileUniqueName, expiresAt, signature);
 		if (validationResult != SignatureValidationResult.VALID) {
+			logger.warn("Rejecting access to file '{}': signature validation failed with result {}", fileUniqueName, validationResult);
 			return Response.status(Status.FORBIDDEN).build();
 		}
 
 		// fileUniqueName cannot be null as it is required by jersey PathParam
-		String fileExtension = FileExtensionCleaning.parseFileNameExtension(fileUniqueName);
-        String fileUid = fileUniqueName.substring(
-            0,
-            fileExtension != null
-                ? fileUniqueName.length() - fileExtension.length() - 1
-                : fileUniqueName.length()
-        );
-		if (fileUid.length() != FILE_UID_LENGTH) {
+		Optional<FileUniqueNameParsed> parsedFileUniqueName = FileResponseHelper.parseAndValidateFileUniqueName(fileUniqueName);
+		if (parsedFileUniqueName.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		String fileExtension = parsedFileUniqueName.get().fileExtension();
 
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
@@ -94,7 +90,7 @@ public class SignedFileWs {
 				}
 
 				return this.fileDownloadService.fetchData(fileUniqueName)
-					.map(fileData -> FileResponseService.buildResponse(
+					.map(fileData -> FileResponseHelper.buildResponse(
 						fileMetadata,
 						fileData,
 						maxAgeCacheInSeconds,
