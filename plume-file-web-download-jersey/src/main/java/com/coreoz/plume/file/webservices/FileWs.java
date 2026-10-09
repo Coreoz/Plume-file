@@ -1,11 +1,10 @@
 package com.coreoz.plume.file.webservices;
 
-import com.coreoz.plume.file.service.FileDownloadJerseyService;
-import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
-import com.coreoz.plume.file.cleaning.FileExtensionCleaning;
-import com.coreoz.plume.file.cleaning.FileNameCleaning;
+import com.coreoz.plume.file.download.jersey.FileDownloadJerseyService;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper;
+import com.coreoz.plume.file.download.jersey.FileResponseHelper.FileUniqueNameParsed;
+import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
 import com.coreoz.plume.jersey.security.permission.PublicApi;
-import com.google.common.net.UrlEscapers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +19,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,8 +28,6 @@ import java.util.Optional;
 @Singleton
 @PublicApi
 public class FileWs {
-    private static final int FILE_UID_LENGTH = 36;
-
 	private final FileDownloadJerseyService fileDownloadService;
 	private final long maxAgeCacheInSeconds;
 
@@ -41,7 +37,6 @@ public class FileWs {
 		FileDownloadConfigurationService config
 	) {
 		this.fileDownloadService = fileDownloadService;
-
 		this.maxAgeCacheInSeconds = config.fileCacheControlMaxAge().getSeconds();
 	}
 
@@ -54,14 +49,11 @@ public class FileWs {
 		@HeaderParam(HttpHeaders.IF_NONE_MATCH) String ifNoneMatchHeader
 	) {
 		// fileUniqueName cannot be null as it is required by jersey PathParam
-		String fileExtension = FileExtensionCleaning.parseFileNameExtension(fileUniqueName);
-		String fileUid = fileUniqueName.substring(
-			0,
-			fileUniqueName.length() - (fileExtension != null ? fileExtension.length() : 0) - 1
-		);
-		if (fileUid.length() != FILE_UID_LENGTH) {
+		Optional<FileUniqueNameParsed> parsedFileUniqueName = FileResponseHelper.parseAndValidateFileUniqueName(fileUniqueName);
+		if (parsedFileUniqueName.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		String fileExtension = parsedFileUniqueName.get().fileExtension();
 
 		return this.fileDownloadService
 			.fetchMetadata(fileUniqueName)
@@ -78,38 +70,12 @@ public class FileWs {
 				}
 
 				return this.fileDownloadService.fetchData(fileUniqueName)
-					.map(fileData -> {
-						ResponseBuilder response = Response.ok(fileData);
-
-						// Adding checksum in etag to enable client basic caching
-						if (fileMetadata.getChecksum() != null) {
-							response.header(HttpHeaders.ETAG, fileMetadata.getChecksum());
-						}
-
-						if (fileMetadata.getMimeType() != null) {
-							response.header(HttpHeaders.CONTENT_TYPE, fileMetadata.getMimeType());
-						}
-
-						if(maxAgeCacheInSeconds > 0) {
-							response.header(
-								HttpHeaders.CACHE_CONTROL,
-								"public, max-age=" + maxAgeCacheInSeconds
-							);
-						}
-						if (attachment) {
-                            String attachmentFilename = Optional.ofNullable(fileMetadata.getFileOriginalName())
-                                .orElse(fileMetadata.getUniqueName());
-							String utf8FileName = UrlEscapers.urlFragmentEscaper().escape(attachmentFilename);
-							String sanitizedFileName = FileNameCleaning.cleanFileName(attachmentFilename);
-                            response
-                                .header(
-									HttpHeaders.CONTENT_DISPOSITION,
-									"attachment; filename=\"" + sanitizedFileName
-										+ "\"; filename*=UTF-8''" + utf8FileName
-								);
-                        }
-						return response.build();
-					});
+					.map(fileData -> FileResponseHelper.buildResponse(
+						fileMetadata,
+						fileData,
+						maxAgeCacheInSeconds,
+						attachment
+					));
 			})
 			.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
