@@ -1,7 +1,7 @@
 Plume File Storage Encryption
 =============================
 
-A [Plume File](../) module providing a reusable, **storage-agnostic** encryption layer for any
+A [Plume File](..) module providing a reusable, **storage-agnostic** encryption layer for any
 `FileStorageService` implementation.
 
 It is used **by default** by [`plume-file-storage-system`](../plume-file-storage-system) (disk
@@ -13,10 +13,13 @@ Components
 - `FileEncryptionService`: the **extension point** (interface). It defines the encryption strategy
   as two streaming operations, `encryptStream` and `decryptStream`.
 - `AesGcmFileEncryptionService`: the **default implementation**, using AES-GCM (authenticated
-  encryption). Each encrypted file starts with a small header (4 magic bytes `PFE1` + a random
-  12 bytes IV), followed by the GCM ciphertext and its authentication tag. Streams that do not
-  start with this header are treated as legacy unencrypted files and returned as-is, so encrypted
-  and plain files can coexist (useful when enabling encryption on an existing storage).
+  encryption). Each encrypted file starts with a small header (3 magic bytes `PFE` + a 1 byte
+  format version + a random 12 bytes IV), followed by the GCM ciphertext and its authentication
+  tag. The file unique name and the format version are bound to the ciphertext as GCM
+  *Additional Authenticated Data* (AAD), so a file cannot be swapped for another one encrypted
+  with the same key. Streams that do not start with this header are treated as legacy unencrypted
+  files and returned as-is, so encrypted and plain files can coexist (useful when enabling
+  encryption on an existing storage).
 - `EncryptingFileStorageService`: a `FileStorageService` **decorator** that encrypts data on `add`
   and decrypts it on `fetch`, delegating the actual storage to the wrapped `FileStorageService`.
 
@@ -56,8 +59,12 @@ Behaviour and guarantees
 - **Metadata transparency**: when used through the Plume File core, the checksum and the file size
   are computed on the **plaintext** before storage, so they stay stable regardless of the key. The
   bytes physically written on disk are larger than the plaintext (header + IV + GCM tag).
+- **Integrity binding**: the file unique name is authenticated as AAD, so moving or substituting an
+  encrypted file under a different name is detected and fails decryption.
+- **Format versioning**: a version byte in the header allows the on-disk format to evolve later
+  (algorithm change, key rotation, ...) while keeping the ability to read older files.
 - **Backward compatibility**: `AesGcmFileEncryptionService` can still read files that were stored
-  before encryption was enabled, because it detects the `PFE1` header.
+  before encryption was enabled, because it detects the `PFE` header.
 
 Providing a custom encryption strategy
 --------------------------------------
@@ -69,10 +76,10 @@ encryption, etc.
 ```java
 public class MyFileEncryptionService implements FileEncryptionService {
     @Override
-    public InputStream encryptStream(InputStream plainData) throws IOException { /* ... */ }
+    public InputStream encryptStream(InputStream plainData, String fileUniqueName) throws IOException { /* ... */ }
 
     @Override
-    public InputStream decryptStream(InputStream storedData) { /* ... */ }
+    public InputStream decryptStream(InputStream storedData, String fileUniqueName) { /* ... */ }
 }
 ```
 
@@ -83,6 +90,8 @@ Guidelines for custom implementations:
   the stream (as the default implementation does) and return unknown streams unchanged in
   `decryptStream`.
 - Prefer **authenticated encryption** so that tampering or a wrong key fails loudly.
+- Consider binding the `fileUniqueName` to the ciphertext (for instance as AAD, as the default
+  implementation does) to prevent file substitution.
 
 To use a custom strategy with the disk storage module, override the `FileEncryptionService` binding
 in your dependency injection configuration; the `EncryptingFileStorageService` decorator will then
@@ -90,7 +99,7 @@ use it transparently.
 
 Migrating an existing storage to encryption
 -------------------------------------------
-**You never have to encrypt existing files by hand.** Thanks to the `PFE1` format marker, encrypted
+**You never have to encrypt existing files by hand.** Thanks to the `PFE` format marker, encrypted
 and plain files coexist: on `fetch`, a file that starts with the marker is decrypted, while a file
 that does not is considered a legacy plaintext file and returned unchanged.
 

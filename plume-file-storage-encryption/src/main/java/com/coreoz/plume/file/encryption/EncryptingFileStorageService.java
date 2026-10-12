@@ -29,12 +29,13 @@ public class EncryptingFileStorageService implements FileStorageService {
 
     @Override
     public void add(String fileUniqueName, InputStream fileData) throws IOException {
-        delegate.add(fileUniqueName, encryptionService.encryptStream(fileData));
+        delegate.add(fileUniqueName, encryptionService.encryptStream(fileData, fileUniqueName));
     }
 
     @Override
     public Optional<InputStream> fetch(String fileUniqueName) {
-        return delegate.fetch(fileUniqueName).map(encryptionService::decryptStream);
+        return delegate.fetch(fileUniqueName)
+            .map(storedData -> encryptionService.decryptStream(storedData, fileUniqueName));
     }
 
     @Override
