@@ -42,8 +42,10 @@ FileStorageService encryptedStorage = new EncryptingFileStorageService(delegateS
 
 Key management rules
 --------------------
-- The AES key must be **16, 24 or 32 bytes** long once decoded (AES-128/192/256). Any other length
-  is rejected with an `IllegalArgumentException` at construction time.
+- The AES key must be **exactly 32 bytes** long once decoded (AES-256). Any other length, and in
+  particular any shorter key, is rejected with an `IllegalArgumentException` at construction time.
+- The key must be **randomly generated** (do not derive it from a password or any predictable value),
+  for example with `openssl rand -base64 32`.
 - The key must be **externalized** (environment variable, secrets manager, KMS/HSM) and
   **never hard-coded** nor committed to the repository.
 - The same key must be used for reading and writing a given file: AES-GCM is authenticated, so a

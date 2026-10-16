@@ -42,6 +42,7 @@ import java.util.Base64;
 public class AesGcmFileEncryptionService implements FileEncryptionService {
     private static final byte[] MAGIC = {'P', 'F', 'E'};
     private static final byte FORMAT_VERSION = 1;
+    private static final int AES_KEY_LENGTH = 32;
     private static final int IV_LENGTH = 12;
     private static final int GCM_TAG_BITS = 128;
     private static final int HEADER_LENGTH = MAGIC.length + 1 + IV_LENGTH;
@@ -51,7 +52,7 @@ public class AesGcmFileEncryptionService implements FileEncryptionService {
     private final SecureRandom secureRandom = new SecureRandom();
 
     /**
-     * @param key the raw AES key bytes (16, 24 or 32 bytes for AES-128/192/256)
+     * @param key the raw AES key bytes (exactly 32 bytes, i.e. AES-256)
      */
     public AesGcmFileEncryptionService(byte[] key) {
         validateKeyLength(key);
@@ -61,18 +62,18 @@ public class AesGcmFileEncryptionService implements FileEncryptionService {
     /**
      * Build an {@link AesGcmFileEncryptionService} from a Base64 encoded AES key.
      *
-     * @param base64Key the Base64 encoded AES key (16, 24 or 32 bytes once decoded)
-     * @throws IllegalArgumentException if the value is not valid Base64 or if the decoded key does
-     * not have a valid AES length
+     * @param base64Key the Base64 encoded AES key (exactly 32 bytes once decoded)
+     * @throws IllegalArgumentException if the value is not valid Base64 or if the decoded key is
+     * not exactly 32 bytes long
      */
     public static AesGcmFileEncryptionService fromBase64Key(String base64Key) {
         return new AesGcmFileEncryptionService(Base64.getDecoder().decode(base64Key));
     }
 
     private static void validateKeyLength(byte[] key) {
-        if (key == null || (key.length != 16 && key.length != 24 && key.length != 32)) {
+        if (key == null || key.length != AES_KEY_LENGTH) {
             throw new IllegalArgumentException(
-                "Invalid AES key length: expected 16, 24 or 32 bytes (AES-128/192/256) but got "
+                "Invalid AES key length: expected " + AES_KEY_LENGTH + " bytes (AES-256) but got "
                 + (key == null ? "null" : key.length + " bytes")
             );
         }

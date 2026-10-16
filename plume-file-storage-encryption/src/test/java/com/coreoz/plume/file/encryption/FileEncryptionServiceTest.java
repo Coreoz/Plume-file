@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,39 @@ class FileEncryptionServiceTest {
         byte[] key = new byte[32];
         new SecureRandom().nextBytes(key);
         return new AesGcmFileEncryptionService(key);
+    }
+
+    @Test
+    void constructor_must_reject_a_key_that_is_not_exactly_32_bytes() {
+        // shorter keys (AES-128/192) and longer keys must all be rejected
+        assertThatThrownBy(() -> new AesGcmFileEncryptionService(new byte[16]))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
+        assertThatThrownBy(() -> new AesGcmFileEncryptionService(new byte[24]))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
+        assertThatThrownBy(() -> new AesGcmFileEncryptionService(new byte[31]))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
+        assertThatThrownBy(() -> new AesGcmFileEncryptionService(new byte[33]))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
+    }
+
+    @Test
+    void constructor_must_reject_a_null_key() {
+        assertThatThrownBy(() -> new AesGcmFileEncryptionService(null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
+    }
+
+    @Test
+    void fromBase64Key_must_reject_a_key_that_is_not_exactly_32_bytes() {
+        String shortBase64Key = Base64.getEncoder().encodeToString(new byte[16]);
+
+        assertThatThrownBy(() -> AesGcmFileEncryptionService.fromBase64Key(shortBase64Key))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("32 bytes");
     }
 
     @Test

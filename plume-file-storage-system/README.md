@@ -21,11 +21,18 @@ Encryption
 ----------
 Files stored on disk are **encrypted by default** using AES-GCM (authenticated encryption).
 
-A Base64 encoded AES key (16, 24 or 32 bytes once decoded, for AES-128/192/256) must be provided
+A Base64 encoded AES-256 key (exactly 32 bytes once decoded) must be provided
 through the configuration, otherwise the application fails to start:
 ```hocon
 file.storage.encryption.key = "base64-encoded-aes-key"
 ```
+
+The key **must be randomly generated and kept secret**, for example with OpenSSL:
+```shell
+openssl rand -base64 32
+```
+Any key that is not exactly 32 bytes long (in particular any shorter key) is rejected at startup:
+it is pointless to accept a weak key that would not provide the expected security level.
 
 To store files **unencrypted**, encryption must be disabled explicitly:
 ```hocon
@@ -47,8 +54,8 @@ Upgrading an existing application to this version enables encryption **by defaul
 consequences:
 
 1. **A key becomes mandatory.** If `file.storage.encryption.key` is not set, the application fails
-   to start (secure by default). Either provide a Base64 AES key or opt out explicitly with
-   `file.storage.encryption.disabled = true`.
+   to start (secure by default). Either provide a Base64 AES-256 key (32 bytes) or opt out explicitly
+   with `file.storage.encryption.disabled = true`.
 2. **Existing files do not need to be re-encrypted by hand.** Legacy plaintext files stay readable
    thanks to the header detection, while every newly stored file is encrypted automatically.
 

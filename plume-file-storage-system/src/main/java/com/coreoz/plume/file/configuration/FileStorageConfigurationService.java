@@ -33,7 +33,8 @@ public class FileStorageConfigurationService {
     }
 
     /**
-     * The optional Base64 encoded AES key used to encrypt the files stored on disk.
+     * The optional Base64 encoded AES-256 key (exactly 32 bytes once decoded) used to encrypt
+     * the files stored on disk.
      */
     public Optional<String> encryptionKeyBase64() {
         return config.hasPath("file.storage.encryption.key")

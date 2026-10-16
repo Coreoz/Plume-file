@@ -34,7 +34,7 @@ public class GuiceFileStorageSystemModule extends AbstractModule {
         }
         String keyBase64 = configurationService.encryptionKeyBase64().orElseThrow(() -> new IllegalStateException(
             "File storage encryption is enabled but no encryption key is configured. "
-            + "Set 'file.storage.encryption.key' (Base64 encoded AES key) "
+            + "Set 'file.storage.encryption.key' (Base64 encoded AES-256 key, 32 bytes) "
             + "or disable encryption with 'file.storage.encryption.disabled = true'."
         ));
         FileEncryptionService encryptionService = AesGcmFileEncryptionService.fromBase64Key(keyBase64);

@@ -51,11 +51,13 @@ in `plume-file-web-download-jersey`, not removed. No SQL database migration is r
 A new reusable module `plume-file-storage-encryption` adds an AES-GCM encryption layer, and the
 disk storage module `plume-file-storage-system` now **encrypts files by default**.
 
-**Breaking change for the disk storage:** a Base64 encoded AES key (16, 24 or 32 bytes once decoded)
+**Breaking change for the disk storage:** a Base64 encoded AES-256 key (exactly 32 bytes once decoded)
 must now be provided, otherwise the application fails to start:
 ```hocon
 file.storage.encryption.key = "base64-encoded-aes-key"
 ```
+The key must be randomly generated and kept secret, for example with `openssl rand -base64 32`.
+Any key that is not exactly 32 bytes long (in particular any shorter key) is rejected at startup.
 To keep storing files unencrypted, encryption must be disabled explicitly:
 ```hocon
 file.storage.encryption.disabled = true
