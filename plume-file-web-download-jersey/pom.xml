@@ -27,6 +27,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-web-download-jersey-common</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
 			<artifactId>plume-file-core</artifactId>
 		</dependency>
 

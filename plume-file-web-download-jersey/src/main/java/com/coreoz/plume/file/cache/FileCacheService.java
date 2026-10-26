@@ -1,12 +1,9 @@
 package com.coreoz.plume.file.cache;
 
-import com.coreoz.plume.file.services.metadata.FileMetadata;
-
-import java.util.Optional;
-
-public interface FileCacheService {
-	Optional<byte[]> fetchFileData(String fileUniqueName);
-
-	Optional<FileMetadata> fetchFileMetadata(String fileUniqueName);
-
+/**
+ * @deprecated For removal in V5
+ * Call {@link com.coreoz.plume.file.download.jersey.cache.FileCacheService} instead
+ */
+@Deprecated(forRemoval = true)
+public interface FileCacheService extends com.coreoz.plume.file.download.jersey.cache.FileCacheService {
 }

@@ -56,10 +56,14 @@
 
 	<modules>
 		<module>plume-file-core</module>
+		<module>plume-file-signed-url</module>
+		<module>plume-file-web-download-jersey-common</module>
+		<module>plume-file-web-signed-download-jersey</module>
 		<module>plume-file-web-download-jersey</module>
 		<module>plume-file-web-upload-jersey</module>
 		<module>plume-file-storage-database</module>
 		<module>plume-file-storage-system</module>
+		<module>plume-file-storage-encryption</module>
 		<module>plume-file-metadata-database</module>
 		<module>plume-file-storage-gcp</module>
 	</modules>
@@ -155,6 +159,26 @@
 			<dependency>
 				<groupId>com.coreoz</groupId>
 				<artifactId>plume-file-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-signed-url</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-web-download-jersey-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-web-signed-download-jersey</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-file-storage-encryption</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>

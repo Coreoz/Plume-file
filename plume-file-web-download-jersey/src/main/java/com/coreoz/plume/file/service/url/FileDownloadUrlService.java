@@ -1,6 +1,6 @@
 package com.coreoz.plume.file.service.url;
 
-import com.coreoz.plume.file.service.configuration.FileDownloadConfigurationService;
+import com.coreoz.plume.file.download.jersey.configuration.FileDownloadConfigurationService;
 import com.coreoz.plume.file.services.url.FileUrlService;
 
 import jakarta.inject.Inject;
