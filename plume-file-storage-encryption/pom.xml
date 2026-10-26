@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.coreoz</groupId>
+		<artifactId>plume-file-parent</artifactId>
+		<version>4.1.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>plume-file-storage-encryption</artifactId>
+	<packaging>jar</packaging>
+	<name>Plume File Storage Encryption</name>
+	<description>Plume File reusable AES-GCM encryption decorator for any FileStorageService implementation</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>plume-db-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.coreoz</groupId>
+				<artifactId>plume-framework-dependencies</artifactId>
+				<version>${plume-framework-dependencies.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

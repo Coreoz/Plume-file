@@ -32,6 +32,11 @@
 
 		<dependency>
 			<groupId>com.coreoz</groupId>
+			<artifactId>plume-file-storage-encryption</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.coreoz</groupId>
 			<artifactId>plume-conf</artifactId>
 		</dependency>
 
